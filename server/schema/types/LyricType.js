@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const graphql = require('graphql');
+const mongoose = require("mongoose");
+const graphql = require("graphql");
 const {
   GraphQLObjectType,
   GraphQLList,
@@ -7,21 +7,22 @@ const {
   GraphQLInt,
   GraphQLString
 } = graphql;
-const Lyric = mongoose.model('lyric');
+const Lyric = mongoose.model("lyric");
 
 const LyricType = new GraphQLObjectType({
-  name:  'LyricType',
+  name: "LyricType",
   fields: () => ({
     id: { type: GraphQLID },
     likes: { type: GraphQLInt },
     content: { type: GraphQLString },
     song: {
-      type: require('./song_type'),
+      type: require("./SongType"),
       resolve(parentValue) {
-        return Lyric.findById(parentValue).populate('song')
+        return Lyric.findById(parentValue)
+          .populate("song")
           .then(lyric => {
-            console.log(lyric)
-            return lyric.song
+            console.log(lyric);
+            return lyric.song;
           });
       }
     }
