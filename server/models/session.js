@@ -10,31 +10,30 @@ const SessionSchema = new Schema({
   },
   sessions: [
     {
-      type: Date,
+      type: Schema.Types.ObjectId,
       ref: "session"
     }
   ]
 });
 
-ExerciseSchema.statics.addSession = function(id, content) {
-  //  TODO: uncomment once session schema has been created
-  const Session = mongoose.model("session");
+SessionSchema.statics.addExercise = function(id, content) {
+  const Exercise = mongoose.model("exercise");
 
-  return this.findById(id).then(exercise => {
+  return this.findById(id).then(session => {
     // FIXME: not sure this is really what I want,
-    //  - will return entire Session object?
-    const session = new Session({ content, exercise });
+    //  - will return entire Exercise object?
+    const exercise = new Exercise({ content, session });
     exercise.sessions.push(session);
-    return Promise.all([session.save(), exercise.save()]).then(
-      ([session, exercise]) => exercise
+    return Promise.all([exercise.save(), session.save()]).then(
+      ([exercise, session]) => session
     );
   });
 };
 
-ExerciseSchema.statics.findSessions = function(id) {
+SessionSchema.statics.findExercises = function(id) {
   return this.findById(id)
-    .populate("sessions")
-    .then(exercise => exercise.sessions);
+    .populate("exercises")
+    .then(session => session.exercises);
 };
 
-mongoose.model("exercise", ExerciseSchema);
+mongoose.model("session", SessionSchema);

@@ -18,7 +18,6 @@ const ExerciseSchema = new Schema({
 });
 
 ExerciseSchema.statics.addSession = function(id, content) {
-  //  TODO: uncomment once session schema has been created
   const Session = mongoose.model("session");
 
   return this.findById(id).then(exercise => {
