@@ -2,35 +2,48 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const SessionSchema = new Schema({
-  title: { type: String },
-  date: { type: Date, default: Date.now },
-  exercises: {
+  definition: {
     type: Schema.Types.ObjectId,
-    ref: "exercise"
+    ref: "sessionDefinition"
   },
-  sessions: [
+  date: { type: Date, default: Date.now },
+  exercises: [
     {
       type: Schema.Types.ObjectId,
-      ref: "session"
+      ref: "exercise"
     }
   ]
 });
 
-SessionSchema.statics.addExercise = function(id, content) {
-  const Exercise = mongoose.model("exercise");
+SessionSchema.statics.addExercise = function(id, definitionId) {
+  const Exercise = mongoose.model("exercise").findById(exerciseId);
 
+  // Create empty Exercise
   return this.findById(id).then(session => {
-    // FIXME: not sure this is really what I want,
-    //  - will return entire Exercise object?
-    const exercise = new Exercise({ content, session });
-    exercise.sessions.push(session);
-    return Promise.all([exercise.save(), session.save()]).then(
-      ([exercise, session]) => session
+    const exercise = new Exercise({
+      definition: definitionId,
+      session: session.id,
+      sets: [],
+      netValue: 0.0,
+      weightChange: {
+        delta: null,
+        sign: ""
+      }
+    });
+    session.exercises.push(exercise);
+    return Promise.all([session.save(), exercise.save()]).then(
+      ([session, exercise]) => exercise
     );
   });
 };
 
-SessionSchema.statics.findExercises = function(id) {
+SessionSchema.statics.getDefinition = function(id) {
+  return this.findById(id)
+    .populate("definition")
+    .then(session => session.definition);
+};
+
+SessionSchema.statics.getExercises = function(id) {
   return this.findById(id)
     .populate("exercises")
     .then(session => session.exercises);

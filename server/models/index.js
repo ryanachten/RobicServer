@@ -5,6 +5,7 @@ mongoose.plugin(schema => {
 });
 
 require("./sessionDefinition");
+require("./session");
 
 // TODO: delete following imports
 require("./song");

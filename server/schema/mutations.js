@@ -4,7 +4,12 @@ const mongoose = require("mongoose");
 const Song = mongoose.model("song");
 const Lyric = mongoose.model("lyric");
 const SessionDefinition = mongoose.model("sessionDefinition");
-const { SongType, LyricType, SessionDefinitionType } = require("./types");
+const {
+  SongType,
+  LyricType,
+  SessionDefinitionType,
+  SessionType
+} = require("./types");
 
 const mutation = new GraphQLObjectType({
   name: "Mutation",
@@ -16,6 +21,16 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parentValue, { title }) {
         return new SessionDefinition({ title }).save();
+      }
+    },
+
+    addSession: {
+      type: SessionType,
+      args: {
+        definitionId: { type: GraphQLID }
+      },
+      resolve(parentValue, { definitionId }) {
+        return SessionDefinition.addNewSession(definitionId);
       }
     },
 

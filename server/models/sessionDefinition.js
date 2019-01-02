@@ -19,12 +19,13 @@ const SessionDefinitionSchema = new Schema({
   ]
 });
 
-SessionDefinitionSchema.statics.addNewSession = function(id) {
+SessionDefinitionSchema.statics.addNewSession = function(definitionId) {
   const Session = mongoose.model("session");
 
-  return this.findById(id).then(sessionDef => {
+  return this.findById(definitionId).then(sessionDef => {
     const activeSession = new Session({
-      date: Date.now()
+      date: Date.now(),
+      definition: sessionDef
       // TODO: add exercises based of latest history object
     });
     // Add the active session to the history log
