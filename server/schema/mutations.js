@@ -3,11 +3,23 @@ const { GraphQLObjectType, GraphQLString, GraphQLID } = graphql;
 const mongoose = require("mongoose");
 const Song = mongoose.model("song");
 const Lyric = mongoose.model("lyric");
-const { SongType, LyricType } = require("./types");
+const SessionDefinition = mongoose.model("sessionDefinition");
+const { SongType, LyricType, SessionDefinitionType } = require("./types");
 
 const mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
+    addSessionDefinition: {
+      type: SessionDefinitionType,
+      args: {
+        title: { type: GraphQLString }
+      },
+      resolve(parentValue, { title }) {
+        return new SessionDefinition({ title }).save();
+      }
+    },
+
+    // TODO: delete following
     addSong: {
       type: SongType,
       args: {
