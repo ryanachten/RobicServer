@@ -77,7 +77,8 @@ UserSchema.statics.login = async ({ password, email }) => {
   // Create signed JSON web token
   const token = jwt.sign(
     {
-      user: _.pick(locatedUser, ["id", "firstName", "lastName", "email"])
+      // At this stage, only include user ID in token to minimise decodable information in token
+      user: _.pick(locatedUser, ["id"])
     },
     JWT_PASSWORD_SECRET,
     {

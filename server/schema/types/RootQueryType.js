@@ -16,12 +16,24 @@ const Song = mongoose.model("song");
 
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
+
   fields: () => ({
     user: {
       type: UserType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(parentValue, { id }) {
         return User.findById(id);
+      }
+    },
+
+    getUser: {
+      type: UserType,
+      // FIXME: Example of how the user object can be accessed via GQL context (third param) - remove later
+      resolve(parentValue, { id }, { user }) {
+        if (!user) {
+          throw new Error("User not logged in");
+        }
+        return User.findById(user.id);
       }
     },
 

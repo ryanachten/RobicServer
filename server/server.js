@@ -1,15 +1,17 @@
-const express = require("express");
-const models = require("./models");
-const expressGraphQL = require("express-graphql");
-const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const express = require("express");
+const expressGraphQL = require("express-graphql");
+const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
+
+const models = require("./models");
 const schema = require("./schema/schema");
 
 require("dotenv").config();
 
 const app = express();
 
-// Replace with your mongoLab URI
+/*** MongoLab configuration ***/
 const MONGO_URI = process.env.MONGOLAB_URI;
 if (!MONGO_URI) {
   throw new Error("You must provide a MongoLab URI");
@@ -26,14 +28,39 @@ mongoose.connection
 
 app.use(bodyParser.json());
 
+// TODO: add CORS middleware here
+
+/*** JWT verification middleware ***/
+const JWT_PASSWORD_SECRET = process.env.JWT_PASSWORD_SECRET;
+const verifyJwtToken = async req => {
+  // Access token off client request header
+  const token = req.headers.authorization;
+  try {
+    // Verify user using JWT secret
+    const { user } = await jwt.verify(token, JWT_PASSWORD_SECRET);
+    // Add the user to the request for parsing in the GQL middleware
+    req.user = user;
+  } catch (err) {
+    console.log(err);
+  }
+  req.next();
+};
+app.use(verifyJwtToken);
+
+/*** GraphQL middleware ***/
 app.use(
   "/graphql",
-  expressGraphQL({
+  expressGraphQL(req => ({
     schema,
-    graphiql: true
-  })
+    graphiql: true,
+    context: {
+      // Add authed user object to GQL context
+      user: req.user
+    }
+  }))
 );
 
+/*** Webpack middleware ***/
 const webpackMiddleware = require("webpack-dev-middleware");
 const webpack = require("webpack");
 const webpackConfig = require("../webpack.config.js");
