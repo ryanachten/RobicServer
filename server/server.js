@@ -25,6 +25,7 @@ mongoose.connection
   .on("error", error => console.log("Error connecting to MongoLab:", error));
 
 app.use(bodyParser.json());
+
 app.use(
   "/graphql",
   expressGraphQL({

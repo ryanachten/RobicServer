@@ -16,7 +16,7 @@ const {
 const mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    addUser: {
+    registerUser: {
       type: UserType,
       args: {
         firstName: { type: GraphQLString },
@@ -25,12 +25,18 @@ const mutation = new GraphQLObjectType({
         email: { type: GraphQLString }
       },
       resolve(parentValue, { firstName, lastName, password, email }) {
-        return new User({
-          firstName,
-          lastName,
-          password,
-          email
-        }).save();
+        return User.register({ firstName, lastName, password, email });
+      }
+    },
+
+    loginUser: {
+      type: GraphQLString,
+      args: {
+        password: { type: GraphQLString },
+        email: { type: GraphQLString }
+      },
+      resolve(parentValue, { password, email }) {
+        return User.login({ password, email });
       }
     },
 
