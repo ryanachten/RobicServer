@@ -3,17 +3,28 @@ const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 const SessionDefinitionType = require("./SessionDefinitionType");
 const SessionType = require("./SessionType");
+const UserType = require("./UserType");
+
 const SongType = require("./SongType");
 const LyricType = require("./LyricType");
 
 const SessionDefinition = mongoose.model("sessionDefinition");
 const Session = mongoose.model("session");
+const User = mongoose.model("user");
 const Lyric = mongoose.model("lyric");
 const Song = mongoose.model("song");
 
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: () => ({
+    user: {
+      type: UserType,
+      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+      resolve(parentValue, { id }) {
+        return User.findById(id);
+      }
+    },
+
     sessionDefinitions: {
       type: new GraphQLList(SessionDefinitionType),
       resolve() {

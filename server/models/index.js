@@ -4,6 +4,7 @@ mongoose.plugin(schema => {
   schema.options.usePushEach = true;
 });
 
+require("./user");
 require("./sessionDefinition");
 require("./session");
 

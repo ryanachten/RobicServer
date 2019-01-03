@@ -1,19 +1,39 @@
 const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLString, GraphQLID } = graphql;
 const mongoose = require("mongoose");
+const User = mongoose.model("user");
 const Song = mongoose.model("song");
 const Lyric = mongoose.model("lyric");
 const SessionDefinition = mongoose.model("sessionDefinition");
 const {
-  SongType,
-  LyricType,
   SessionDefinitionType,
-  SessionType
+  SessionType,
+  UserType,
+  SongType,
+  LyricType
 } = require("./types");
 
 const mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
+    addUser: {
+      type: UserType,
+      args: {
+        firstName: { type: GraphQLString },
+        lastName: { type: GraphQLString },
+        password: { type: GraphQLString },
+        email: { type: GraphQLString }
+      },
+      resolve(parentValue, { firstName, lastName, password, email }) {
+        return new User({
+          firstName,
+          lastName,
+          password,
+          email
+        }).save();
+      }
+    },
+
     addSessionDefinition: {
       type: SessionDefinitionType,
       args: {
