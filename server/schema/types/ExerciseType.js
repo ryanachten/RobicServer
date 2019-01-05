@@ -8,8 +8,6 @@ const {
   GraphQLInt,
   GraphQLFloat
 } = graphql;
-// const ExerciseType = require("./ExerciseType");
-// const SessionDefinitionType = require("./SessionDefinitionType");
 const Exercise = mongoose.model("exercise");
 
 const SetType = new GraphQLObjectType({
