@@ -2,39 +2,50 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const ExerciseSchema = new Schema({
-  title: { type: String },
-  unit: { type: String },
-  lastActive: { type: Date, default: Date.now },
-  user: {
+  definition: {
     type: Schema.Types.ObjectId,
-    ref: "user"
+    ref: "exerciseDefinition"
   },
-  sessions: [
+  session: {
+    type: Schema.Types.ObjectId,
+    ref: "session"
+  },
+  sets: [
     {
-      type: Schema.Types.ObjectId,
-      ref: "session"
+      reps: { type: Number, default: 0 },
+      value: { type: Number, default: 0 }
     }
-  ]
+  ],
+  netValue: { type: Number, default: 0 }
 });
 
-ExerciseSchema.statics.addSession = function(id, content) {
-  const Session = mongoose.model("session");
-
-  return this.findById(id).then(exercise => {
-    // FIXME: not sure this is really what I want,
-    //  - will return entire Session object?
-    const session = new Session({ content, exercise });
-    exercise.sessions.push(session);
-    return Promise.all([session.save(), exercise.save()]).then(
-      ([session, exercise]) => exercise
-    );
+ExerciseSchema.statics.addSet = async ({ id, reps, value }) => {
+  const exercise = await this.findById(id);
+  exercise.sets.push({
+    reps,
+    value
   });
+  await exercise.save();
+  return exercise;
 };
 
-ExerciseSchema.statics.findSessions = function(id) {
+ExerciseSchema.statics.updateNetValue = async (id, netValue) => {
+  const exercise = await this.findById(id);
+  exercise.netValue = netValue;
+  await exercise.save();
+  return exercise;
+};
+
+ExerciseSchema.statics.getDefinition = function(id) {
   return this.findById(id)
-    .populate("sessions")
-    .then(exercise => exercise.sessions);
+    .populate("definition")
+    .then(exercise => exercise.definition);
+};
+
+ExerciseSchema.statics.getSession = function(id) {
+  return this.findById(id)
+    .populate("session")
+    .then(exercise => exercise.session);
 };
 
 mongoose.model("exercise", ExerciseSchema);

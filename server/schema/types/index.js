@@ -1,3 +1,4 @@
+const ExerciseType = require("./ExerciseType");
 const ExerciseDefinitionType = require("./ExerciseDefinitionType");
 const SessionDefinitionType = require("./SessionDefinitionType");
 const SessionType = require("./SessionType");
@@ -8,6 +9,7 @@ const RootQueryType = require("./RootQueryType");
 
 module.exports = {
   RootQueryType,
+  ExerciseType,
   ExerciseDefinitionType,
   SessionDefinitionType,
   SessionType,
