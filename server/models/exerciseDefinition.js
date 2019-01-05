@@ -12,6 +12,43 @@ const ExerciseDefinitionSchema = new Schema({
   },
   title: { type: String },
   unit: { type: String },
+  personalBest: {
+    value: {
+      value: { type: Number, default: 0 },
+      exercise: {
+        type: Schema.Types.ObjectId,
+        ref: "exercise"
+      }
+    },
+    setCount: {
+      value: { type: Number, default: 0 },
+      exercise: {
+        type: Schema.Types.ObjectId,
+        ref: "exercise"
+      }
+    },
+    totalReps: {
+      value: { type: Number, default: 0 },
+      exercise: {
+        type: Schema.Types.ObjectId,
+        ref: "exercise"
+      }
+    },
+    netValue: {
+      value: { type: Number, default: 0 },
+      exercise: {
+        type: Schema.Types.ObjectId,
+        ref: "exercise"
+      }
+    },
+    timeTaken: {
+      value: { type: Number, default: 0 },
+      exercise: {
+        type: Schema.Types.ObjectId,
+        ref: "exercise"
+      }
+    }
+  },
   history: [
     {
       type: Schema.Types.ObjectId,
@@ -44,6 +81,15 @@ ExerciseDefinitionSchema.statics.getHistory = function(id) {
       .populate("history")
       .then(exercise => exercise.history)
   );
+};
+
+ExerciseDefinitionSchema.statics.getPersonalBestExercise = async (
+  id,
+  record
+) => {
+  const definition = await this.findById(id);
+  const exercise = await exercise.personalBest[record].populate("exercise");
+  return exercise;
 };
 
 mongoose.model("exerciseDefinition", ExerciseDefinitionSchema);

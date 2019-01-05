@@ -1,19 +1,107 @@
 const mongoose = require("mongoose");
 const graphql = require("graphql");
-const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = graphql;
+const {
+  GraphQLObjectType,
+  GraphQLString,
+  GraphQLID,
+  GraphQLList,
+  GraphQLInt,
+  GraphQLFloat
+} = graphql;
 const UserType = require("./UserType");
 const ExerciseType = require("./ExerciseType");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 
 // TODO: these string types should be objects associated to ExerciseType``
+
+const BestValueType = new GraphQLObjectType({
+  name: "BestValueType",
+  fields: () => ({
+    value: { type: GraphQLFloat },
+    exercise: {
+      type: ExerciseType,
+      resolve(parentValue) {
+        return ExerciseDefinition.getPersonalBestExercise(
+          parentValue.id,
+          "value"
+        );
+      }
+    }
+  })
+});
+
+const BestSetCountType = new GraphQLObjectType({
+  name: "BestSetCountType",
+  fields: () => ({
+    value: { type: GraphQLInt },
+    exercise: {
+      type: ExerciseType,
+      resolve(parentValue) {
+        return ExerciseDefinition.getPersonalBestExercise(
+          parentValue.id,
+          "setCount"
+        );
+      }
+    }
+  })
+});
+
+const BestTotalRepsType = new GraphQLObjectType({
+  name: "BestTotalRepsType",
+  fields: () => ({
+    value: { type: GraphQLInt },
+    exercise: {
+      type: ExerciseType,
+      resolve(parentValue) {
+        return ExerciseDefinition.getPersonalBestExercise(
+          parentValue.id,
+          "totalReps"
+        );
+      }
+    }
+  })
+});
+
+const BestNetValueType = new GraphQLObjectType({
+  name: "BestNetValueType",
+  fields: () => ({
+    value: { type: GraphQLFloat },
+    exercise: {
+      type: ExerciseType,
+      resolve(parentValue) {
+        return ExerciseDefinition.getPersonalBestExercise(
+          parentValue.id,
+          "netValue"
+        );
+      }
+    }
+  })
+});
+
+const BestTimeTakenType = new GraphQLObjectType({
+  name: "BestTimeTakenType",
+  fields: () => ({
+    value: { type: GraphQLFloat },
+    exercise: {
+      type: ExerciseType,
+      resolve(parentValue) {
+        return ExerciseDefinition.getPersonalBestExercise(
+          parentValue.id,
+          "timeTaken"
+        );
+      }
+    }
+  })
+});
+
 const PersonalBestType = new GraphQLObjectType({
   name: "PersonalBestType",
   fields: () => ({
-    value: { type: GraphQLString },
-    setCount: { type: GraphQLString },
-    totalReps: { type: GraphQLString },
-    timeTaken: { type: GraphQLString },
-    netValue: { type: GraphQLString }
+    value: { type: BestValueType },
+    setCount: { type: BestSetCountType },
+    totalReps: { type: BestTotalRepsType },
+    netValue: { type: BestNetValueType },
+    timeTaken: { type: BestTimeTakenType }
   })
 });
 
