@@ -12,8 +12,6 @@ const UserType = require("./UserType");
 const ExerciseType = require("./ExerciseType");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 
-// TODO: these string types should be objects associated to ExerciseType``
-
 const BestValueType = new GraphQLObjectType({
   name: "BestValueType",
   fields: () => ({

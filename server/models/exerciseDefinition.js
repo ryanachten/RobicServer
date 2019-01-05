@@ -57,21 +57,27 @@ const ExerciseDefinitionSchema = new Schema({
   ]
 });
 
-ExerciseDefinitionSchema.statics.addNewSession = function(definitionId) {
+ExerciseDefinitionSchema.statics.addNewSession = async (
+  definitionId,
+  sessionId
+) => {
   const Exercise = mongoose.model("exercise");
-
-  return this.findById(definitionId).then(exerciseDef => {
-    const activeExercise = new Exercise({
-      date: Date.now(),
-      definition: exerciseDef
-    });
-    // Add the active session to the history log
-    exerciseDef.history.push(activeExercise);
-    // Save both the updated definition and new active session, return new session
-    return Promise.all([exerciseDef.save(), activeExercise.save()]).then(
-      ([exerciseDef, activeExercise]) => activeExercise
-    );
+  const Session = mongoose.model("session");
+  const exerciseDef = await this.findById(definitionId);
+  const session = await Session.findById(sessionId);
+  const activeExercise = new Exercise({
+    date: Date.now(),
+    definition: exerciseDef,
+    session,
+    sets: [],
+    netValue: 0
   });
+  // Add the active session to the history log
+  exerciseDef.history.push(activeExercise);
+  // Save both the updated definition and new active exercise, return new exercise
+  return Promise.all([exerciseDef.save(), activeExercise.save()]).then(
+    ([exerciseDef, activeExercise]) => activeExercise
+  );
 };
 
 ExerciseDefinitionSchema.statics.getHistory = function(id) {

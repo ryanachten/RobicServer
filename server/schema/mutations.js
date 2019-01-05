@@ -5,7 +5,10 @@ const User = mongoose.model("user");
 const Song = mongoose.model("song");
 const Lyric = mongoose.model("lyric");
 const SessionDefinition = mongoose.model("sessionDefinition");
+const ExerciseDefinition = mongoose.model("exerciseDefinition");
 const {
+  ExerciseType,
+  ExerciseDefinitionType,
   SessionDefinitionType,
   SessionType,
   UserType,
@@ -45,8 +48,8 @@ const mutation = new GraphQLObjectType({
       args: {
         title: { type: GraphQLString }
       },
-      resolve(parentValue, { title }) {
-        return new SessionDefinition({ title }).save();
+      resolve(parentValue, { title }, { user }) {
+        return new SessionDefinition({ title, user }).save();
       }
     },
 
@@ -57,6 +60,28 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parentValue, { definitionId }) {
         return SessionDefinition.addNewSession(definitionId);
+      }
+    },
+
+    addExerciseDefinition: {
+      type: ExerciseDefinitionType,
+      args: {
+        title: { type: GraphQLString },
+        unit: { type: GraphQLString }
+      },
+      resolve(parentValue, { title, unit }, { user }) {
+        return new ExerciseDefinition({ title, unit, user }).save();
+      }
+    },
+
+    addExercise: {
+      type: ExerciseType,
+      args: {
+        definitionId: { type: GraphQLID },
+        sessionId: { type: GraphQLID }
+      },
+      resolve(parentValue, { definitionId, sessionId }) {
+        return ExerciseDefinition.addNewSession(definitionId, sessionId);
       }
     },
 
