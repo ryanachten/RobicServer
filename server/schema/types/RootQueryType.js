@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
+const ExerciseDefinitionType = require("./ExerciseDefinitionType");
 const SessionDefinitionType = require("./SessionDefinitionType");
 const SessionType = require("./SessionType");
 const UserType = require("./UserType");
@@ -8,9 +9,11 @@ const UserType = require("./UserType");
 const SongType = require("./SongType");
 const LyricType = require("./LyricType");
 
+const User = mongoose.model("user");
 const SessionDefinition = mongoose.model("sessionDefinition");
 const Session = mongoose.model("session");
-const User = mongoose.model("user");
+const ExerciseDefinition = mongoose.model("exerciseDefinition");
+
 const Lyric = mongoose.model("lyric");
 const Song = mongoose.model("song");
 
@@ -34,6 +37,21 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(parentValue, { id }) {
         return User.findById(id);
+      }
+    },
+
+    exerciseDefinitions: {
+      type: new GraphQLList(ExerciseDefinitionType),
+      resolve() {
+        return ExerciseDefinition.find({});
+      }
+    },
+
+    exerciseDefinition: {
+      type: ExerciseDefinitionType,
+      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
+      resolve(parentValue, { id }) {
+        return ExerciseDefinition.findById(id);
       }
     },
 
