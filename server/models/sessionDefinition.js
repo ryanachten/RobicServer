@@ -11,6 +11,12 @@ const SessionDefinitionSchema = new Schema({
     ref: "user"
   },
   title: { type: String },
+  exercises: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "exerciseDefinition"
+    }
+  ],
   history: [
     {
       type: Schema.Types.ObjectId,
@@ -43,6 +49,15 @@ SessionDefinitionSchema.statics.getHistory = function(id) {
       // Find the definition and then return the history log
       .populate("history")
       .then(session => session.history)
+  );
+};
+
+SessionDefinitionSchema.statics.getExercises = function(id) {
+  return (
+    this.findById(id)
+      // Find the definition and then return the exercise list
+      .populate("exercises")
+      .then(session => session.exercises)
   );
 };
 

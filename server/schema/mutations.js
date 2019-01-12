@@ -1,5 +1,5 @@
 const graphql = require("graphql");
-const { GraphQLObjectType, GraphQLString, GraphQLID } = graphql;
+const { GraphQLList, GraphQLObjectType, GraphQLString, GraphQLID } = graphql;
 const mongoose = require("mongoose");
 const User = mongoose.model("user");
 const Song = mongoose.model("song");
@@ -46,10 +46,15 @@ const mutation = new GraphQLObjectType({
     addSessionDefinition: {
       type: SessionDefinitionType,
       args: {
-        title: { type: GraphQLString }
+        title: { type: GraphQLString },
+        exercises: { type: new GraphQLList(GraphQLID) }
       },
-      resolve(parentValue, { title }, { user }) {
-        return new SessionDefinition({ title, user }).save();
+      resolve(parentValue, { title, exercises }, { user }) {
+        return new SessionDefinition({
+          title,
+          exercises,
+          user: user.id
+        }).save();
       }
     },
 
@@ -70,7 +75,7 @@ const mutation = new GraphQLObjectType({
         unit: { type: GraphQLString }
       },
       resolve(parentValue, { title, unit }, { user }) {
-        return new ExerciseDefinition({ title, unit, user }).save();
+        return new ExerciseDefinition({ title, unit, user: user.id }).save();
       }
     },
 
