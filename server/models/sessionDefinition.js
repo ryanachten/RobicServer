@@ -25,22 +25,41 @@ const SessionDefinitionSchema = new Schema({
   ]
 });
 
-SessionDefinitionSchema.statics.addNewSession = function(definitionId) {
+SessionDefinitionSchema.statics.addNewSession = async function(definitionId) {
   const Session = mongoose.model("session");
+  const Exercise = mongoose.model("exercise");
+  const ExerciseDefinition = mongoose.model("exerciseDefinition");
 
-  return this.findById(definitionId).then(sessionDef => {
-    const activeSession = new Session({
-      date: Date.now(),
-      definition: sessionDef
-      // TODO: add exercises based of latest history object
-    });
-    // Add the active session to the history log
-    sessionDef.history.push(activeSession);
-    // Save both the updated definition and new active session, return new session
-    return Promise.all([sessionDef.save(), activeSession.save()]).then(
-      ([sessionDef, activeSession]) => activeSession
-    );
+  const sessionDefinition = await this.findById(definitionId);
+  const activeSession = new Session({
+    date: Date.now(),
+    definition: sessionDefinition
   });
+  const exceriseDefinitions = sessionDefinition.exercises;
+  const exercises = await Promise.all(
+    exceriseDefinitions.map(async exerciseDefId => {
+      const exerciseDef = await ExerciseDefinition.findById(exerciseDefId);
+      const exercise = new Exercise({
+        definition: exerciseDef,
+        session: activeSession,
+        sets: [],
+        netValue: 0
+      });
+      // Add exercise to session
+      activeSession.exercises.push(exercise);
+      // Add exercise to definition
+      exerciseDef.history.push(exercise);
+      await exercise.save();
+      await exerciseDef.save();
+    })
+  );
+  // Add the active session to the history log
+  sessionDefinition.history.push(activeSession);
+  // Save both the updated definition and new active session, return new session
+  await sessionDefinition.save();
+  await activeSession.save();
+
+  return activeSession;
 };
 
 SessionDefinitionSchema.statics.getHistory = function(id) {
