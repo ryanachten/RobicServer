@@ -9,7 +9,7 @@ const {
   GraphQLFloat
 } = graphql;
 const UserType = require("./UserType");
-const ExerciseType = require("./ExerciseType");
+const { ExerciseType } = require("./ExerciseType");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 
 const BestValueType = new GraphQLObjectType({

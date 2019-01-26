@@ -1,12 +1,20 @@
 const graphql = require("graphql");
-const { GraphQLList, GraphQLObjectType, GraphQLString, GraphQLID } = graphql;
+const {
+  GraphQLList,
+  GraphQLObjectType,
+  GraphQLInt,
+  GraphQLString,
+  GraphQLID
+} = graphql;
 const mongoose = require("mongoose");
+const Exercise = mongoose.model("exercise");
 const User = mongoose.model("user");
 const Song = mongoose.model("song");
 const Lyric = mongoose.model("lyric");
 const SessionDefinition = mongoose.model("sessionDefinition");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 const {
+  SetType,
   ExerciseType,
   ExerciseDefinitionType,
   SessionDefinitionType,
@@ -15,6 +23,7 @@ const {
   SongType,
   LyricType
 } = require("./types");
+const { SetInput } = require("./inputs");
 
 const mutation = new GraphQLObjectType({
   name: "Mutation",
@@ -87,6 +96,18 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parentValue, { definitionId, sessionId }) {
         return ExerciseDefinition.addNewSession(definitionId, sessionId);
+      }
+    },
+
+    updateExercise: {
+      type: ExerciseType,
+      args: {
+        exerciseId: { type: GraphQLID },
+        sets: { type: new GraphQLList(SetInput) },
+        timeTaken: { type: GraphQLInt }
+      },
+      resolve(parentValue, { exerciseId, sets, timeTaken }) {
+        return Exercise.update(exerciseId, sets, timeTaken);
       }
     },
 

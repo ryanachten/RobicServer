@@ -39,4 +39,4 @@ const ExerciseType = new GraphQLObjectType({
   })
 });
 
-module.exports = ExerciseType;
+module.exports = { ExerciseType, SetType };

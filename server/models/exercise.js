@@ -19,23 +19,6 @@ const ExerciseSchema = new Schema({
   netValue: { type: Number, default: 0 }
 });
 
-ExerciseSchema.statics.addSet = async ({ id, reps, value }) => {
-  const exercise = await this.findById(id);
-  exercise.sets.push({
-    reps,
-    value
-  });
-  await exercise.save();
-  return exercise;
-};
-
-ExerciseSchema.statics.updateNetValue = async (id, netValue) => {
-  const exercise = await this.findById(id);
-  exercise.netValue = netValue;
-  await exercise.save();
-  return exercise;
-};
-
 ExerciseSchema.statics.getDefinition = function(id) {
   return this.findById(id)
     .populate("definition")
@@ -46,6 +29,13 @@ ExerciseSchema.statics.getSession = function(id) {
   return this.findById(id)
     .populate("session")
     .then(exercise => exercise.session);
+};
+
+ExerciseSchema.statics.update = async function(exerciseId, sets, timeTaken) {
+  const exercise = await this.findById(exerciseId);
+  exercise.sets = sets;
+  exercise.timeTaken = timeTaken;
+  return exercise.save();
 };
 
 mongoose.model("exercise", ExerciseSchema);

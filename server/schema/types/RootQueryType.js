@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
-const ExerciseType = require("./ExerciseType");
+const { ExerciseType } = require("./ExerciseType");
 const ExerciseDefinitionType = require("./ExerciseDefinitionType");
 const SessionDefinitionType = require("./SessionDefinitionType");
 const SessionType = require("./SessionType");

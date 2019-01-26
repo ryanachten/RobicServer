@@ -1,4 +1,4 @@
-const ExerciseType = require("./ExerciseType");
+const { ExerciseType, SetType } = require("./ExerciseType");
 const ExerciseDefinitionType = require("./ExerciseDefinitionType");
 const SessionDefinitionType = require("./SessionDefinitionType");
 const SessionType = require("./SessionType");
@@ -13,6 +13,7 @@ module.exports = {
   ExerciseDefinitionType,
   SessionDefinitionType,
   SessionType,
+  SetType,
   UserType,
   SongType,
   LyricType
