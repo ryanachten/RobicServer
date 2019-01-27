@@ -52,7 +52,7 @@ const ExerciseDefinitionSchema = new Schema({
   history: [
     {
       type: Schema.Types.ObjectId,
-      ref: "session"
+      ref: "exercise"
     }
   ]
 });
@@ -70,6 +70,7 @@ ExerciseDefinitionSchema.statics.addNewSession = async (
     definition: exerciseDef,
     session,
     sets: [],
+    timeTaken: 0,
     netValue: 0
   });
   // Add the active session to the history log

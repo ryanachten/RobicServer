@@ -16,6 +16,7 @@ const ExerciseSchema = new Schema({
       value: { type: Number, default: 0 }
     }
   ],
+  timeTaken: { type: Number, default: 0 },
   netValue: { type: Number, default: 0 }
 });
 
