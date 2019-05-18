@@ -1,4 +1,5 @@
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const express = require("express");
 const expressGraphQL = require("express-graphql");
 const jwt = require("jsonwebtoken");
@@ -18,17 +19,14 @@ if (!MONGO_URI) {
 }
 
 mongoose.Promise = global.Promise;
-mongoose.connect(
-  MONGO_URI,
-  { useMongoClient: true }
-);
+mongoose.connect(MONGO_URI, { useMongoClient: true });
 mongoose.connection
   .once("open", () => console.log("Connected to MongoLab instance."))
   .on("error", error => console.log("Error connecting to MongoLab:", error));
 
+/*** General middleware ***/
 app.use(bodyParser.json());
-
-// TODO: add CORS middleware here
+app.use(cors());
 
 /*** JWT verification middleware ***/
 const JWT_PASSWORD_SECRET = process.env.JWT_PASSWORD_SECRET;
