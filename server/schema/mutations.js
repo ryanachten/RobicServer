@@ -84,7 +84,7 @@ const mutation = new GraphQLObjectType({
         unit: { type: GraphQLString }
       },
       resolve(parentValue, { title, unit }, { user }) {
-        return new ExerciseDefinition({ title, unit, user: user.id }).save();
+        return User.createExercise(title, unit, user.id);
       }
     },
 

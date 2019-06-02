@@ -104,4 +104,20 @@ UserSchema.statics.getExercises = function(id) {
     .then(user => user.exercises);
 };
 
+UserSchema.statics.createExercise = async function(title, unit, userId) {
+  const ExerciseDefinition = mongoose.model("exerciseDefinition");
+  const user = await this.findById(userId);
+  // Create and save the new definition
+  const definition = await new ExerciseDefinition({
+    title,
+    unit,
+    user
+  }).save();
+  // Add the exercise to the user's exercises
+  await user.populate("exercises");
+  user.exercises.push(definition);
+  await user.save();
+  return definition;
+};
+
 mongoose.model("user", UserSchema);
