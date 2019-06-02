@@ -44,8 +44,8 @@ const RootQuery = new GraphQLObjectType({
 
     exerciseDefinitions: {
       type: new GraphQLList(ExerciseDefinitionType),
-      resolve() {
-        return ExerciseDefinition.find({});
+      resolve(parentValue, {}, { user }) {
+        return User.getExercises(user.id);
       }
     },
 
