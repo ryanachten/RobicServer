@@ -40,7 +40,13 @@ const UserSchema = new Schema({
     }
   ],
   firstName: { type: String },
-  lastName: { type: String }
+  lastName: { type: String },
+  exercises: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "exerciseDefinition"
+    }
+  ]
 });
 
 UserSchema.statics.register = async ({
@@ -56,7 +62,8 @@ UserSchema.statics.register = async ({
     firstName,
     lastName,
     email,
-    password: hashedPassword
+    password: hashedPassword,
+    exercises: []
   }).save();
 };
 
@@ -87,6 +94,14 @@ UserSchema.statics.login = async ({ password, email }) => {
     }
   );
   return token;
+};
+
+UserSchema.statics.getExercises = async ({ password, email }) => {};
+
+UserSchema.statics.getExercises = function(id) {
+  return this.findById(id)
+    .populate("exercises")
+    .then(user => user.exercises);
 };
 
 mongoose.model("user", UserSchema);

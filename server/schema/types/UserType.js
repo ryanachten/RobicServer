@@ -9,7 +9,13 @@ const UserType = new GraphQLObjectType({
     id: { type: GraphQLID },
     firstName: { type: GraphQLString },
     lastName: { type: GraphQLString },
-    email: { type: GraphQLString }
+    email: { type: GraphQLString },
+    exercises: {
+      type: new GraphQLList(require("./ExerciseDefinitionType")),
+      resolve(parentValue) {
+        return User.getExercises(parentValue.id);
+      }
+    }
   })
 });
 
