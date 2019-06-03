@@ -57,20 +57,18 @@ const ExerciseDefinitionSchema = new Schema({
   ]
 });
 
-ExerciseDefinitionSchema.statics.addNewSession = async (
+ExerciseDefinitionSchema.statics.addNewSession = async function({
   definitionId,
-  sessionId
-) => {
+  sets,
+  timeTaken
+}) {
   const Exercise = mongoose.model("exercise");
-  const Session = mongoose.model("session");
   const exerciseDef = await this.findById(definitionId);
-  const session = await Session.findById(sessionId);
   const activeExercise = new Exercise({
     date: Date.now(),
-    definition: exerciseDef,
-    session,
-    sets: [],
-    timeTaken: 0,
+    definition: definitionId,
+    sets,
+    timeTaken,
     netValue: 0
   });
   // Add the active session to the history log

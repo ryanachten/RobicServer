@@ -92,10 +92,15 @@ const mutation = new GraphQLObjectType({
       type: ExerciseType,
       args: {
         definitionId: { type: GraphQLID },
-        sessionId: { type: GraphQLID }
+        sets: { type: new GraphQLList(SetInput) },
+        timeTaken: { type: GraphQLString }
       },
-      resolve(parentValue, { definitionId, sessionId }) {
-        return ExerciseDefinition.addNewSession(definitionId, sessionId);
+      resolve(parentValue, { definitionId, sets, timeTaken }) {
+        return ExerciseDefinition.addNewSession({
+          definitionId,
+          sets,
+          timeTaken
+        });
       }
     },
 
