@@ -22,16 +22,11 @@ const ExerciseType = new GraphQLObjectType({
   name: "ExerciseType",
   fields: () => ({
     id: { type: GraphQLID },
+    date: { type: GraphQLString },
     definition: {
       type: require("./ExerciseDefinitionType"),
       resolve(parentValue) {
         return Exercise.getDefinition(parentValue.id);
-      }
-    },
-    session: {
-      type: require("./SessionType"),
-      resolve(parentValue) {
-        return Exercise.getSession(parentValue.id);
       }
     },
     sets: { type: new GraphQLList(SetType) },

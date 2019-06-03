@@ -6,17 +6,14 @@ const ExerciseSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "exerciseDefinition"
   },
-  session: {
-    type: Schema.Types.ObjectId,
-    ref: "session"
-  },
+  date: { type: Date },
   sets: [
     {
       reps: { type: Number, default: 0 },
       value: { type: Number, default: 0 }
     }
   ],
-  timeTaken: { type: Number, default: 0 },
+  timeTaken: { type: String },
   netValue: { type: Number, default: 0 }
 });
 
@@ -24,12 +21,6 @@ ExerciseSchema.statics.getDefinition = function(id) {
   return this.findById(id)
     .populate("definition")
     .then(exercise => exercise.definition);
-};
-
-ExerciseSchema.statics.getSession = function(id) {
-  return this.findById(id)
-    .populate("session")
-    .then(exercise => exercise.session);
 };
 
 ExerciseSchema.statics.update = async function(exerciseId, sets, timeTaken) {
