@@ -29,8 +29,9 @@ const ExerciseType = new GraphQLObjectType({
         return Exercise.getDefinition(parentValue.id);
       }
     },
+    netValue: { type: GraphQLFloat },
     sets: { type: new GraphQLList(SetType) },
-    netValue: { type: GraphQLFloat }
+    timeTaken: { type: GraphQLString }
   })
 });
 
