@@ -9,7 +9,3 @@ require("./sessionDefinition");
 require("./session");
 require("./exercise");
 require("./exerciseDefinition");
-
-// TODO: delete following imports
-require("./song");
-require("./lyric");

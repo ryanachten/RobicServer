@@ -9,8 +9,6 @@ const {
 const mongoose = require("mongoose");
 const Exercise = mongoose.model("exercise");
 const User = mongoose.model("user");
-const Song = mongoose.model("song");
-const Lyric = mongoose.model("lyric");
 const SessionDefinition = mongoose.model("sessionDefinition");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 const {
@@ -19,9 +17,7 @@ const {
   ExerciseDefinitionType,
   SessionDefinitionType,
   SessionType,
-  UserType,
-  SongType,
-  LyricType
+  UserType
 } = require("./types");
 const { SetInput } = require("./inputs");
 
@@ -125,41 +121,6 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parentValue, { exerciseId, sets, timeTaken }) {
         return Exercise.update(exerciseId, sets, timeTaken);
-      }
-    },
-
-    // TODO: delete following
-    addSong: {
-      type: SongType,
-      args: {
-        title: { type: GraphQLString }
-      },
-      resolve(parentValue, { title }) {
-        return new Song({ title }).save();
-      }
-    },
-    addLyricToSong: {
-      type: SongType,
-      args: {
-        content: { type: GraphQLString },
-        songId: { type: GraphQLID }
-      },
-      resolve(parentValue, { content, songId }) {
-        return Song.addLyric(songId, content);
-      }
-    },
-    likeLyric: {
-      type: LyricType,
-      args: { id: { type: GraphQLID } },
-      resolve(parentValue, { id }) {
-        return Lyric.like(id);
-      }
-    },
-    deleteSong: {
-      type: SongType,
-      args: { id: { type: GraphQLID } },
-      resolve(parentValue, { id }) {
-        return Song.remove({ _id: id });
       }
     }
   }

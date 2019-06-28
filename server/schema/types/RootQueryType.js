@@ -7,17 +7,11 @@ const SessionDefinitionType = require("./SessionDefinitionType");
 const SessionType = require("./SessionType");
 const UserType = require("./UserType");
 
-const SongType = require("./SongType");
-const LyricType = require("./LyricType");
-
 const User = mongoose.model("user");
 const SessionDefinition = mongoose.model("sessionDefinition");
 const Session = mongoose.model("session");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 const Exercise = mongoose.model("exercise");
-
-const Lyric = mongoose.model("lyric");
-const Song = mongoose.model("song");
 
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
@@ -99,28 +93,6 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(parentValue, { id }) {
         return Session.findById(id);
-      }
-    },
-
-    // TODO: delete following
-    songs: {
-      type: new GraphQLList(SongType),
-      resolve() {
-        return Song.find({});
-      }
-    },
-    song: {
-      type: SongType,
-      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue, { id }) {
-        return Song.findById(id);
-      }
-    },
-    lyric: {
-      type: LyricType,
-      args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parnetValue, { id }) {
-        return Lyric.findById(id);
       }
     }
   })
