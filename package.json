@@ -1,11 +1,11 @@
 {
-  "name": "lyrical",
+  "name": "robic-server",
   "version": "1.0.0",
-  "description": "Starter point for a graphQL course",
+  "description": "GraphQL server for Robic web app",
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/StephenGrider/Lyrical-GraphQL"
+    "url": "https://github.com/ryanachten/RobicServer"
   },
   "scripts": {
     "start": "node index.js",
