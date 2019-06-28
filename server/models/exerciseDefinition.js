@@ -97,4 +97,11 @@ ExerciseDefinitionSchema.statics.getPersonalBestExercise = async (
   return exercise;
 };
 
+ExerciseDefinitionSchema.statics.update = async function(id, title, unit) {
+  const definition = await this.findById(id);
+  definition.title = title;
+  definition.unit = unit;
+  return definition.save();
+};
+
 mongoose.model("exerciseDefinition", ExerciseDefinitionSchema);

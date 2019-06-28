@@ -88,6 +88,18 @@ const mutation = new GraphQLObjectType({
       }
     },
 
+    updateExerciseDefinition: {
+      type: ExerciseDefinitionType,
+      args: {
+        exerciseId: { type: GraphQLID },
+        title: { type: GraphQLString },
+        unit: { type: GraphQLString }
+      },
+      resolve(parentValue, { exerciseId, title, unit }) {
+        return ExerciseDefinition.update(exerciseId, title, unit);
+      }
+    },
+
     addExercise: {
       type: ExerciseType,
       args: {
