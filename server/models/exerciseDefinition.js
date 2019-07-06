@@ -12,6 +12,7 @@ const ExerciseDefinitionSchema = new Schema({
   },
   title: { type: String },
   unit: { type: String },
+  primaryMuscleGroup: { type: String },
   personalBest: {
     value: {
       value: { type: Number, default: 0 },
@@ -97,10 +98,16 @@ ExerciseDefinitionSchema.statics.getPersonalBestExercise = async (
   return exercise;
 };
 
-ExerciseDefinitionSchema.statics.update = async function(id, title, unit) {
+ExerciseDefinitionSchema.statics.update = async function(
+  id,
+  title,
+  unit,
+  primaryMuscleGroup
+) {
   const definition = await this.findById(id);
   definition.title = title;
   definition.unit = unit;
+  definition.primaryMuscleGroup = primaryMuscleGroup;
   return definition.save();
 };
 
