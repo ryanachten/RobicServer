@@ -104,12 +104,14 @@ UserSchema.statics.getExercises = function(id) {
     .then(user => user.exercises);
 };
 
-UserSchema.statics.createExercise = async function(
+UserSchema.statics.createExercise = async function({
   title,
   unit,
   primaryMuscleGroup,
-  userId
-) {
+  type,
+  childExercises,
+  user
+}) {
   const ExerciseDefinition = mongoose.model("exerciseDefinition");
   const user = await this.findById(userId);
   // Create and save the new definition
@@ -117,6 +119,8 @@ UserSchema.statics.createExercise = async function(
     title,
     unit,
     primaryMuscleGroup,
+    type,
+    childExercises,
     user
   }).save();
   // Add the exercise to the user's exercises

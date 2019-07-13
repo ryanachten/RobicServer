@@ -114,8 +114,8 @@ const ExerciseDefinitionType = new GraphQLObjectType({
     type: { type: GraphQLString },
     childExercises: {
       type: new GraphQLList(ExerciseDefinitionType),
-      resolve(exercise) {
-        return ExerciseDefinition.getChildExercise(exercise.id);
+      resolve(parentValue) {
+        return ExerciseDefinition.getChildExercises(parentValue.id);
       }
     },
     history: {

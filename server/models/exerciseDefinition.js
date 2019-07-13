@@ -87,8 +87,10 @@ ExerciseDefinitionSchema.statics.addNewSession = async function({
   );
 };
 
-ExerciseDefinitionSchema.statics.getChildExercise = function(id) {
-  return this.findById(id);
+ExerciseDefinitionSchema.statics.getChildExercises = function(id) {
+  return this.findById(id)
+    .populate("childExercises")
+    .then(exercise => exercise.childExercises);
 };
 
 ExerciseDefinitionSchema.statics.getHistory = function(id) {
@@ -109,16 +111,20 @@ ExerciseDefinitionSchema.statics.getPersonalBestExercise = async (
   return exercise;
 };
 
-ExerciseDefinitionSchema.statics.update = async function(
+ExerciseDefinitionSchema.statics.update = async function({
   id,
   title,
   unit,
-  primaryMuscleGroup
-) {
+  primaryMuscleGroup,
+  type,
+  childExercises
+}) {
   const definition = await this.findById(id);
   definition.title = title;
   definition.unit = unit;
   definition.primaryMuscleGroup = primaryMuscleGroup;
+  definition.type = type;
+  definition.childExercises = childExercises;
   return definition.save();
 };
 
