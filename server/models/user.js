@@ -110,7 +110,7 @@ UserSchema.statics.createExercise = async function({
   primaryMuscleGroup,
   type,
   childExercises,
-  user
+  user: userId
 }) {
   const ExerciseDefinition = mongoose.model("exerciseDefinition");
   const user = await this.findById(userId);
