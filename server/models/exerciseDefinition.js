@@ -12,7 +12,7 @@ const ExerciseDefinitionSchema = new Schema({
   },
   title: { type: String },
   unit: { type: String },
-  primaryMuscleGroup: { type: String },
+  primaryMuscleGroup: [{ type: String }],
   personalBest: {
     value: {
       value: { type: Number, default: 0 },

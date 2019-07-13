@@ -78,7 +78,7 @@ const mutation = new GraphQLObjectType({
       args: {
         title: { type: GraphQLString },
         unit: { type: GraphQLString },
-        primaryMuscleGroup: { type: GraphQLString }
+        primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(parentValue, { title, unit, primaryMuscleGroup }, { user }) {
         return User.createExercise(title, unit, primaryMuscleGroup, user.id);
@@ -91,7 +91,7 @@ const mutation = new GraphQLObjectType({
         exerciseId: { type: GraphQLID },
         title: { type: GraphQLString },
         unit: { type: GraphQLString },
-        primaryMuscleGroup: { type: GraphQLString }
+        primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(parentValue, { exerciseId, title, unit, primaryMuscleGroup }) {
         return ExerciseDefinition.update(

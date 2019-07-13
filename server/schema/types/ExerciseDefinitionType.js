@@ -109,7 +109,7 @@ const ExerciseDefinitionType = new GraphQLObjectType({
     id: { type: GraphQLID },
     title: { type: GraphQLString },
     unit: { type: GraphQLString },
-    primaryMuscleGroup: { type: GraphQLString },
+    primaryMuscleGroup: { type: new GraphQLList(GraphQLString) },
     personalBest: { type: PersonalBestType },
     history: {
       type: new GraphQLList(ExerciseType),
