@@ -111,6 +111,13 @@ const ExerciseDefinitionType = new GraphQLObjectType({
     unit: { type: GraphQLString },
     primaryMuscleGroup: { type: new GraphQLList(GraphQLString) },
     personalBest: { type: PersonalBestType },
+    type: { type: GraphQLString },
+    childExercises: {
+      type: new GraphQLList(ExerciseDefinitionType),
+      resolve(exercise) {
+        return ExerciseDefinition.getChildExercise(exercise.id);
+      }
+    },
     history: {
       type: new GraphQLList(ExerciseType),
       resolve(parentValue) {

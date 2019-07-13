@@ -13,6 +13,13 @@ const ExerciseDefinitionSchema = new Schema({
   title: { type: String },
   unit: { type: String },
   primaryMuscleGroup: [{ type: String }],
+  type: { type: String },
+  childExercises: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "exerciseDefinition"
+    }
+  ],
   personalBest: {
     value: {
       value: { type: Number, default: 0 },
@@ -78,6 +85,10 @@ ExerciseDefinitionSchema.statics.addNewSession = async function({
   return Promise.all([exerciseDef.save(), activeExercise.save()]).then(
     ([exerciseDef, activeExercise]) => activeExercise
   );
+};
+
+ExerciseDefinitionSchema.statics.getChildExercise = function(id) {
+  return this.findById(id);
 };
 
 ExerciseDefinitionSchema.statics.getHistory = function(id) {
