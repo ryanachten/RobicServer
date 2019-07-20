@@ -10,7 +10,17 @@ const ExerciseSchema = new Schema({
   sets: [
     {
       reps: { type: Number, default: 0 },
-      value: { type: Number, default: 0 }
+      value: { type: Number, default: 0 },
+      exercises: [
+        {
+          id: {
+            type: Schema.Types.ObjectId,
+            ref: "exerciseDefinition"
+          },
+          reps: { type: Number, default: 0 },
+          value: { type: Number, default: 0 }
+        }
+      ]
     }
   ],
   timeTaken: { type: String },

@@ -23,7 +23,7 @@ const SetType = new GraphQLObjectType({
   name: "SetType",
   fields: () => ({
     exercises: {
-      type: SetExercise
+      type: new GraphQLList(SetExercise)
     },
     reps: { type: GraphQLInt },
     value: { type: GraphQLFloat }
