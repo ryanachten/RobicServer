@@ -10,9 +10,21 @@ const {
 } = graphql;
 const Exercise = mongoose.model("exercise");
 
+const SetExercise = new GraphQLObjectType({
+  name: "SetExercise",
+  fields: () => ({
+    id: { type: GraphQLID },
+    reps: { type: GraphQLInt },
+    value: { type: GraphQLFloat }
+  })
+});
+
 const SetType = new GraphQLObjectType({
   name: "SetType",
   fields: () => ({
+    exercises: {
+      type: SetExercise
+    },
     reps: { type: GraphQLInt },
     value: { type: GraphQLFloat }
   })
