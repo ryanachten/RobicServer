@@ -102,6 +102,10 @@ ExerciseDefinitionSchema.statics.getHistory = function(id) {
   );
 };
 
+ExerciseDefinitionSchema.statics.getUnit = function(id) {
+  return this.findById(id).then(exercise => exercise.unit);
+};
+
 ExerciseDefinitionSchema.statics.getPersonalBestExercise = async (
   id,
   record

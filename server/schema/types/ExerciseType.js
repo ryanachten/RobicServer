@@ -9,13 +9,20 @@ const {
   GraphQLFloat
 } = graphql;
 const Exercise = mongoose.model("exercise");
+const ExerciseDefinition = mongoose.model("exerciseDefinition");
 
 const SetExercise = new GraphQLObjectType({
   name: "SetExercise",
   fields: () => ({
     id: { type: GraphQLID },
     reps: { type: GraphQLInt },
-    value: { type: GraphQLFloat }
+    value: { type: GraphQLFloat },
+    unit: {
+      type: GraphQLString,
+      resolve(parentValue, { id }) {
+        return ExerciseDefinition.getUnit(parentValue.id);
+      }
+    }
   })
 });
 
