@@ -6,6 +6,7 @@ const {
   GraphQLList,
   GraphQLFloat
 } = graphql;
+const { exerciseFields, exerciseDefinitionFields } = require("./fields");
 
 const SetExerciseInput = new GraphQLInputObjectType({
   name: "SetExerciseInput",
@@ -27,4 +28,30 @@ const SetInput = new GraphQLInputObjectType({
   })
 });
 
-module.exports = { SetInput };
+const ExerciseDefinitionInput = new GraphQLInputObjectType({
+  name: "ExerciseDefinitionInput",
+  fields: () => ({
+    ...exerciseDefinitionFields(),
+    childExercises: {
+      type: ExerciseDefinitionInput
+    },
+    history: {
+      type: require("./inputs").ExerciseInput
+    }
+  })
+});
+
+const ExerciseInput = new GraphQLInputObjectType({
+  name: "ExerciseInput",
+  fields: () => ({
+    ...exerciseFields(),
+    definition: {
+      type: ExerciseDefinitionInput
+    },
+    sets: {
+      type: SetInput
+    }
+  })
+});
+
+module.exports = { ExerciseDefinitionInput, ExerciseInput, SetInput };

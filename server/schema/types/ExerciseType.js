@@ -10,6 +10,7 @@ const {
 } = graphql;
 const Exercise = mongoose.model("exercise");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
+const { exerciseFields } = require("../fields");
 
 const SetExercise = new GraphQLObjectType({
   name: "SetExercise",
@@ -39,19 +40,7 @@ const SetType = new GraphQLObjectType({
 
 const ExerciseType = new GraphQLObjectType({
   name: "ExerciseType",
-  fields: () => ({
-    id: { type: GraphQLID },
-    date: { type: GraphQLString },
-    definition: {
-      type: require("./ExerciseDefinitionType"),
-      resolve(parentValue) {
-        return Exercise.getDefinition(parentValue.id);
-      }
-    },
-    netValue: { type: GraphQLFloat },
-    sets: { type: new GraphQLList(SetType) },
-    timeTaken: { type: GraphQLString }
-  })
+  fields: exerciseFields
 });
 
 module.exports = { ExerciseType, SetType };
