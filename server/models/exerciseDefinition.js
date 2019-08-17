@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
+const Exercise = mongoose.model("exercise");
 
 /*
   Houses history and aggregate data for the Exercise schema
@@ -106,15 +107,6 @@ ExerciseDefinitionSchema.statics.getUnit = function(id) {
   return this.findById(id).then(exercise => exercise.unit);
 };
 
-ExerciseDefinitionSchema.statics.getPersonalBestExercise = async (
-  id,
-  record
-) => {
-  const definition = await this.findById(id);
-  const exercise = await exercise.personalBest[record].populate("exercise");
-  return exercise;
-};
-
 ExerciseDefinitionSchema.statics.update = async function({
   id,
   title,
@@ -130,6 +122,22 @@ ExerciseDefinitionSchema.statics.update = async function({
   definition.type = type;
   definition.childExercises = childExercises;
   return definition.save();
+};
+
+ExerciseDefinitionSchema.statics.removeHistorySession = async function(
+  definitionId,
+  exerciseId
+) {
+  // Remove the exercise from definition history
+  const definition = await this.findById(definitionId);
+
+  // Delete the exercise from the database
+  // this appears to handle removing the defintion history too
+  await Exercise.findById(exerciseId)
+    .remove()
+    .exec();
+
+  return definition;
 };
 
 mongoose.model("exerciseDefinition", ExerciseDefinitionSchema);

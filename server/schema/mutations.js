@@ -123,6 +123,20 @@ const mutation = new GraphQLObjectType({
       }
     },
 
+    removeHistorySession: {
+      type: ExerciseDefinitionType,
+      args: {
+        definitionId: { type: GraphQLID },
+        exerciseId: { type: GraphQLID }
+      },
+      resolve(parentValue, { definitionId, exerciseId }) {
+        return ExerciseDefinition.removeHistorySession(
+          definitionId,
+          exerciseId
+        );
+      }
+    },
+
     addExercise: {
       type: ExerciseType,
       args: {
