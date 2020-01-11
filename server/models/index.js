@@ -5,7 +5,5 @@ mongoose.plugin(schema => {
 });
 
 require("./user");
-require("./sessionDefinition");
-require("./session");
 require("./exercise");
 require("./exerciseDefinition");

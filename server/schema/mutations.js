@@ -9,14 +9,11 @@ const {
 const mongoose = require("mongoose");
 const Exercise = mongoose.model("exercise");
 const User = mongoose.model("user");
-const SessionDefinition = mongoose.model("sessionDefinition");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 const {
   SetType,
   ExerciseType,
   ExerciseDefinitionType,
-  SessionDefinitionType,
-  SessionType,
   UserType
 } = require("./types");
 const { SetInput } = require("./inputs");
@@ -45,31 +42,6 @@ const mutation = new GraphQLObjectType({
       },
       resolve(parentValue, { password, email }) {
         return User.login({ password, email });
-      }
-    },
-
-    addSessionDefinition: {
-      type: SessionDefinitionType,
-      args: {
-        title: { type: GraphQLString },
-        exercises: { type: new GraphQLList(GraphQLID) }
-      },
-      resolve(parentValue, { title, exercises }, { user }) {
-        return new SessionDefinition({
-          title,
-          exercises,
-          user: user.id
-        }).save();
-      }
-    },
-
-    addSession: {
-      type: SessionType,
-      args: {
-        definitionId: { type: GraphQLID }
-      },
-      resolve(parentValue, { definitionId }) {
-        return SessionDefinition.addNewSession(definitionId);
       }
     },
 
