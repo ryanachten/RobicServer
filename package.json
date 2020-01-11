@@ -28,7 +28,7 @@
     "express-session": "^1.15.0",
     "graphql": "^0.8.2",
     "jsonwebtoken": "^8.4.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mongoose": "^5.7.5",
     "nodemon": "*",
     "passport": "^0.3.2",
