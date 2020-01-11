@@ -6,9 +6,10 @@ import ReactDOM from "react-dom";
 const client = new ApolloClient({});
 
 const Root = () => {
+  window.location.href = "http://robic.herokuapp.com";
   return (
     <ApolloProvider client={client}>
-      <div>Robic server</div>
+      <div />
     </ApolloProvider>
   );
 };
