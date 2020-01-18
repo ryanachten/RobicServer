@@ -11,8 +11,11 @@
     "start": "node index.js",
     "start:dev": "nodemon index.js --ignore client"
   },
-  "author": "",
+  "author": "Ryan Achten",
   "license": "ISC",
+  "engines": {
+    "node": "10.15.0"
+  },
   "dependencies": {
     "axios": "^0.18.1",
     "babel-core": "^6.22.1",
