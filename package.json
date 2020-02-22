@@ -9,7 +9,9 @@
   },
   "scripts": {
     "start": "node index.js",
-    "start:dev": "nodemon index.js --ignore client"
+    "start:dev": "nodemon index.js --ignore client",
+    "build-ts": "tsc",
+    "watch-ts": "tsc -w"
   },
   "author": "Ryan Achten",
   "license": "ISC",
