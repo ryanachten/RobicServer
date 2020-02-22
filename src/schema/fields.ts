@@ -1,3 +1,5 @@
+import { IExerciseDefinition } from "../interfaces";
+
 const mongoose = require("mongoose");
 const graphql = require("graphql");
 const {
@@ -8,6 +10,7 @@ const {
   GraphQLInt,
   GraphQLFloat
 } = graphql;
+const Exercise = mongoose.model("exercise");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 
 const exerciseDefinitionFields = () => ({
@@ -18,24 +21,24 @@ const exerciseDefinitionFields = () => ({
   type: { type: GraphQLString },
   childExercises: {
     type: new GraphQLList(require("./types/ExerciseDefinitionType")),
-    resolve(parentValue) {
+    resolve(parentValue: IExerciseDefinition) {
       return ExerciseDefinition.getChildExercises(parentValue.id);
     }
   },
   history: {
     type: new GraphQLList(require("./types/ExerciseType").ExerciseType),
-    resolve(parentValue) {
+    resolve(parentValue: IExerciseDefinition) {
       return ExerciseDefinition.getHistory(parentValue.id);
     }
   }
 });
 
-exerciseFields = () => ({
+const exerciseFields = () => ({
   id: { type: GraphQLID },
   date: { type: GraphQLString },
   definition: {
     type: require("./types/ExerciseDefinitionType"),
-    resolve(parentValue) {
+    resolve(parentValue: IExerciseDefinition) {
       return Exercise.getDefinition(parentValue.id);
     }
   },
