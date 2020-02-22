@@ -4,8 +4,6 @@ const express = require("express");
 const expressGraphQL = require("express-graphql");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-
-const models = require("./models");
 const schema = require("./schema/schema");
 
 require("dotenv").config();
@@ -14,7 +12,7 @@ type ExpressRequest = {
   headers: {
     authorization: string;
   };
-  user: {}; //TODO populate
+  user: {}; //TODO populatew
   next: () => void;
 };
 
