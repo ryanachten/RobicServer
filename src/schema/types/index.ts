@@ -1,10 +1,10 @@
 const { ExerciseType, SetType } = require("./ExerciseType");
 const ExerciseDefinitionType = require("./ExerciseDefinitionType");
 const UserType = require("./UserType");
-const RootQueryType = require("./RootQueryType");
+const RootType = require("./RootQueryType");
 
 module.exports = {
-  RootQueryType,
+  RootQueryType: RootType,
   ExerciseType,
   ExerciseDefinitionType,
   SetType,
