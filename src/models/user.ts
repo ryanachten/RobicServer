@@ -72,9 +72,9 @@ UserSchema.statics.register = async ({
 UserSchema.statics.login = async ({ password, email }: IUser) => {
   const User = mongoose.model("user");
   // Locate user by email address in DB.
-  const locatedUser = await User.findOne({
+  const locatedUser = (await User.findOne({
     email
-  });
+  })) as IUser;
   if (!locatedUser) {
     throw new Error(`No user with the email address ${email} was found`);
   }
@@ -130,4 +130,4 @@ UserSchema.statics.createExercise = async function({
   return definition;
 };
 
-mongoose.model("user", UserSchema);
+mongoose.model<IUser>("user", UserSchema);

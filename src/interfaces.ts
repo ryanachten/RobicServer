@@ -81,11 +81,11 @@ export interface IExerciseDefinition extends Document {
   user: IUser;
 }
 
-export type IUser = {
+export interface IUser extends Document {
   email: string;
   exercises: IExerciseDefinition[];
   password: string;
   firstName: string;
   id: string;
   lastName: string;
-};
+}
