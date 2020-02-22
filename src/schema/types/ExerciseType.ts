@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
-const graphql = require("graphql");
+import * as mongoose from "mongoose";
+import * as graphql from "graphql";
+import { IExerciseDefinition } from "../../interfaces";
 const {
   GraphQLObjectType,
   GraphQLString,
@@ -20,7 +21,7 @@ const SetExercise = new GraphQLObjectType({
     value: { type: GraphQLFloat },
     unit: {
       type: GraphQLString,
-      resolve(parentValue, { id }) {
+      resolve(parentValue: IExerciseDefinition, { id }: IExerciseDefinition) {
         return ExerciseDefinition.getUnit(parentValue.id);
       }
     }
