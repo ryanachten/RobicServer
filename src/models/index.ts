@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import * as mongoose from "mongoose";
 
-mongoose.plugin(schema => {
+mongoose.plugin((schema: any) => {
   schema.options.usePushEach = true;
 });
 

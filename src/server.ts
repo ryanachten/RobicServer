@@ -1,4 +1,5 @@
 import * as mongoose from "mongoose";
+import { IRequest } from "./interfaces";
 
 const bodyParser = require("body-parser");
 const cors = require("cors");
@@ -8,14 +9,6 @@ const jwt = require("jsonwebtoken");
 const schema = require("./schema/schema");
 
 require("dotenv").config();
-
-type ExpressRequest = {
-  headers: {
-    authorization: string;
-  };
-  user: {}; //TODO populatew
-  next: () => void;
-};
 
 const app = express();
 
@@ -43,7 +36,7 @@ app.use(cors());
 
 /*** JWT verification middleware ***/
 const JWT_PASSWORD_SECRET = process.env.JWT_PASSWORD_SECRET;
-const verifyJwtToken = async (req: ExpressRequest) => {
+const verifyJwtToken = async (req: IRequest) => {
   // Access token off client request header
   const token = req.headers.authorization;
   try {
@@ -61,7 +54,7 @@ app.use(verifyJwtToken);
 /*** GraphQL middleware ***/
 app.use(
   "/graphql",
-  expressGraphQL((req: ExpressRequest) => ({
+  expressGraphQL((req: IRequest) => ({
     schema,
     graphiql: true,
     context: {

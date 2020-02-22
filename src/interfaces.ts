@@ -1,5 +1,13 @@
 import { Document } from "mongoose";
 
+export type IRequest = {
+  headers: {
+    authorization: string;
+  };
+  user: IUser;
+  next: () => void;
+};
+
 export enum MuscleGroup {
   CHEST = "Chest",
   FOREARMS = "Forearms",
@@ -72,7 +80,7 @@ export interface IExerciseDefinition extends Document {
   unit?: IUnit;
 }
 
-export type User = {
+export type IUser = {
   email: string;
   firstName: string;
   id: string;

@@ -1,7 +1,14 @@
+import * as graphql from "graphql";
+import * as ExerciseType from "./ExerciseType";
+import {
+  IRequest,
+  IUser,
+  IExerciseDefinition,
+  IExercise
+} from "../../interfaces";
+
 const mongoose = require("mongoose");
-const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
-const { ExerciseType } = require("./ExerciseType");
 const ExerciseDefinitionType = require("./ExerciseDefinitionType");
 const UserType = require("./UserType");
 
@@ -16,7 +23,7 @@ const RootQuery = new GraphQLObjectType({
     currentUser: {
       description: "Returns current user based on JSON web token from client",
       type: UserType,
-      resolve(parentValue, {}, { user }) {
+      resolve(parentValue: IRequest, {}, { user }: IRequest) {
         if (!user) {
           return null;
         }
@@ -27,14 +34,14 @@ const RootQuery = new GraphQLObjectType({
     getUserById: {
       type: UserType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue, { id }) {
+      resolve(parentValue: IUser, { id }: IUser) {
         return User.findById(id);
       }
     },
 
     exerciseDefinitions: {
       type: new GraphQLList(ExerciseDefinitionType),
-      resolve(parentValue, {}, { user }) {
+      resolve(parentValue: IRequest, {}, { user }: IRequest) {
         return User.getExercises(user.id);
       }
     },
@@ -42,7 +49,7 @@ const RootQuery = new GraphQLObjectType({
     exerciseDefinition: {
       type: ExerciseDefinitionType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue, { id }) {
+      resolve(parentValue: IExerciseDefinition, { id }: IExerciseDefinition) {
         return ExerciseDefinition.findById(id);
       }
     },
@@ -57,7 +64,7 @@ const RootQuery = new GraphQLObjectType({
     exercise: {
       type: ExerciseType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue, { id }) {
+      resolve(parentValue: IExercise, { id }: IExercise) {
         return Exercise.findById(id);
       }
     }
