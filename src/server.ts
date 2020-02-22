@@ -10,6 +10,14 @@ const schema = require("./schema/schema");
 
 require("dotenv").config();
 
+type ExpressRequest = {
+  headers: {
+    authorization: string;
+  };
+  user: {}; //TODO populate
+  next: () => void;
+};
+
 const app = express();
 
 /*** MongoLab configuration ***/
@@ -26,7 +34,9 @@ mongoose.connect(MONGO_URI, {
 });
 mongoose.connection
   .once("open", () => console.log("Connected to MongoLab instance."))
-  .on("error", error => console.log("Error connecting to MongoLab:", error));
+  .on("error", (error: Error) =>
+    console.log("Error connecting to MongoLab:", error)
+  );
 
 /*** General middleware ***/
 app.use(bodyParser.json());
@@ -34,7 +44,7 @@ app.use(cors());
 
 /*** JWT verification middleware ***/
 const JWT_PASSWORD_SECRET = process.env.JWT_PASSWORD_SECRET;
-const verifyJwtToken = async req => {
+const verifyJwtToken = async (req: ExpressRequest) => {
   // Access token off client request header
   const token = req.headers.authorization;
   try {
@@ -52,7 +62,7 @@ app.use(verifyJwtToken);
 /*** GraphQL middleware ***/
 app.use(
   "/graphql",
-  expressGraphQL(req => ({
+  expressGraphQL((req: ExpressRequest) => ({
     schema,
     graphiql: true,
     context: {
