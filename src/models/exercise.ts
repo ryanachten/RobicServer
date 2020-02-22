@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose = require("mongoose");
 import { IExercise, ISet } from "../interfaces";
 const Schema = mongoose.Schema;
 

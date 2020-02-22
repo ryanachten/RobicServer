@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose = require("mongoose");
 import * as graphql from "graphql";
 import { IExerciseDefinition } from "../../interfaces";
 const {

@@ -1,6 +1,6 @@
 const _ = require("lodash");
 
-import * as graphql from "graphql";
+import graphql = require("graphql");
 
 const { GraphQLSchema } = graphql;
 

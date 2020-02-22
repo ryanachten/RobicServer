@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose = require("mongoose");
 
 mongoose.plugin((schema: any) => {
   schema.options.usePushEach = true;

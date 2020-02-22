@@ -1,4 +1,4 @@
-import * as mongoose from "mongoose";
+import mongoose = require("mongoose");
 import { IRequest } from "./interfaces";
 
 const bodyParser = require("body-parser");
@@ -6,10 +6,11 @@ const cors = require("cors");
 const express = require("express");
 const expressGraphQL = require("express-graphql");
 const jwt = require("jsonwebtoken");
-const schema = require("./schema/schema");
-
 require("dotenv").config();
 
+require("./models");
+
+const schema = require("./schema/schema");
 const app = express();
 
 /*** MongoLab configuration ***/

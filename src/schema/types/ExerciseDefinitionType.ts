@@ -3,7 +3,9 @@ const { exerciseDefinitionFields } = require("../fields");
 
 const { GraphQLObjectType } = graphql;
 
-module.exports = new GraphQLObjectType({
+const ExerciseDefinition = new GraphQLObjectType({
   name: "ExerciseDefinitionType",
   fields: exerciseDefinitionFields
 });
+
+module.exports = ExerciseDefinition;

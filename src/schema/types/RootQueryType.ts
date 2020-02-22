@@ -1,5 +1,4 @@
 import * as graphql from "graphql";
-import * as ExerciseType from "./ExerciseType";
 import {
   IRequest,
   IUser,
@@ -10,6 +9,7 @@ import {
 const mongoose = require("mongoose");
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 const ExerciseDefinitionType = require("./ExerciseDefinitionType");
+const { ExerciseType } = require("./ExerciseType");
 const UserType = require("./UserType");
 
 const User = mongoose.model("user");

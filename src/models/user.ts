@@ -1,9 +1,9 @@
+import mongoose = require("mongoose");
 import { IUser, IExerciseDefinition } from "../interfaces";
 
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 const validator = require("validator");
 const Schema = mongoose.Schema;
 
