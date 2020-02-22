@@ -1,5 +1,7 @@
 const _ = require("lodash");
-require("graphql");
+
+import * as graphql from "graphql";
+
 const { GraphQLSchema } = graphql;
 
 const { RootQueryType } = require("./types");
