@@ -2,14 +2,7 @@ import { IExerciseDefinition } from "../interfaces";
 
 const mongoose = require("mongoose");
 const graphql = require("graphql");
-const {
-  GraphQLObjectType,
-  GraphQLString,
-  GraphQLID,
-  GraphQLList,
-  GraphQLInt,
-  GraphQLFloat
-} = graphql;
+const { GraphQLString, GraphQLID, GraphQLList, GraphQLFloat } = graphql;
 const Exercise = mongoose.model("exercise");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 

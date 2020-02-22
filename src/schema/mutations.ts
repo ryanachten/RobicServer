@@ -1,4 +1,5 @@
-const graphql = require("graphql");
+import * as graphql from "graphql";
+import { IExercise, IExerciseDefinition, IUser, IRequest } from "../interfaces";
 const {
   GraphQLList,
   GraphQLObjectType,
@@ -10,12 +11,7 @@ const mongoose = require("mongoose");
 const Exercise = mongoose.model("exercise");
 const User = mongoose.model("user");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
-const {
-  SetType,
-  ExerciseType,
-  ExerciseDefinitionType,
-  UserType
-} = require("./types");
+const { ExerciseType, ExerciseDefinitionType, UserType } = require("./types");
 const { SetInput } = require("./inputs");
 
 const mutation = new GraphQLObjectType({
@@ -29,7 +25,10 @@ const mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         email: { type: GraphQLString }
       },
-      resolve(parentValue, { firstName, lastName, password, email }) {
+      resolve(
+        parentValue: IUser,
+        { firstName, lastName, password, email }: IUser
+      ) {
         return User.register({ firstName, lastName, password, email });
       }
     },
@@ -40,7 +39,7 @@ const mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         email: { type: GraphQLString }
       },
-      resolve(parentValue, { password, email }) {
+      resolve(parentValue: IUser, { password, email }: IUser) {
         return User.login({ password, email });
       }
     },
@@ -55,9 +54,15 @@ const mutation = new GraphQLObjectType({
         primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(
-        parentValue,
-        { title, unit, primaryMuscleGroup, type, childExercises },
-        { user }
+        parentValue: IExerciseDefinition,
+        {
+          title,
+          unit,
+          primaryMuscleGroup,
+          type,
+          childExercises
+        }: IExerciseDefinition,
+        { user }: IRequest
       ) {
         return User.createExercise({
           title,
@@ -81,8 +86,15 @@ const mutation = new GraphQLObjectType({
         primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(
-        parentValue,
-        { exerciseId, title, type, childExercises, unit, primaryMuscleGroup }
+        parentValue: { exerciseId: string } & IExerciseDefinition,
+        {
+          exerciseId,
+          title,
+          type,
+          childExercises,
+          unit,
+          primaryMuscleGroup
+        }: { exerciseId: string } & IExerciseDefinition
       ) {
         return ExerciseDefinition.update({
           id: exerciseId,
@@ -101,7 +113,13 @@ const mutation = new GraphQLObjectType({
         definitionId: { type: GraphQLID },
         exerciseId: { type: GraphQLID }
       },
-      resolve(parentValue, { definitionId, exerciseId }) {
+      resolve(
+        parentValue: { definitionId: string; exerciseId: string },
+        {
+          definitionId,
+          exerciseId
+        }: { definitionId: string; exerciseId: string }
+      ) {
         return ExerciseDefinition.removeHistorySession(
           definitionId,
           exerciseId
@@ -116,7 +134,10 @@ const mutation = new GraphQLObjectType({
         sets: { type: new GraphQLList(SetInput) },
         timeTaken: { type: GraphQLString }
       },
-      resolve(parentValue, { definitionId, sets, timeTaken }) {
+      resolve(
+        parentValue: { definitionId: string } & IExercise,
+        { definitionId, sets, timeTaken }: { definitionId: string } & IExercise
+      ) {
         return ExerciseDefinition.addNewSession({
           definitionId,
           sets,
@@ -132,7 +153,10 @@ const mutation = new GraphQLObjectType({
         sets: { type: new GraphQLList(SetInput) },
         timeTaken: { type: GraphQLInt }
       },
-      resolve(parentValue, { exerciseId, sets, timeTaken }) {
+      resolve(
+        parentValue: { exerciseId: string } & IExercise,
+        { exerciseId, sets, timeTaken }: { exerciseId: string } & IExercise
+      ) {
         return Exercise.update(exerciseId, sets, timeTaken);
       }
     }
