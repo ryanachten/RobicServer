@@ -78,10 +78,13 @@ export interface IExerciseDefinition extends Document {
   title: string;
   type: ExerciseType;
   unit?: IUnit;
+  user: IUser;
 }
 
 export type IUser = {
   email: string;
+  exercises: IExerciseDefinition[];
+  password: string;
   firstName: string;
   id: string;
   lastName: string;

@@ -1,3 +1,5 @@
+import { IUser, IExerciseDefinition } from "../interfaces";
+
 const _ = require("lodash");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -22,7 +24,7 @@ const UserSchema = new Schema({
     minlength: 1,
     unique: true,
     validate: {
-      validator: value => validator.isEmail(value),
+      validator: (value: ValidityState) => validator.isEmail(value),
       message: "{VALUE} is not a valid email"
     }
   },
@@ -54,7 +56,7 @@ UserSchema.statics.register = async ({
   lastName,
   password,
   email
-}) => {
+}: IUser) => {
   const User = mongoose.model("user");
   // Store user password using hashed password with 12 salt rounds
   const hashedPassword = await bcrypt.hash(password, 12);
@@ -67,7 +69,7 @@ UserSchema.statics.register = async ({
   }).save();
 };
 
-UserSchema.statics.login = async ({ password, email }) => {
+UserSchema.statics.login = async ({ password, email }: IUser) => {
   const User = mongoose.model("user");
   // Locate user by email address in DB.
   const locatedUser = await User.findOne({
@@ -96,12 +98,10 @@ UserSchema.statics.login = async ({ password, email }) => {
   return token;
 };
 
-UserSchema.statics.getExercises = async ({ password, email }) => {};
-
-UserSchema.statics.getExercises = function(id) {
+UserSchema.statics.getExercises = function(id: string) {
   return this.findById(id)
     .populate("exercises")
-    .then(user => user.exercises);
+    .then((user: IUser) => user.exercises);
 };
 
 UserSchema.statics.createExercise = async function({
@@ -111,7 +111,7 @@ UserSchema.statics.createExercise = async function({
   type,
   childExercises,
   user: userId
-}) {
+}: IExerciseDefinition) {
   const ExerciseDefinition = mongoose.model("exerciseDefinition");
   const user = await this.findById(userId);
   // Create and save the new definition
