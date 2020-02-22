@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+import * as mongoose from "mongoose";
+import { IExercise, ISet } from "../interfaces";
 const Schema = mongoose.Schema;
 
 const ExerciseSchema = new Schema({
@@ -27,17 +28,21 @@ const ExerciseSchema = new Schema({
   netValue: { type: Number, default: 0 }
 });
 
-ExerciseSchema.statics.getDefinition = function(id) {
+ExerciseSchema.statics.getDefinition = function(id: string) {
   return this.findById(id)
     .populate("definition")
-    .then(exercise => exercise.definition);
+    .then((exercise: IExercise) => exercise.definition);
 };
 
-ExerciseSchema.statics.update = async function(exerciseId, sets, timeTaken) {
+ExerciseSchema.statics.update = async function(
+  exerciseId: string,
+  sets: ISet[],
+  timeTaken: string
+) {
   const exercise = await this.findById(exerciseId);
   exercise.sets = sets;
   exercise.timeTaken = timeTaken;
   return exercise.save();
 };
 
-mongoose.model("exercise", ExerciseSchema);
+mongoose.model<IExercise>("exercise", ExerciseSchema);

@@ -1,3 +1,5 @@
+import { Document } from "mongoose";
+
 export enum MuscleGroup {
   CHEST = "Chest",
   FOREARMS = "Forearms",
@@ -32,7 +34,7 @@ export interface SetExercise {
   unit: Unit;
 }
 
-export type Set = {
+export type ISet = {
   exercises?: SetExercise[];
   reps: number; //TODO: should be optional
   value: number; //TODO: should be optional
@@ -44,13 +46,13 @@ export enum ExerciseType {
   SUPERSET = "Superset"
 }
 
-export type Exercise = {
+export interface IExercise extends Document {
   id: string;
   date: string;
-  definiton: IExerciseDefinition;
-  sets: Set[];
+  definition: IExerciseDefinition;
+  sets: ISet[];
   timeTaken: string;
-};
+}
 
 export type PersonalBest = {
   netValue: { value: number };
@@ -62,7 +64,7 @@ export type PersonalBest = {
 
 export interface IExerciseDefinition extends Document {
   childExercises?: IExerciseDefinition[];
-  history: Exercise[];
+  history: IExercise[];
   id: string;
   primaryMuscleGroup: MuscleGroup[];
   title: string;

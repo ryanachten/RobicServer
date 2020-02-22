@@ -1,9 +1,10 @@
+import * as mongoose from "mongoose";
+
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const express = require("express");
 const expressGraphQL = require("express-graphql");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 const schema = require("./schema/schema");
 
 require("dotenv").config();
@@ -24,7 +25,7 @@ if (!MONGO_URI) {
   throw new Error("You must provide a MongoLab URI");
 }
 
-mongoose.Promise = global.Promise;
+// mongoose.Promise = global.Promise; // TODO: is this needed?
 mongoose.connect(MONGO_URI, {
   useCreateIndex: true,
   useNewUrlParser: true,
