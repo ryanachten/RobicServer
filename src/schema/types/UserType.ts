@@ -1,9 +1,11 @@
+import { IUser } from "../../interfaces";
+
 const mongoose = require("mongoose");
 const graphql = require("graphql");
 const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = graphql;
 const User = mongoose.model("user");
 
-const UserType = new GraphQLObjectType({
+module.exports = new GraphQLObjectType({
   name: "UserType",
   fields: () => ({
     id: { type: GraphQLID },
@@ -12,11 +14,9 @@ const UserType = new GraphQLObjectType({
     email: { type: GraphQLString },
     exercises: {
       type: new GraphQLList(require("./ExerciseDefinitionType")),
-      resolve(parentValue) {
+      resolve(parentValue: IUser) {
         return User.getExercises(parentValue.id);
       }
     }
   })
 });
-
-module.exports = UserType;
