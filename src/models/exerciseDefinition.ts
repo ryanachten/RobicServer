@@ -1,4 +1,6 @@
-const mongoose = require("mongoose");
+import * as mongoose from "mongoose";
+import { IExerciseDefinition, ISet } from "../interfaces";
+
 const Schema = mongoose.Schema;
 const Exercise = mongoose.model("exercise");
 
@@ -70,6 +72,10 @@ ExerciseDefinitionSchema.statics.addNewSession = async function({
   definitionId,
   sets,
   timeTaken
+}: {
+  definitionId: string;
+  sets: ISet;
+  timeTaken: string;
 }) {
   const Exercise = mongoose.model("exercise");
   const exerciseDef = await this.findById(definitionId);
@@ -88,23 +94,25 @@ ExerciseDefinitionSchema.statics.addNewSession = async function({
   );
 };
 
-ExerciseDefinitionSchema.statics.getChildExercises = function(id) {
+ExerciseDefinitionSchema.statics.getChildExercises = function(id: string) {
   return this.findById(id)
     .populate("childExercises")
-    .then(exercise => exercise.childExercises);
+    .then((exercise: IExerciseDefinition) => exercise.childExercises);
 };
 
-ExerciseDefinitionSchema.statics.getHistory = function(id) {
+ExerciseDefinitionSchema.statics.getHistory = function(id: string) {
   return (
     this.findById(id)
       // Find the definition and then return the history log
       .populate("history")
-      .then(exercise => exercise.history)
+      .then((exercise: IExerciseDefinition) => exercise.history)
   );
 };
 
-ExerciseDefinitionSchema.statics.getUnit = function(id) {
-  return this.findById(id).then(exercise => exercise.unit);
+ExerciseDefinitionSchema.statics.getUnit = function(id: string) {
+  return this.findById(id).then(
+    (exercise: IExerciseDefinition) => exercise.unit
+  );
 };
 
 ExerciseDefinitionSchema.statics.update = async function({
@@ -114,7 +122,7 @@ ExerciseDefinitionSchema.statics.update = async function({
   primaryMuscleGroup,
   type,
   childExercises
-}) {
+}: IExerciseDefinition) {
   const definition = await this.findById(id);
   definition.title = title;
   definition.unit = unit;
@@ -125,8 +133,8 @@ ExerciseDefinitionSchema.statics.update = async function({
 };
 
 ExerciseDefinitionSchema.statics.removeHistorySession = async function(
-  definitionId,
-  exerciseId
+  definitionId: string,
+  exerciseId: string
 ) {
   // Remove the exercise from definition history
   const definition = await this.findById(definitionId);
@@ -140,4 +148,7 @@ ExerciseDefinitionSchema.statics.removeHistorySession = async function(
   return definition;
 };
 
-mongoose.model("exerciseDefinition", ExerciseDefinitionSchema);
+mongoose.model<IExerciseDefinition>(
+  "exerciseDefinition",
+  ExerciseDefinitionSchema
+);

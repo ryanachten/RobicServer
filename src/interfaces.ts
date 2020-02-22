@@ -21,7 +21,7 @@ export enum MuscleGroup {
   // ABDUCTORS = "Abductors"
 }
 
-export enum Unit {
+export enum IUnit {
   kg = "kg",
   min = "min",
   bodyweight = "body weight"
@@ -31,7 +31,7 @@ export interface SetExercise {
   id: string;
   reps: number;
   value: number;
-  unit: Unit;
+  unit: IUnit;
 }
 
 export type ISet = {
@@ -69,7 +69,7 @@ export interface IExerciseDefinition extends Document {
   primaryMuscleGroup: MuscleGroup[];
   title: string;
   type: ExerciseType;
-  unit?: Unit;
+  unit?: IUnit;
 }
 
 export type User = {

@@ -9,7 +9,6 @@ const {
   GraphQLInt,
   GraphQLFloat
 } = graphql;
-const Exercise = mongoose.model("exercise");
 const ExerciseDefinition = mongoose.model("exerciseDefinition");
 const { exerciseFields } = require("../fields");
 
@@ -22,7 +21,7 @@ const SetExercise = new GraphQLObjectType({
     unit: {
       type: GraphQLString,
       resolve(parentValue: IExerciseDefinition, { id }: IExerciseDefinition) {
-        return ExerciseDefinition.getUnit(parentValue.id);
+        return ExerciseDefinition.schema.methods.getUnit(parentValue.id);
       }
     }
   })
