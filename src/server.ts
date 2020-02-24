@@ -1,17 +1,17 @@
 import { IRequest } from './interfaces';
 
 import mongoose = require('mongoose');
-
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const express = require('express');
-const expressGraphQL = require('express-graphql');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+import bodyParser = require('body-parser');
+import cors = require('cors');
+import express = require('express');
+import expressGraphQL = require('express-graphql');
+import jwt = require('jsonwebtoken');
 
 require('./models');
 
-const schema = require('./schema/schema');
+import schema = require('./schema/schema');
+
+require('dotenv').config();
 
 const app = express();
 
@@ -44,11 +44,11 @@ const verifyJwtToken = async (req: IRequest) => {
   const token = req.headers.authorization;
   try {
     // Verify user using JWT secret
-    const { user } = await jwt.verify(token, JWT_PASSWORD_SECRET);
+    const { user } = (await jwt.verify(token, JWT_PASSWORD_SECRET)) as IRequest;
     // Add the user to the request for parsing in the GQL middleware
     req.user = user;
   } catch (err) {
-    console.log(err);
+    console.log('Error getting user from JWT verification', err);
   }
   req.next();
 };
