@@ -1,4 +1,4 @@
-import { Document } from "mongoose";
+import { Document } from 'mongoose';
 
 export type IRequest = {
   headers: {
@@ -9,30 +9,30 @@ export type IRequest = {
 };
 
 export enum MuscleGroup {
-  CHEST = "Chest",
-  FOREARMS = "Forearms",
-  LATS = "Lats",
+  CHEST = 'Chest',
+  FOREARMS = 'Forearms',
+  LATS = 'Lats',
   // MIDDLE_BACK = "Middle Back",
-  LOWER_BACK = "Lower Back",
-  NECK = "Neck",
-  HAMS = "Hamstrings",
-  QUADS = "Quadriceps",
-  CALVES = "Calves",
-  TRICEPS = "Triceps",
-  TRAPS = "Traps",
-  SHOULDERS = "Shoulders",
-  ABS = "Abdominals",
-  OBLIQUES = "Obliques",
-  GLUTES = "Glutes",
-  BICEPS = "Biceps"
+  LOWER_BACK = 'Lower Back',
+  NECK = 'Neck',
+  HAMS = 'Hamstrings',
+  QUADS = 'Quadriceps',
+  CALVES = 'Calves',
+  TRICEPS = 'Triceps',
+  TRAPS = 'Traps',
+  SHOULDERS = 'Shoulders',
+  ABS = 'Abdominals',
+  OBLIQUES = 'Obliques',
+  GLUTES = 'Glutes',
+  BICEPS = 'Biceps'
   // ADDUCTORS = "Adductors",
   // ABDUCTORS = "Abductors"
 }
 
 export enum IUnit {
-  kg = "kg",
-  min = "min",
-  bodyweight = "body weight"
+  kg = 'kg',
+  min = 'min',
+  bodyweight = 'body weight'
 }
 
 export interface SetExercise {
@@ -44,14 +44,14 @@ export interface SetExercise {
 
 export type ISet = {
   exercises?: SetExercise[];
-  reps: number; //TODO: should be optional
-  value: number; //TODO: should be optional
+  reps: number; // TODO: should be optional
+  value: number; // TODO: should be optional
 };
 
 export enum ExerciseType {
-  CIRCUIT = "Circuit",
-  STANDARD = "Standard",
-  SUPERSET = "Superset"
+  CIRCUIT = 'Circuit',
+  STANDARD = 'Standard',
+  SUPERSET = 'Superset'
 }
 
 export interface IExercise extends Document {

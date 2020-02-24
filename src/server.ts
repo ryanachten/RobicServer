@@ -1,42 +1,42 @@
-import mongoose = require("mongoose");
-import { IRequest } from "./interfaces";
+import { IRequest } from './interfaces';
 
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const express = require("express");
-const expressGraphQL = require("express-graphql");
-const jwt = require("jsonwebtoken");
-require("dotenv").config();
+import mongoose = require('mongoose');
 
-require("./models");
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const express = require('express');
+const expressGraphQL = require('express-graphql');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
-const schema = require("./schema/schema");
+require('./models');
+
+const schema = require('./schema/schema');
+
 const app = express();
 
-/*** MongoLab configuration ***/
+/** * MongoLab configuration ** */
 const MONGO_URI = process.env.MONGOLAB_URI;
 if (!MONGO_URI) {
-  throw new Error("You must provide a MongoLab URI");
+  throw new Error('You must provide a MongoLab URI');
 }
 
 // mongoose.Promise = global.Promise; // TODO: is this needed?
 mongoose.connect(MONGO_URI, {
   useCreateIndex: true,
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 mongoose.connection
-  .once("open", () => console.log("Connected to MongoLab instance."))
-  .on("error", (error: Error) =>
-    console.log("Error connecting to MongoLab:", error)
-  );
+  .once('open', () => console.log('Connected to MongoLab instance.'))
+  .on('error', (error: Error) => console.log('Error connecting to MongoLab:', error));
 
-/*** General middleware ***/
+/** * General middleware ** */
 app.use(bodyParser.json());
 app.use(cors());
 
-/*** JWT verification middleware ***/
-const JWT_PASSWORD_SECRET = process.env.JWT_PASSWORD_SECRET;
+/** * JWT verification middleware ** */
+const { JWT_PASSWORD_SECRET } = process.env;
 const verifyJwtToken = async (req: IRequest) => {
   // Access token off client request header
   const token = req.headers.authorization;
@@ -52,17 +52,17 @@ const verifyJwtToken = async (req: IRequest) => {
 };
 app.use(verifyJwtToken);
 
-/*** GraphQL middleware ***/
+/** * GraphQL middleware ** */
 app.use(
-  "/graphql",
+  '/graphql',
   expressGraphQL((req: IRequest) => ({
     schema,
     graphiql: true,
     context: {
       // Add authed user object to GQL context
-      user: req.user
-    }
-  }))
+      user: req.user,
+    },
+  })),
 );
 
 module.exports = app;

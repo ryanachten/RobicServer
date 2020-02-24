@@ -1,21 +1,25 @@
-import * as graphql from "graphql";
-import { IExercise, IExerciseDefinition, IUser, IRequest } from "../interfaces";
+import * as graphql from 'graphql';
+import {
+  IExercise, IExerciseDefinition, IUser, IRequest,
+} from '../interfaces';
+
 const {
   GraphQLList,
   GraphQLObjectType,
   GraphQLInt,
   GraphQLString,
-  GraphQLID
+  GraphQLID,
 } = graphql;
-const mongoose = require("mongoose");
-const Exercise = mongoose.model("exercise");
-const User = mongoose.model("user");
-const ExerciseDefinition = mongoose.model("exerciseDefinition");
-const { ExerciseType, ExerciseDefinitionType, UserType } = require("./types");
-const { SetInput } = require("./inputs");
+const mongoose = require('mongoose');
+
+const Exercise = mongoose.model('exercise');
+const User = mongoose.model('user');
+const ExerciseDefinition = mongoose.model('exerciseDefinition');
+const { ExerciseType, ExerciseDefinitionType, UserType } = require('./types');
+const { SetInput } = require('./inputs');
 
 const mutation = new GraphQLObjectType({
-  name: "Mutation",
+  name: 'Mutation',
   fields: {
     registerUser: {
       type: UserType,
@@ -23,25 +27,29 @@ const mutation = new GraphQLObjectType({
         firstName: { type: GraphQLString },
         lastName: { type: GraphQLString },
         password: { type: GraphQLString },
-        email: { type: GraphQLString }
+        email: { type: GraphQLString },
       },
       resolve(
         parentValue: IUser,
-        { firstName, lastName, password, email }: IUser
+        {
+          firstName, lastName, password, email,
+        }: IUser,
       ) {
-        return User.register({ firstName, lastName, password, email });
-      }
+        return User.register({
+          firstName, lastName, password, email,
+        });
+      },
     },
 
     loginUser: {
       type: GraphQLString,
       args: {
         password: { type: GraphQLString },
-        email: { type: GraphQLString }
+        email: { type: GraphQLString },
       },
       resolve(parentValue: IUser, { password, email }: IUser) {
         return User.login({ password, email });
-      }
+      },
     },
 
     addExerciseDefinition: {
@@ -51,7 +59,7 @@ const mutation = new GraphQLObjectType({
         unit: { type: GraphQLString },
         type: { type: GraphQLString },
         childExercises: { type: new GraphQLList(GraphQLID) },
-        primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
+        primaryMuscleGroup: { type: new GraphQLList(GraphQLString) },
       },
       resolve(
         parentValue: IExerciseDefinition,
@@ -60,9 +68,9 @@ const mutation = new GraphQLObjectType({
           unit,
           primaryMuscleGroup,
           type,
-          childExercises
+          childExercises,
         }: IExerciseDefinition,
-        { user }: IRequest
+        { user }: IRequest,
       ) {
         return User.createExercise({
           title,
@@ -70,9 +78,9 @@ const mutation = new GraphQLObjectType({
           primaryMuscleGroup,
           type,
           childExercises,
-          user: user.id
+          user: user.id,
         });
-      }
+      },
     },
 
     updateExerciseDefinition: {
@@ -83,7 +91,7 @@ const mutation = new GraphQLObjectType({
         unit: { type: GraphQLString },
         type: { type: GraphQLString },
         childExercises: { type: new GraphQLList(GraphQLID) },
-        primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
+        primaryMuscleGroup: { type: new GraphQLList(GraphQLString) },
       },
       resolve(
         parentValue: { exerciseId: string } & IExerciseDefinition,
@@ -93,8 +101,8 @@ const mutation = new GraphQLObjectType({
           type,
           childExercises,
           unit,
-          primaryMuscleGroup
-        }: { exerciseId: string } & IExerciseDefinition
+          primaryMuscleGroup,
+        }: { exerciseId: string } & IExerciseDefinition,
       ) {
         return ExerciseDefinition.update({
           id: exerciseId,
@@ -102,29 +110,29 @@ const mutation = new GraphQLObjectType({
           unit,
           primaryMuscleGroup,
           type,
-          childExercises
+          childExercises,
         });
-      }
+      },
     },
 
     removeHistorySession: {
       type: ExerciseDefinitionType,
       args: {
         definitionId: { type: GraphQLID },
-        exerciseId: { type: GraphQLID }
+        exerciseId: { type: GraphQLID },
       },
       resolve(
         parentValue: { definitionId: string; exerciseId: string },
         {
           definitionId,
-          exerciseId
-        }: { definitionId: string; exerciseId: string }
+          exerciseId,
+        }: { definitionId: string; exerciseId: string },
       ) {
         return ExerciseDefinition.removeHistorySession(
           definitionId,
-          exerciseId
+          exerciseId,
         );
-      }
+      },
     },
 
     addExercise: {
@@ -132,18 +140,18 @@ const mutation = new GraphQLObjectType({
       args: {
         definitionId: { type: GraphQLID },
         sets: { type: new GraphQLList(SetInput) },
-        timeTaken: { type: GraphQLString }
+        timeTaken: { type: GraphQLString },
       },
       resolve(
         parentValue: { definitionId: string } & IExercise,
-        { definitionId, sets, timeTaken }: { definitionId: string } & IExercise
+        { definitionId, sets, timeTaken }: { definitionId: string } & IExercise,
       ) {
         return ExerciseDefinition.addNewSession({
           definitionId,
           sets,
-          timeTaken
+          timeTaken,
         });
-      }
+      },
     },
 
     updateExercise: {
@@ -151,16 +159,16 @@ const mutation = new GraphQLObjectType({
       args: {
         exerciseId: { type: GraphQLID },
         sets: { type: new GraphQLList(SetInput) },
-        timeTaken: { type: GraphQLInt }
+        timeTaken: { type: GraphQLInt },
       },
       resolve(
         parentValue: { exerciseId: string } & IExercise,
-        { exerciseId, sets, timeTaken }: { exerciseId: string } & IExercise
+        { exerciseId, sets, timeTaken }: { exerciseId: string } & IExercise,
       ) {
         return Exercise.update(exerciseId, sets, timeTaken);
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 module.exports = mutation;

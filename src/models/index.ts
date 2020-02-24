@@ -1,9 +1,9 @@
-import mongoose = require("mongoose");
+import mongoose = require('mongoose');
 
 mongoose.plugin((schema: any) => {
   schema.options.usePushEach = true;
 });
 
-require("./user");
-require("./exercise");
-require("./exerciseDefinition");
+require('./user');
+require('./exercise');
+require('./exerciseDefinition');

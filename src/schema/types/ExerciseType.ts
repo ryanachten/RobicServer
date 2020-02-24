@@ -1,19 +1,20 @@
-import mongoose = require("mongoose");
-import * as graphql from "graphql";
-import { IExerciseDefinition } from "../../interfaces";
+import * as graphql from 'graphql';
+import { IExerciseDefinition } from '../../interfaces';
+
+import mongoose = require('mongoose');
 const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLID,
   GraphQLList,
   GraphQLInt,
-  GraphQLFloat
+  GraphQLFloat,
 } = graphql;
-const ExerciseDefinition = mongoose.model("exerciseDefinition");
-const { exerciseFields } = require("../fields");
+const ExerciseDefinition = mongoose.model('exerciseDefinition');
+const { exerciseFields } = require('../fields');
 
 const SetExercise = new GraphQLObjectType({
-  name: "SetExercise",
+  name: 'SetExercise',
   fields: () => ({
     id: { type: GraphQLID },
     reps: { type: GraphQLInt },
@@ -22,25 +23,25 @@ const SetExercise = new GraphQLObjectType({
       type: GraphQLString,
       resolve(parentValue: IExerciseDefinition, { id }: IExerciseDefinition) {
         return ExerciseDefinition.schema.methods.getUnit(parentValue.id);
-      }
-    }
-  })
+      },
+    },
+  }),
 });
 
 const SetType = new GraphQLObjectType({
-  name: "SetType",
+  name: 'SetType',
   fields: () => ({
     exercises: {
-      type: new GraphQLList(SetExercise)
+      type: new GraphQLList(SetExercise),
     },
     reps: { type: GraphQLInt },
-    value: { type: GraphQLFloat }
-  })
+    value: { type: GraphQLFloat },
+  }),
 });
 
 const ExerciseType = new GraphQLObjectType({
-  name: "ExerciseType",
-  fields: exerciseFields
+  name: 'ExerciseType',
+  fields: exerciseFields,
 });
 
 module.exports = { ExerciseType, SetType };

@@ -1,8 +1,9 @@
-import mongoose = require("mongoose");
-import { IExerciseDefinition, ISet } from "../interfaces";
+import { IExerciseDefinition, ISet } from '../interfaces';
 
-const Schema = mongoose.Schema;
-const Exercise = mongoose.model("exercise");
+import mongoose = require('mongoose');
+
+const { Schema } = mongoose;
+const Exercise = mongoose.model('exercise');
 
 /*
   Houses history and aggregate data for the Exercise schema
@@ -11,7 +12,7 @@ const Exercise = mongoose.model("exercise");
 const ExerciseDefinitionSchema = new Schema({
   user: {
     type: Schema.Types.ObjectId,
-    ref: "user"
+    ref: 'user',
   },
   title: { type: String },
   unit: { type: String },
@@ -20,108 +21,108 @@ const ExerciseDefinitionSchema = new Schema({
   childExercises: [
     {
       type: Schema.Types.ObjectId,
-      ref: "exerciseDefinition"
-    }
+      ref: 'exerciseDefinition',
+    },
   ],
   personalBest: {
     value: {
       value: { type: Number, default: 0 },
       exercise: {
         type: Schema.Types.ObjectId,
-        ref: "exercise"
-      }
+        ref: 'exercise',
+      },
     },
     setCount: {
       value: { type: Number, default: 0 },
       exercise: {
         type: Schema.Types.ObjectId,
-        ref: "exercise"
-      }
+        ref: 'exercise',
+      },
     },
     totalReps: {
       value: { type: Number, default: 0 },
       exercise: {
         type: Schema.Types.ObjectId,
-        ref: "exercise"
-      }
+        ref: 'exercise',
+      },
     },
     netValue: {
       value: { type: Number, default: 0 },
       exercise: {
         type: Schema.Types.ObjectId,
-        ref: "exercise"
-      }
+        ref: 'exercise',
+      },
     },
     timeTaken: {
       value: { type: Number, default: 0 },
       exercise: {
         type: Schema.Types.ObjectId,
-        ref: "exercise"
-      }
-    }
+        ref: 'exercise',
+      },
+    },
   },
   history: [
     {
       type: Schema.Types.ObjectId,
-      ref: "exercise"
-    }
-  ]
+      ref: 'exercise',
+    },
+  ],
 });
 
-ExerciseDefinitionSchema.statics.addNewSession = async function({
+ExerciseDefinitionSchema.statics.addNewSession = async function ({
   definitionId,
   sets,
-  timeTaken
+  timeTaken,
 }: {
   definitionId: string;
   sets: ISet;
   timeTaken: string;
 }) {
-  const Exercise = mongoose.model("exercise");
+  const Exercise = mongoose.model('exercise');
   const exerciseDef = await this.findById(definitionId);
   const activeExercise = new Exercise({
     date: Date.now(),
     definition: definitionId,
     sets,
     timeTaken,
-    netValue: 0
+    netValue: 0,
   });
   // Add the active session to the history log
   exerciseDef.history.push(activeExercise);
   // Save both the updated definition and new active exercise, return new exercise
   return Promise.all([exerciseDef.save(), activeExercise.save()]).then(
-    ([exerciseDef, activeExercise]) => activeExercise
+    ([exerciseDef, activeExercise]) => activeExercise,
   );
 };
 
-ExerciseDefinitionSchema.statics.getChildExercises = function(id: string) {
+ExerciseDefinitionSchema.statics.getChildExercises = function (id: string) {
   return this.findById(id)
-    .populate("childExercises")
+    .populate('childExercises')
     .then((exercise: IExerciseDefinition) => exercise.childExercises);
 };
 
-ExerciseDefinitionSchema.statics.getHistory = function(id: string) {
+ExerciseDefinitionSchema.statics.getHistory = function (id: string) {
   return (
     this.findById(id)
       // Find the definition and then return the history log
-      .populate("history")
+      .populate('history')
       .then((exercise: IExerciseDefinition) => exercise.history)
   );
 };
 
-ExerciseDefinitionSchema.statics.getUnit = function(id: string) {
+ExerciseDefinitionSchema.statics.getUnit = function (id: string) {
   return this.findById(id).then(
-    (exercise: IExerciseDefinition) => exercise.unit
+    (exercise: IExerciseDefinition) => exercise.unit,
   );
 };
 
-ExerciseDefinitionSchema.statics.update = async function({
+ExerciseDefinitionSchema.statics.update = async function ({
   id,
   title,
   unit,
   primaryMuscleGroup,
   type,
-  childExercises
+  childExercises,
 }: IExerciseDefinition) {
   const definition = await this.findById(id);
   definition.title = title;
@@ -132,9 +133,9 @@ ExerciseDefinitionSchema.statics.update = async function({
   return definition.save();
 };
 
-ExerciseDefinitionSchema.statics.removeHistorySession = async function(
+ExerciseDefinitionSchema.statics.removeHistorySession = async function (
   definitionId: string,
-  exerciseId: string
+  exerciseId: string,
 ) {
   // Remove the exercise from definition history
   const definition = await this.findById(definitionId);
@@ -149,6 +150,6 @@ ExerciseDefinitionSchema.statics.removeHistorySession = async function(
 };
 
 mongoose.model<IExerciseDefinition>(
-  "exerciseDefinition",
-  ExerciseDefinitionSchema
+  'exerciseDefinition',
+  ExerciseDefinitionSchema,
 );

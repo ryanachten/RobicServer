@@ -1,15 +1,18 @@
-import mongoose = require("mongoose");
-import { IUser, IExerciseDefinition } from "../interfaces";
+import { IUser, IExerciseDefinition } from '../interfaces';
 
-const _ = require("lodash");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const validator = require("validator");
-const Schema = mongoose.Schema;
+import mongoose = require('mongoose');
+
+const _ = require('lodash');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const validator = require('validator');
+
+const { Schema } = mongoose;
 
 // Extract secret from env for password salt
-require("dotenv").config();
-const JWT_PASSWORD_SECRET = process.env.JWT_PASSWORD_SECRET;
+require('dotenv').config();
+
+const { JWT_PASSWORD_SECRET } = process.env;
 
 /*
   Houses user information and authentication details
@@ -25,39 +28,39 @@ const UserSchema = new Schema({
     unique: true,
     validate: {
       validator: (value: ValidityState) => validator.isEmail(value),
-      message: "{VALUE} is not a valid email"
-    }
+      message: '{VALUE} is not a valid email',
+    },
   },
   password: { type: String, required: true, minlength: 6 },
   tokens: [
     {
       access: {
         type: String,
-        required: true
+        required: true,
       },
       token: {
         type: String,
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   ],
   firstName: { type: String },
   lastName: { type: String },
   exercises: [
     {
       type: Schema.Types.ObjectId,
-      ref: "exerciseDefinition"
-    }
-  ]
+      ref: 'exerciseDefinition',
+    },
+  ],
 });
 
 UserSchema.statics.register = async ({
   firstName,
   lastName,
   password,
-  email
+  email,
 }: IUser) => {
-  const User = mongoose.model("user");
+  const User = mongoose.model('user');
   // Store user password using hashed password with 12 salt rounds
   const hashedPassword = await bcrypt.hash(password, 12);
   return await new User({
@@ -65,15 +68,15 @@ UserSchema.statics.register = async ({
     lastName,
     email,
     password: hashedPassword,
-    exercises: []
+    exercises: [],
   }).save();
 };
 
 UserSchema.statics.login = async ({ password, email }: IUser) => {
-  const User = mongoose.model("user");
+  const User = mongoose.model('user');
   // Locate user by email address in DB.
   const locatedUser = (await User.findOne({
-    email
+    email,
   })) as IUser;
   if (!locatedUser) {
     throw new Error(`No user with the email address ${email} was found`);
@@ -81,38 +84,38 @@ UserSchema.statics.login = async ({ password, email }: IUser) => {
   // Compared the provided email with the hashed version stored on the user object
   const validPassword = await bcrypt.compare(password, locatedUser.password);
   if (!validPassword) {
-    throw new Error(`The password provided is incorrect`);
+    throw new Error('The password provided is incorrect');
   }
   // Create signed JSON web token
   const token = jwt.sign(
     {
       // At this stage, only include user ID in token to minimise decodable information in token
-      user: _.pick(locatedUser, ["id"])
+      user: _.pick(locatedUser, ['id']),
     },
     JWT_PASSWORD_SECRET,
     {
       // Token will expire in one year
-      expiresIn: "1y"
-    }
+      expiresIn: '1y',
+    },
   );
   return token;
 };
 
-UserSchema.statics.getExercises = function(id: string) {
+UserSchema.statics.getExercises = function (id: string) {
   return this.findById(id)
-    .populate("exercises")
+    .populate('exercises')
     .then((user: IUser) => user.exercises);
 };
 
-UserSchema.statics.createExercise = async function({
+UserSchema.statics.createExercise = async function ({
   title,
   unit,
   primaryMuscleGroup,
   type,
   childExercises,
-  user: userId
+  user: userId,
 }: IExerciseDefinition) {
-  const ExerciseDefinition = mongoose.model("exerciseDefinition");
+  const ExerciseDefinition = mongoose.model('exerciseDefinition');
   const user = await this.findById(userId);
   // Create and save the new definition
   const definition = await new ExerciseDefinition({
@@ -121,13 +124,13 @@ UserSchema.statics.createExercise = async function({
     primaryMuscleGroup,
     type,
     childExercises,
-    user
+    user,
   }).save();
   // Add the exercise to the user's exercises
-  await user.populate("exercises");
+  await user.populate('exercises');
   user.exercises.push(definition);
   await user.save();
   return definition;
 };
 
-mongoose.model<IUser>("user", UserSchema);
+mongoose.model<IUser>('user', UserSchema);
