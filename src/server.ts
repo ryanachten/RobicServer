@@ -25,11 +25,13 @@ if (!MONGO_URI) {
 mongoose.connect(MONGO_URI, {
   useCreateIndex: true,
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 });
 mongoose.connection
   .once('open', () => console.log('Connected to MongoLab instance.'))
-  .on('error', (error: Error) => console.log('Error connecting to MongoLab:', error));
+  .on('error', (error: Error) =>
+    console.log('Error connecting to MongoLab:', error)
+  );
 
 /** * General middleware ** */
 app.use(bodyParser.json());
@@ -60,9 +62,9 @@ app.use(
     graphiql: true,
     context: {
       // Add authed user object to GQL context
-      user: req.user,
-    },
-  })),
+      user: req.user
+    }
+  }))
 );
 
 module.exports = app;

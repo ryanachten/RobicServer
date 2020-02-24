@@ -11,7 +11,8 @@
     "start": "node index.js",
     "build": "tsc",
     "watch": "nodemon index.js",
-    "watch-ts": "tsc -w"
+    "watch-ts": "tsc -w",
+    "lint": "./node_modules/.bin/eslint 'src/**"
   },
   "author": "Ryan Achten",
   "license": "ISC",
@@ -44,6 +45,7 @@
     "@typescript-eslint/parser": "^2.20.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-typescript": "^7.0.0",
+    "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.18.2",
     "typescript": "^3.8.2"
   }
