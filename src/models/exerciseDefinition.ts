@@ -75,7 +75,7 @@ const ExerciseDefinitionSchema = new Schema({
   ]
 });
 
-ExerciseDefinitionSchema.statics.addNewSession = async ({
+ExerciseDefinitionSchema.statics.addNewSession = async function({
   definitionId,
   sets,
   timeTaken
@@ -83,8 +83,8 @@ ExerciseDefinitionSchema.statics.addNewSession = async ({
   definitionId: string;
   sets: ISet;
   timeTaken: string;
-}): Promise<ExerciseDocument> => {
-  const exerciseDef = (await ExerciseDefinitionSchema.methods.findById(
+}): Promise<ExerciseDocument> {
+  const exerciseDef = (await this.findById(
     definitionId
   )) as ExerciseDefinitionDocument;
   const activeExercise = new Exercise({
@@ -153,9 +153,7 @@ ExerciseDefinitionSchema.statics.removeHistorySession = async function(
 
   // Delete the exercise from the database
   // this appears to handle removing the defintion history too
-  await Exercise.findById(exerciseId)
-    .remove()
-    .exec();
+  await Exercise.findByIdAndDelete(exerciseId);
 
   return definition;
 };
