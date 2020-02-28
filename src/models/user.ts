@@ -1,15 +1,15 @@
+import validator from 'validator';
 import {
   UserDocument,
   UserModel,
-  ExerciseDefinitionDocument
+  ExerciseDefinitionDocument,
+  ExerciseDocument
 } from '../interfaces';
 
+import _ = require('lodash');
+import bcrypt = require('bcrypt');
+import jwt = require('jsonwebtoken');
 import mongoose = require('mongoose');
-
-const _ = require('lodash');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const validator = require('validator');
 
 const { Schema } = mongoose;
 
@@ -31,7 +31,7 @@ const UserSchema = new Schema({
     minlength: 1,
     unique: true,
     validate: {
-      validator: (value: ValidityState) => validator.isEmail(value),
+      validator: (value: string): boolean => validator.isEmail(value),
       message: '{VALUE} is not a valid email'
     }
   },
@@ -63,20 +63,24 @@ UserSchema.statics.register = async ({
   lastName,
   password,
   email
-}: UserDocument) => {
+}: UserDocument): Promise<UserDocument> => {
   const User = mongoose.model('user');
   // Store user password using hashed password with 12 salt rounds
   const hashedPassword = await bcrypt.hash(password, 12);
-  return await new User({
+  const newUser = (await new User({
     firstName,
     lastName,
     email,
     password: hashedPassword,
     exercises: []
-  }).save();
+  }).save()) as UserDocument;
+  return newUser;
 };
 
-UserSchema.statics.login = async ({ password, email }: UserDocument) => {
+UserSchema.statics.login = async ({
+  password,
+  email
+}: UserDocument): Promise<string> => {
   const User = mongoose.model('user');
   // Locate user by email address in DB.
   const locatedUser = (await User.findOne({
@@ -105,7 +109,7 @@ UserSchema.statics.login = async ({ password, email }: UserDocument) => {
   return token;
 };
 
-UserSchema.statics.getExercises = function(id: string) {
+UserSchema.statics.getExercises = function(id: string): ExerciseDocument[] {
   return this.findById(id)
     .populate('exercises')
     .then((user: UserDocument) => user.exercises);
@@ -118,18 +122,18 @@ UserSchema.statics.createExercise = async function({
   type,
   childExercises,
   user: userId
-}: ExerciseDefinitionDocument) {
+}: ExerciseDefinitionDocument): Promise<ExerciseDocument> {
   const ExerciseDefinition = mongoose.model('exerciseDefinition');
   const user = await this.findById(userId);
   // Create and save the new definition
-  const definition = await new ExerciseDefinition({
+  const definition = (await new ExerciseDefinition({
     title,
     unit,
     primaryMuscleGroup,
     type,
     childExercises,
     user
-  }).save();
+  }).save()) as ExerciseDocument;
   // Add the exercise to the user's exercises
   await user.populate('exercises');
   user.exercises.push(definition);
