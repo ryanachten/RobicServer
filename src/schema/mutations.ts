@@ -1,6 +1,7 @@
 import * as graphql from 'graphql';
 import {
-  IExercise,
+  ExerciseDocument,
+  ExerciseModel,
   ExerciseDefinitionDocument,
   ExerciseDefinitionModel,
   IRequest,
@@ -17,7 +18,7 @@ const {
 } = graphql;
 import mongoose = require('mongoose');
 
-const Exercise = mongoose.model('exercise');
+const Exercise = mongoose.model('exercise') as ExerciseModel;
 const User = mongoose.model('user') as UserModel;
 const ExerciseDefinition = mongoose.model(
   'exerciseDefinition'
@@ -156,9 +157,13 @@ const mutation = new GraphQLObjectType({
         timeTaken: { type: GraphQLString }
       },
       resolve(
-        parentValue: { definitionId: string } & IExercise,
-        { definitionId, sets, timeTaken }: { definitionId: string } & IExercise
-      ): IExercise {
+        parentValue: { definitionId: string } & ExerciseDocument,
+        {
+          definitionId,
+          sets,
+          timeTaken
+        }: { definitionId: string } & ExerciseDocument
+      ): ExerciseDocument {
         return ExerciseDefinition.addNewSession({
           definitionId,
           sets,
@@ -175,9 +180,13 @@ const mutation = new GraphQLObjectType({
         timeTaken: { type: GraphQLInt }
       },
       resolve(
-        parentValue: { exerciseId: string } & IExercise,
-        { exerciseId, sets, timeTaken }: { exerciseId: string } & IExercise
-      ) {
+        parentValue: { exerciseId: string } & ExerciseDocument,
+        {
+          exerciseId,
+          sets,
+          timeTaken
+        }: { exerciseId: string } & ExerciseDocument
+      ): ExerciseModel {
         return Exercise.update(exerciseId, sets, timeTaken);
       }
     }

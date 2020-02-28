@@ -54,14 +54,6 @@ export enum ExerciseType {
   SUPERSET = 'Superset'
 }
 
-export interface IExercise extends Document {
-  id: string;
-  date: string;
-  definition: ExerciseDefinitionDocument;
-  sets: ISet[];
-  timeTaken: string;
-}
-
 export type PersonalBest = {
   netValue: { value: number };
   setCount: { value: number };
@@ -70,9 +62,23 @@ export type PersonalBest = {
   value: { value: number };
 };
 
+export interface ExerciseDocument extends Document {
+  id: string;
+  date: string;
+  definition: ExerciseDefinitionDocument;
+  sets: ISet[];
+  timeTaken: string;
+}
+
+export interface ExerciseModel extends Model<ExerciseDocument> {
+  // FIXME: occluded by Model.update
+  //  should be - update: (exerciseId: string, sets: ISet[], timeTaken: string) => ExerciseDocument
+  update: (exerciseId: any, sets: any, timeTaken: any) => any;
+}
+
 export interface ExerciseDefinitionDocument extends Document {
   childExercises?: ExerciseDefinitionDocument[];
-  history: IExercise[];
+  history: ExerciseDocument[];
   id: string;
   primaryMuscleGroup: MuscleGroup[];
   title: string;
@@ -87,8 +93,9 @@ export interface ExerciseDefinitionModel
     definitionId: string;
     sets: ISet[];
     timeTaken: string;
-  }) => IExercise;
-  update: (updatedExercise: ExerciseDefinitionDocument) => any; // FIXME: should be ExerciseDefinitionDocument but wont work
+  }) => ExerciseDocument;
+  // FIXME: occluded by Model.update
+  update: (updatedExercise: ExerciseDefinitionDocument) => any;
   removeHistorySession: (
     definitionId: string,
     exerciseId: string

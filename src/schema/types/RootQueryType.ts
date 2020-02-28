@@ -3,7 +3,7 @@ import {
   IRequest,
   UserDocument,
   ExerciseDefinitionDocument,
-  IExercise
+  ExerciseDocument
 } from '../../interfaces';
 
 const mongoose = require('mongoose');
@@ -68,7 +68,7 @@ const RootQuery = new GraphQLObjectType({
     exercise: {
       type: ExerciseType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue: IExercise, { id }: IExercise) {
+      resolve(parentValue: ExerciseDocument, { id }: ExerciseDocument) {
         return Exercise.findById(id);
       }
     }
