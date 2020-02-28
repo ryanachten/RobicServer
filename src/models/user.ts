@@ -1,4 +1,8 @@
-import { UserDocument, UserModel, IExerciseDefinition } from '../interfaces';
+import {
+  UserDocument,
+  UserModel,
+  ExerciseDefinitionDocument
+} from '../interfaces';
 
 import mongoose = require('mongoose');
 
@@ -114,7 +118,7 @@ UserSchema.statics.createExercise = async function({
   type,
   childExercises,
   user: userId
-}: IExerciseDefinition) {
+}: ExerciseDefinitionDocument) {
   const ExerciseDefinition = mongoose.model('exerciseDefinition');
   const user = await this.findById(userId);
   // Create and save the new definition

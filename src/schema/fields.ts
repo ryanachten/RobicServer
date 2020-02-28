@@ -1,11 +1,9 @@
-import { IExerciseDefinition } from '../interfaces';
+import { ExerciseDefinitionDocument } from '../interfaces';
 
 const mongoose = require('mongoose');
 const graphql = require('graphql');
 
-const {
-  GraphQLString, GraphQLID, GraphQLList, GraphQLFloat,
-} = graphql;
+const { GraphQLString, GraphQLID, GraphQLList, GraphQLFloat } = graphql;
 const Exercise = mongoose.model('exercise');
 const ExerciseDefinition = mongoose.model('exerciseDefinition');
 
@@ -17,16 +15,16 @@ const exerciseDefinitionFields = () => ({
   type: { type: GraphQLString },
   childExercises: {
     type: new GraphQLList(require('./types/ExerciseDefinitionType')),
-    resolve(parentValue: IExerciseDefinition) {
+    resolve(parentValue: ExerciseDefinitionDocument) {
       return ExerciseDefinition.getChildExercises(parentValue.id);
-    },
+    }
   },
   history: {
     type: new GraphQLList(require('./types/ExerciseType').ExerciseType),
-    resolve(parentValue: IExerciseDefinition) {
+    resolve(parentValue: ExerciseDefinitionDocument) {
       return ExerciseDefinition.getHistory(parentValue.id);
-    },
-  },
+    }
+  }
 });
 
 const exerciseFields = () => ({
@@ -34,13 +32,13 @@ const exerciseFields = () => ({
   date: { type: GraphQLString },
   definition: {
     type: require('./types/ExerciseDefinitionType'),
-    resolve(parentValue: IExerciseDefinition) {
+    resolve(parentValue: ExerciseDefinitionDocument) {
       return Exercise.getDefinition(parentValue.id);
-    },
+    }
   },
   netValue: { type: GraphQLFloat },
   sets: { type: new GraphQLList(require('./types/ExerciseType').SetType) },
-  timeTaken: { type: GraphQLString },
+  timeTaken: { type: GraphQLString }
 });
 
 module.exports = { exerciseFields, exerciseDefinitionFields };

@@ -2,7 +2,7 @@ import * as graphql from 'graphql';
 import {
   IRequest,
   UserDocument,
-  IExerciseDefinition,
+  ExerciseDefinitionDocument,
   IExercise
 } from '../../interfaces';
 
@@ -50,7 +50,10 @@ const RootQuery = new GraphQLObjectType({
     exerciseDefinition: {
       type: ExerciseDefinitionType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue: IExerciseDefinition, { id }: IExerciseDefinition) {
+      resolve(
+        parentValue: ExerciseDefinitionDocument,
+        { id }: ExerciseDefinitionDocument
+      ) {
         return ExerciseDefinition.findById(id);
       }
     },

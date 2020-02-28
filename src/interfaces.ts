@@ -57,7 +57,7 @@ export enum ExerciseType {
 export interface IExercise extends Document {
   id: string;
   date: string;
-  definition: IExerciseDefinition;
+  definition: ExerciseDefinitionDocument;
   sets: ISet[];
   timeTaken: string;
 }
@@ -70,8 +70,8 @@ export type PersonalBest = {
   value: { value: number };
 };
 
-export interface IExerciseDefinition extends Document {
-  childExercises?: IExerciseDefinition[];
+export interface ExerciseDefinitionDocument extends Document {
+  childExercises?: ExerciseDefinitionDocument[];
   history: IExercise[];
   id: string;
   primaryMuscleGroup: MuscleGroup[];
@@ -81,9 +81,23 @@ export interface IExerciseDefinition extends Document {
   user?: string;
 }
 
+export interface ExerciseDefinitionModel
+  extends Model<ExerciseDefinitionDocument> {
+  addNewSession: (exercise: {
+    definitionId: string;
+    sets: ISet[];
+    timeTaken: string;
+  }) => IExercise;
+  update: (updatedExercise: ExerciseDefinitionDocument) => any; // FIXME: should be ExerciseDefinitionDocument but wont work
+  removeHistorySession: (
+    definitionId: string,
+    exerciseId: string
+  ) => ExerciseDefinitionDocument;
+}
+
 export interface UserDocument extends Document {
   email: string;
-  exercises: IExerciseDefinition[];
+  exercises: ExerciseDefinitionDocument[];
   password: string;
   firstName: string;
   id: string;
@@ -98,5 +112,7 @@ export interface UserModel extends Model<UserDocument> {
     password: string;
     email: string;
   }) => UserDocument;
-  createExercise: (exercise: IExerciseDefinition) => IExerciseDefinition;
+  createExercise: (
+    exercise: ExerciseDefinitionDocument
+  ) => ExerciseDefinitionDocument;
 }

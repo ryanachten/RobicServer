@@ -1,9 +1,10 @@
 import * as graphql from 'graphql';
 import {
   IExercise,
-  IExerciseDefinition,
-  UserDocument,
+  ExerciseDefinitionDocument,
+  ExerciseDefinitionModel,
   IRequest,
+  UserDocument,
   UserModel
 } from '../interfaces';
 
@@ -18,7 +19,9 @@ import mongoose = require('mongoose');
 
 const Exercise = mongoose.model('exercise');
 const User = mongoose.model('user') as UserModel;
-const ExerciseDefinition = mongoose.model('exerciseDefinition');
+const ExerciseDefinition = mongoose.model(
+  'exerciseDefinition'
+) as ExerciseDefinitionModel;
 const { ExerciseType, ExerciseDefinitionType, UserType } = require('./types');
 const { SetInput } = require('./inputs');
 
@@ -70,16 +73,16 @@ const mutation = new GraphQLObjectType({
         primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(
-        parentValue: IExerciseDefinition,
+        parentValue: ExerciseDefinitionDocument,
         {
           title,
           unit,
           primaryMuscleGroup,
           type,
           childExercises
-        }: IExerciseDefinition,
+        }: ExerciseDefinitionDocument,
         { user }: IRequest
-      ): IExerciseDefinition {
+      ): ExerciseDefinitionDocument {
         const exercise = {
           title,
           unit,
@@ -87,7 +90,7 @@ const mutation = new GraphQLObjectType({
           type,
           childExercises,
           user: user.id
-        } as IExerciseDefinition;
+        } as ExerciseDefinitionDocument;
         return User.createExercise(exercise);
       }
     },
@@ -103,7 +106,7 @@ const mutation = new GraphQLObjectType({
         primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(
-        parentValue: { exerciseId: string } & IExerciseDefinition,
+        parentValue: { exerciseId: string } & ExerciseDefinitionDocument,
         {
           exerciseId,
           title,
@@ -111,16 +114,17 @@ const mutation = new GraphQLObjectType({
           childExercises,
           unit,
           primaryMuscleGroup
-        }: { exerciseId: string } & IExerciseDefinition
-      ): IExerciseDefinition {
-        return ExerciseDefinition.schema.methods.update({
+        }: { exerciseId: string } & ExerciseDefinitionDocument
+      ): ExerciseDefinitionDocument {
+        const exercise = {
           id: exerciseId,
           title,
           unit,
           primaryMuscleGroup,
           type,
           childExercises
-        });
+        } as ExerciseDefinitionDocument;
+        return ExerciseDefinition.update(exercise);
       }
     },
 
@@ -136,8 +140,8 @@ const mutation = new GraphQLObjectType({
           definitionId,
           exerciseId
         }: { definitionId: string; exerciseId: string }
-      ) {
-        return ExerciseDefinition.schema.methods.removeHistorySession(
+      ): ExerciseDefinitionDocument {
+        return ExerciseDefinition.removeHistorySession(
           definitionId,
           exerciseId
         );
@@ -154,8 +158,8 @@ const mutation = new GraphQLObjectType({
       resolve(
         parentValue: { definitionId: string } & IExercise,
         { definitionId, sets, timeTaken }: { definitionId: string } & IExercise
-      ) {
-        return ExerciseDefinition.schema.methods.addNewSession({
+      ): IExercise {
+        return ExerciseDefinition.addNewSession({
           definitionId,
           sets,
           timeTaken
