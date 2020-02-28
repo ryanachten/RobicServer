@@ -39,7 +39,7 @@ app.use(cors());
 
 /** * JWT verification middleware ** */
 const { JWT_PASSWORD_SECRET } = process.env;
-const verifyJwtToken = async (req: IRequest) => {
+const verifyJwtToken = async (req: IRequest): Promise<void> => {
   // Access token off client request header
   const token = req.headers.authorization;
   try {

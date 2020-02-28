@@ -1,12 +1,12 @@
-import { UserDocument } from '../../interfaces';
+import * as graphql from 'graphql';
+import { UserDocument, UserModel, ExerciseDocument } from '../../interfaces';
 
-const mongoose = require('mongoose');
-const graphql = require('graphql');
+import mongoose = require('mongoose');
 
 const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = graphql;
-const User = mongoose.model('user');
+const User = mongoose.model('user') as UserModel;
 
-module.exports = new GraphQLObjectType({
+export default new GraphQLObjectType({
   name: 'UserType',
   fields: () => ({
     id: { type: GraphQLID },
@@ -15,7 +15,7 @@ module.exports = new GraphQLObjectType({
     email: { type: GraphQLString },
     exercises: {
       type: new GraphQLList(require('./ExerciseDefinitionType')),
-      resolve(parentValue: UserDocument) {
+      resolve(parentValue: UserDocument): ExerciseDocument[] {
         return User.getExercises(parentValue.id);
       }
     }

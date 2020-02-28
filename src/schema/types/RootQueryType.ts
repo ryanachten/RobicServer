@@ -6,13 +6,13 @@ import {
   ExerciseDocument,
   UserModel
 } from '../../interfaces';
+import UserType from './UserType';
 
 import mongoose = require('mongoose');
 
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 const ExerciseDefinitionType = require('./ExerciseDefinitionType');
 const { ExerciseType } = require('./ExerciseType');
-const UserType = require('./UserType');
 
 const User = mongoose.model('user') as UserModel;
 const ExerciseDefinition = mongoose.model('exerciseDefinition');
