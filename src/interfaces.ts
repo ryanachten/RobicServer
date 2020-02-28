@@ -1,10 +1,10 @@
-import { Document } from 'mongoose';
+import { Document, Model } from 'mongoose';
 
 export type IRequest = {
   headers: {
     authorization: string;
   };
-  user: IUser;
+  user: UserDocument;
   next: () => void;
 };
 
@@ -78,14 +78,25 @@ export interface IExerciseDefinition extends Document {
   title: string;
   type: ExerciseType;
   unit?: IUnit;
-  user: IUser;
+  user?: string;
 }
 
-export interface IUser extends Document {
+export interface UserDocument extends Document {
   email: string;
   exercises: IExerciseDefinition[];
   password: string;
   firstName: string;
   id: string;
   lastName: string;
+}
+
+export interface UserModel extends Model<UserDocument> {
+  login: (details: { password: string; email: string }) => UserDocument;
+  register: (details: {
+    firstName: string;
+    lastName: string;
+    password: string;
+    email: string;
+  }) => UserDocument;
+  createExercise: (exercise: IExerciseDefinition) => IExerciseDefinition;
 }

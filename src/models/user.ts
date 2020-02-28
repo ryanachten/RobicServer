@@ -1,4 +1,4 @@
-import { IUser, IExerciseDefinition } from '../interfaces';
+import { UserDocument, UserModel, IExerciseDefinition } from '../interfaces';
 
 import mongoose = require('mongoose');
 
@@ -28,38 +28,38 @@ const UserSchema = new Schema({
     unique: true,
     validate: {
       validator: (value: ValidityState) => validator.isEmail(value),
-      message: '{VALUE} is not a valid email',
-    },
+      message: '{VALUE} is not a valid email'
+    }
   },
   password: { type: String, required: true, minlength: 6 },
   tokens: [
     {
       access: {
         type: String,
-        required: true,
+        required: true
       },
       token: {
         type: String,
-        required: true,
-      },
-    },
+        required: true
+      }
+    }
   ],
   firstName: { type: String },
   lastName: { type: String },
   exercises: [
     {
       type: Schema.Types.ObjectId,
-      ref: 'exerciseDefinition',
-    },
-  ],
+      ref: 'exerciseDefinition'
+    }
+  ]
 });
 
 UserSchema.statics.register = async ({
   firstName,
   lastName,
   password,
-  email,
-}: IUser) => {
+  email
+}: UserDocument) => {
   const User = mongoose.model('user');
   // Store user password using hashed password with 12 salt rounds
   const hashedPassword = await bcrypt.hash(password, 12);
@@ -68,16 +68,16 @@ UserSchema.statics.register = async ({
     lastName,
     email,
     password: hashedPassword,
-    exercises: [],
+    exercises: []
   }).save();
 };
 
-UserSchema.statics.login = async ({ password, email }: IUser) => {
+UserSchema.statics.login = async ({ password, email }: UserDocument) => {
   const User = mongoose.model('user');
   // Locate user by email address in DB.
   const locatedUser = (await User.findOne({
-    email,
-  })) as IUser;
+    email
+  })) as UserDocument;
   if (!locatedUser) {
     throw new Error(`No user with the email address ${email} was found`);
   }
@@ -90,30 +90,30 @@ UserSchema.statics.login = async ({ password, email }: IUser) => {
   const token = jwt.sign(
     {
       // At this stage, only include user ID in token to minimise decodable information in token
-      user: _.pick(locatedUser, ['id']),
+      user: _.pick(locatedUser, ['id'])
     },
     JWT_PASSWORD_SECRET,
     {
       // Token will expire in one year
-      expiresIn: '1y',
-    },
+      expiresIn: '1y'
+    }
   );
   return token;
 };
 
-UserSchema.statics.getExercises = function (id: string) {
+UserSchema.statics.getExercises = function(id: string) {
   return this.findById(id)
     .populate('exercises')
-    .then((user: IUser) => user.exercises);
+    .then((user: UserDocument) => user.exercises);
 };
 
-UserSchema.statics.createExercise = async function ({
+UserSchema.statics.createExercise = async function({
   title,
   unit,
   primaryMuscleGroup,
   type,
   childExercises,
-  user: userId,
+  user: userId
 }: IExerciseDefinition) {
   const ExerciseDefinition = mongoose.model('exerciseDefinition');
   const user = await this.findById(userId);
@@ -124,7 +124,7 @@ UserSchema.statics.createExercise = async function ({
     primaryMuscleGroup,
     type,
     childExercises,
-    user,
+    user
   }).save();
   // Add the exercise to the user's exercises
   await user.populate('exercises');
@@ -133,4 +133,4 @@ UserSchema.statics.createExercise = async function ({
   return definition;
 };
 
-mongoose.model<IUser>('user', UserSchema);
+mongoose.model<UserDocument, UserModel>('user', UserSchema);

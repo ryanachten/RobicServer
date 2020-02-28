@@ -1,5 +1,11 @@
 import * as graphql from 'graphql';
-import { IExercise, IExerciseDefinition, IUser, IRequest } from '../interfaces';
+import {
+  IExercise,
+  IExerciseDefinition,
+  UserDocument,
+  IRequest,
+  UserModel
+} from '../interfaces';
 
 const {
   GraphQLList,
@@ -11,7 +17,7 @@ const {
 import mongoose = require('mongoose');
 
 const Exercise = mongoose.model('exercise');
-const User = mongoose.model('user');
+const User = mongoose.model('user') as UserModel;
 const ExerciseDefinition = mongoose.model('exerciseDefinition');
 const { ExerciseType, ExerciseDefinitionType, UserType } = require('./types');
 const { SetInput } = require('./inputs');
@@ -28,10 +34,10 @@ const mutation = new GraphQLObjectType({
         email: { type: GraphQLString }
       },
       resolve(
-        parentValue: IUser,
-        { firstName, lastName, password, email }: IUser
-      ) {
-        return User.schema.methods.register({
+        parentValue: UserDocument,
+        { firstName, lastName, password, email }: UserDocument
+      ): UserDocument {
+        return User.register({
           firstName,
           lastName,
           password,
@@ -46,7 +52,10 @@ const mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         email: { type: GraphQLString }
       },
-      resolve(parentValue: IUser, { password, email }: IUser) {
+      resolve(
+        parentValue: UserDocument,
+        { password, email }: UserDocument
+      ): UserDocument {
         return User.login({ password, email });
       }
     },
@@ -70,15 +79,16 @@ const mutation = new GraphQLObjectType({
           childExercises
         }: IExerciseDefinition,
         { user }: IRequest
-      ) {
-        return User.schema.methods.createExercise({
+      ): IExerciseDefinition {
+        const exercise = {
           title,
           unit,
           primaryMuscleGroup,
           type,
           childExercises,
           user: user.id
-        });
+        } as IExerciseDefinition;
+        return User.createExercise(exercise);
       }
     },
 
@@ -102,7 +112,7 @@ const mutation = new GraphQLObjectType({
           unit,
           primaryMuscleGroup
         }: { exerciseId: string } & IExerciseDefinition
-      ) {
+      ): IExerciseDefinition {
         return ExerciseDefinition.schema.methods.update({
           id: exerciseId,
           title,

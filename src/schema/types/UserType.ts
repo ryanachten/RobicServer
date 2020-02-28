@@ -1,11 +1,9 @@
-import { IUser } from '../../interfaces';
+import { UserDocument } from '../../interfaces';
 
 const mongoose = require('mongoose');
 const graphql = require('graphql');
 
-const {
-  GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList,
-} = graphql;
+const { GraphQLObjectType, GraphQLString, GraphQLID, GraphQLList } = graphql;
 const User = mongoose.model('user');
 
 module.exports = new GraphQLObjectType({
@@ -17,9 +15,9 @@ module.exports = new GraphQLObjectType({
     email: { type: GraphQLString },
     exercises: {
       type: new GraphQLList(require('./ExerciseDefinitionType')),
-      resolve(parentValue: IUser) {
+      resolve(parentValue: UserDocument) {
         return User.getExercises(parentValue.id);
-      },
-    },
-  }),
+      }
+    }
+  })
 });

@@ -1,16 +1,14 @@
 import * as graphql from 'graphql';
 import {
   IRequest,
-  IUser,
+  UserDocument,
   IExerciseDefinition,
-  IExercise,
+  IExercise
 } from '../../interfaces';
 
 const mongoose = require('mongoose');
 
-const {
-  GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull,
-} = graphql;
+const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 const ExerciseDefinitionType = require('./ExerciseDefinitionType');
 const { ExerciseType } = require('./ExerciseType');
 const UserType = require('./UserType');
@@ -31,22 +29,22 @@ const RootQuery = new GraphQLObjectType({
           return null;
         }
         return User.findById(user.id);
-      },
+      }
     },
 
     getUserById: {
       type: UserType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue: IUser, { id }: IUser) {
+      resolve(parentValue: UserDocument, { id }: UserDocument) {
         return User.findById(id);
-      },
+      }
     },
 
     exerciseDefinitions: {
       type: new GraphQLList(ExerciseDefinitionType),
       resolve(parentValue: IRequest, {}, { user }: IRequest) {
         return User.getExercises(user.id);
-      },
+      }
     },
 
     exerciseDefinition: {
@@ -54,14 +52,14 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(parentValue: IExerciseDefinition, { id }: IExerciseDefinition) {
         return ExerciseDefinition.findById(id);
-      },
+      }
     },
 
     exercises: {
       type: new GraphQLList(ExerciseType),
       resolve() {
         return Exercise.find({});
-      },
+      }
     },
 
     exercise: {
@@ -69,9 +67,9 @@ const RootQuery = new GraphQLObjectType({
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
       resolve(parentValue: IExercise, { id }: IExercise) {
         return Exercise.findById(id);
-      },
-    },
-  }),
+      }
+    }
+  })
 });
 
 module.exports = RootQuery;
