@@ -1,7 +1,8 @@
 import {
   ExerciseDefinitionDocument,
   ExerciseDefinitionModel,
-  ISet
+  ISet,
+  ExerciseDocument
 } from '../interfaces';
 
 import mongoose = require('mongoose');
@@ -73,7 +74,7 @@ const ExerciseDefinitionSchema = new Schema({
   ]
 });
 
-ExerciseDefinitionSchema.statics.addNewSession = async function({
+ExerciseDefinitionSchema.statics.addNewSession = async ({
   definitionId,
   sets,
   timeTaken
@@ -81,21 +82,22 @@ ExerciseDefinitionSchema.statics.addNewSession = async function({
   definitionId: string;
   sets: ISet;
   timeTaken: string;
-}) {
-  const Exercise = mongoose.model('exercise');
-  const exerciseDef = await this.findById(definitionId);
+}): Promise<ExerciseDocument> => {
+  const exerciseDef = (await ExerciseDefinitionSchema.methods.findById(
+    definitionId
+  )) as ExerciseDefinitionDocument;
   const activeExercise = new Exercise({
     date: Date.now(),
     definition: definitionId,
     sets,
     timeTaken,
     netValue: 0
-  });
+  }) as ExerciseDocument;
   // Add the active session to the history log
   exerciseDef.history.push(activeExercise);
   // Save both the updated definition and new active exercise, return new exercise
   return Promise.all([exerciseDef.save(), activeExercise.save()]).then(
-    ([exerciseDef, activeExercise]) => activeExercise
+    ([definition, newExercise]) => newExercise as ExerciseDocument
   );
 };
 

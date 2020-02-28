@@ -10,10 +10,10 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
     'airbnb-typescript/base',
-    'prettier/@typescript-eslint',
-    'plugin:prettier/recommended'
+    'prettier/@typescript-eslint'
   ],
   rules: {
-    'func-names': 'off'
+    'func-names': 'off',
+    'comma-dangle': ['error', 'never']
   }
 };

@@ -1,4 +1,8 @@
-import { ExerciseDocument, ISet } from '../interfaces';
+import {
+  ExerciseDocument,
+  ISet,
+  ExerciseDefinitionDocument
+} from '../interfaces';
 
 import mongoose = require('mongoose');
 const { Schema } = mongoose;
@@ -29,7 +33,9 @@ const ExerciseSchema = new Schema({
   netValue: { type: Number, default: 0 }
 });
 
-ExerciseSchema.statics.getDefinition = function(id: string) {
+ExerciseSchema.statics.getDefinition = function(
+  id: string
+): ExerciseDefinitionDocument {
   return this.findById(id)
     .populate('definition')
     .then((exercise: ExerciseDocument) => exercise.definition);
@@ -39,7 +45,7 @@ ExerciseSchema.statics.update = async function(
   exerciseId: string,
   sets: ISet[],
   timeTaken: string
-) {
+): Promise<ExerciseDocument> {
   const exercise = await this.findById(exerciseId);
   exercise.sets = sets;
   exercise.timeTaken = timeTaken;
