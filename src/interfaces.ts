@@ -71,6 +71,7 @@ export interface ExerciseDocument extends Document {
 }
 
 export interface ExerciseModel extends Model<ExerciseDocument> {
+  getDefinition: (id: string) => ExerciseDefinitionDocument;
   // FIXME: occluded by Model.update
   //  should be - update: (exerciseId: string, sets: ISet[], timeTaken: string) => ExerciseDocument
   update: (exerciseId: any, sets: any, timeTaken: any) => any;
@@ -94,6 +95,8 @@ export interface ExerciseDefinitionModel
     sets: ISet[];
     timeTaken: string;
   }) => ExerciseDocument;
+  getChildExercises: (id: string) => ExerciseDefinitionDocument[];
+  getHistory: (id: string) => ExerciseDocument[];
   getUnit: (id: string) => Unit;
   // FIXME: occluded by Model.update
   update: (updatedExercise: ExerciseDefinitionDocument) => any;
