@@ -6,7 +6,7 @@ const { GraphQLObjectType } = graphql;
 
 const ExerciseDefinition = new GraphQLObjectType({
   name: 'ExerciseDefinitionType',
-  fields: exerciseDefinitionFields,
+  fields: exerciseDefinitionFields
 });
 
 module.exports = ExerciseDefinition;

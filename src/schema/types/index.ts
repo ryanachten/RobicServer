@@ -8,5 +8,5 @@ module.exports = {
   ExerciseType,
   ExerciseDefinitionType,
   SetType,
-  UserType,
+  UserType
 };

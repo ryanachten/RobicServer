@@ -3,17 +3,18 @@ import {
   IRequest,
   UserDocument,
   ExerciseDefinitionDocument,
-  ExerciseDocument
+  ExerciseDocument,
+  UserModel
 } from '../../interfaces';
 
-const mongoose = require('mongoose');
+import mongoose = require('mongoose');
 
 const { GraphQLObjectType, GraphQLList, GraphQLID, GraphQLNonNull } = graphql;
 const ExerciseDefinitionType = require('./ExerciseDefinitionType');
 const { ExerciseType } = require('./ExerciseType');
 const UserType = require('./UserType');
 
-const User = mongoose.model('user');
+const User = mongoose.model('user') as UserModel;
 const ExerciseDefinition = mongoose.model('exerciseDefinition');
 const Exercise = mongoose.model('exercise');
 
@@ -24,7 +25,11 @@ const RootQuery = new GraphQLObjectType({
     currentUser: {
       description: 'Returns current user based on JSON web token from client',
       type: UserType,
-      resolve(parentValue: IRequest, {}, { user }: IRequest) {
+      resolve(
+        parentValue: IRequest,
+        {},
+        { user }: IRequest
+      ): mongoose.DocumentQuery<UserDocument, UserDocument> {
         if (!user) {
           return null;
         }
@@ -35,14 +40,21 @@ const RootQuery = new GraphQLObjectType({
     getUserById: {
       type: UserType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue: UserDocument, { id }: UserDocument) {
+      resolve(
+        parentValue: UserDocument,
+        { id }: UserDocument
+      ): mongoose.DocumentQuery<UserDocument, UserDocument> {
         return User.findById(id);
       }
     },
 
     exerciseDefinitions: {
       type: new GraphQLList(ExerciseDefinitionType),
-      resolve(parentValue: IRequest, {}, { user }: IRequest) {
+      resolve(
+        parentValue: IRequest,
+        {},
+        { user }: IRequest
+      ): ExerciseDocument[] {
         return User.getExercises(user.id);
       }
     },
@@ -53,7 +65,7 @@ const RootQuery = new GraphQLObjectType({
       resolve(
         parentValue: ExerciseDefinitionDocument,
         { id }: ExerciseDefinitionDocument
-      ) {
+      ): mongoose.DocumentQuery<mongoose.Document, mongoose.Document> {
         return ExerciseDefinition.findById(id);
       }
     },
@@ -68,7 +80,10 @@ const RootQuery = new GraphQLObjectType({
     exercise: {
       type: ExerciseType,
       args: { id: { type: new GraphQLNonNull(GraphQLID) } },
-      resolve(parentValue: ExerciseDocument, { id }: ExerciseDocument) {
+      resolve(
+        parentValue: ExerciseDocument,
+        { id }: ExerciseDocument
+      ): mongoose.DocumentQuery<mongoose.Document, mongoose.Document> {
         return Exercise.findById(id);
       }
     }

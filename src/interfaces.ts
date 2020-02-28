@@ -123,4 +123,5 @@ export interface UserModel extends Model<UserDocument> {
   createExercise: (
     exercise: ExerciseDefinitionDocument
   ) => ExerciseDefinitionDocument;
+  getExercises: (id: string) => ExerciseDocument[];
 }
