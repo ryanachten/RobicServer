@@ -1,10 +1,16 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import {
+  ExerciseDocument,
+  Set,
+  ExerciseDefinitionDocument
+} from '../interfaces';
+
+import mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const ExerciseSchema = new Schema({
   definition: {
     type: Schema.Types.ObjectId,
-    ref: "exerciseDefinition"
+    ref: 'exerciseDefinition'
   },
   date: { type: Date },
   sets: [
@@ -15,7 +21,7 @@ const ExerciseSchema = new Schema({
         {
           id: {
             type: Schema.Types.ObjectId,
-            ref: "exerciseDefinition"
+            ref: 'exerciseDefinition'
           },
           reps: { type: Number, default: 0 },
           value: { type: Number, default: 0 }
@@ -27,17 +33,23 @@ const ExerciseSchema = new Schema({
   netValue: { type: Number, default: 0 }
 });
 
-ExerciseSchema.statics.getDefinition = function(id) {
+ExerciseSchema.statics.getDefinition = function(
+  id: string
+): ExerciseDefinitionDocument {
   return this.findById(id)
-    .populate("definition")
-    .then(exercise => exercise.definition);
+    .populate('definition')
+    .then((exercise: ExerciseDocument) => exercise.definition);
 };
 
-ExerciseSchema.statics.update = async function(exerciseId, sets, timeTaken) {
+ExerciseSchema.statics.update = async function(
+  exerciseId: string,
+  sets: Set[],
+  timeTaken: string
+): Promise<ExerciseDocument> {
   const exercise = await this.findById(exerciseId);
   exercise.sets = sets;
   exercise.timeTaken = timeTaken;
   return exercise.save();
 };
 
-mongoose.model("exercise", ExerciseSchema);
+mongoose.model<ExerciseDocument>('exercise', ExerciseSchema);

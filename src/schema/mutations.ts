@@ -1,4 +1,14 @@
-const graphql = require("graphql");
+import * as graphql from 'graphql';
+import {
+  ExerciseDocument,
+  ExerciseModel,
+  ExerciseDefinitionDocument,
+  ExerciseDefinitionModel,
+  Request,
+  UserDocument,
+  UserModel
+} from '../interfaces';
+
 const {
   GraphQLList,
   GraphQLObjectType,
@@ -6,20 +16,18 @@ const {
   GraphQLString,
   GraphQLID
 } = graphql;
-const mongoose = require("mongoose");
-const Exercise = mongoose.model("exercise");
-const User = mongoose.model("user");
-const ExerciseDefinition = mongoose.model("exerciseDefinition");
-const {
-  SetType,
-  ExerciseType,
-  ExerciseDefinitionType,
-  UserType
-} = require("./types");
-const { SetInput } = require("./inputs");
+import mongoose = require('mongoose');
+
+const Exercise = mongoose.model('exercise') as ExerciseModel;
+const User = mongoose.model('user') as UserModel;
+const ExerciseDefinition = mongoose.model(
+  'exerciseDefinition'
+) as ExerciseDefinitionModel;
+const { ExerciseType, ExerciseDefinitionType, UserType } = require('./types');
+const { SetInput } = require('./inputs');
 
 const mutation = new GraphQLObjectType({
-  name: "Mutation",
+  name: 'Mutation',
   fields: {
     registerUser: {
       type: UserType,
@@ -29,8 +37,16 @@ const mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         email: { type: GraphQLString }
       },
-      resolve(parentValue, { firstName, lastName, password, email }) {
-        return User.register({ firstName, lastName, password, email });
+      resolve(
+        parentValue: UserDocument,
+        { firstName, lastName, password, email }: UserDocument
+      ): UserDocument {
+        return User.register({
+          firstName,
+          lastName,
+          password,
+          email
+        });
       }
     },
 
@@ -40,7 +56,10 @@ const mutation = new GraphQLObjectType({
         password: { type: GraphQLString },
         email: { type: GraphQLString }
       },
-      resolve(parentValue, { password, email }) {
+      resolve(
+        parentValue: UserDocument,
+        { password, email }: UserDocument
+      ): UserDocument {
         return User.login({ password, email });
       }
     },
@@ -55,18 +74,25 @@ const mutation = new GraphQLObjectType({
         primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(
-        parentValue,
-        { title, unit, primaryMuscleGroup, type, childExercises },
-        { user }
-      ) {
-        return User.createExercise({
+        parentValue: ExerciseDefinitionDocument,
+        {
+          title,
+          unit,
+          primaryMuscleGroup,
+          type,
+          childExercises
+        }: ExerciseDefinitionDocument,
+        { user }: Request
+      ): ExerciseDefinitionDocument {
+        const exercise = {
           title,
           unit,
           primaryMuscleGroup,
           type,
           childExercises,
           user: user.id
-        });
+        } as ExerciseDefinitionDocument;
+        return User.createExercise(exercise);
       }
     },
 
@@ -81,17 +107,25 @@ const mutation = new GraphQLObjectType({
         primaryMuscleGroup: { type: new GraphQLList(GraphQLString) }
       },
       resolve(
-        parentValue,
-        { exerciseId, title, type, childExercises, unit, primaryMuscleGroup }
-      ) {
-        return ExerciseDefinition.update({
+        parentValue: { exerciseId: string } & ExerciseDefinitionDocument,
+        {
+          exerciseId,
+          title,
+          type,
+          childExercises,
+          unit,
+          primaryMuscleGroup
+        }: { exerciseId: string } & ExerciseDefinitionDocument
+      ): ExerciseDefinitionDocument {
+        const exercise = {
           id: exerciseId,
           title,
           unit,
           primaryMuscleGroup,
           type,
           childExercises
-        });
+        } as ExerciseDefinitionDocument;
+        return ExerciseDefinition.update(exercise);
       }
     },
 
@@ -101,7 +135,13 @@ const mutation = new GraphQLObjectType({
         definitionId: { type: GraphQLID },
         exerciseId: { type: GraphQLID }
       },
-      resolve(parentValue, { definitionId, exerciseId }) {
+      resolve(
+        parentValue: { definitionId: string; exerciseId: string },
+        {
+          definitionId,
+          exerciseId
+        }: { definitionId: string; exerciseId: string }
+      ): ExerciseDefinitionDocument {
         return ExerciseDefinition.removeHistorySession(
           definitionId,
           exerciseId
@@ -116,7 +156,14 @@ const mutation = new GraphQLObjectType({
         sets: { type: new GraphQLList(SetInput) },
         timeTaken: { type: GraphQLString }
       },
-      resolve(parentValue, { definitionId, sets, timeTaken }) {
+      resolve(
+        parentValue: { definitionId: string } & ExerciseDocument,
+        {
+          definitionId,
+          sets,
+          timeTaken
+        }: { definitionId: string } & ExerciseDocument
+      ): ExerciseDocument {
         return ExerciseDefinition.addNewSession({
           definitionId,
           sets,
@@ -132,7 +179,14 @@ const mutation = new GraphQLObjectType({
         sets: { type: new GraphQLList(SetInput) },
         timeTaken: { type: GraphQLInt }
       },
-      resolve(parentValue, { exerciseId, sets, timeTaken }) {
+      resolve(
+        parentValue: { exerciseId: string } & ExerciseDocument,
+        {
+          exerciseId,
+          sets,
+          timeTaken
+        }: { exerciseId: string } & ExerciseDocument
+      ): ExerciseModel {
         return Exercise.update(exerciseId, sets, timeTaken);
       }
     }
