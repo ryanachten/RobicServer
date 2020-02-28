@@ -1,11 +1,11 @@
-const graphql = require('graphql');
+import * as graphql from 'graphql';
 
 const {
   GraphQLInputObjectType,
   GraphQLID,
   GraphQLInt,
   GraphQLList,
-  GraphQLFloat,
+  GraphQLFloat
 } = graphql;
 const { exerciseFields, exerciseDefinitionFields } = require('./fields');
 
@@ -14,19 +14,19 @@ const SetExerciseInput = new GraphQLInputObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     reps: { type: GraphQLInt },
-    value: { type: GraphQLFloat },
-  }),
+    value: { type: GraphQLFloat }
+  })
 });
 
 const SetInput = new GraphQLInputObjectType({
   name: 'SetInput',
   fields: () => ({
     exercises: {
-      type: new GraphQLList(SetExerciseInput),
+      type: new GraphQLList(SetExerciseInput)
     },
     reps: { type: GraphQLInt },
-    value: { type: GraphQLFloat },
-  }),
+    value: { type: GraphQLFloat }
+  })
 });
 
 const ExerciseDefinitionInput = new GraphQLInputObjectType({
@@ -34,12 +34,12 @@ const ExerciseDefinitionInput = new GraphQLInputObjectType({
   fields: () => ({
     ...exerciseDefinitionFields(),
     childExercises: {
-      type: ExerciseDefinitionInput,
+      type: ExerciseDefinitionInput
     },
     history: {
-      type: require('./inputs').ExerciseInput,
-    },
-  }),
+      type: require('./inputs').ExerciseInput
+    }
+  })
 });
 
 const ExerciseInput = new GraphQLInputObjectType({
@@ -47,12 +47,12 @@ const ExerciseInput = new GraphQLInputObjectType({
   fields: () => ({
     ...exerciseFields(),
     definition: {
-      type: ExerciseDefinitionInput,
+      type: ExerciseDefinitionInput
     },
     sets: {
-      type: SetInput,
-    },
-  }),
+      type: SetInput
+    }
+  })
 });
 
 module.exports = { ExerciseDefinitionInput, ExerciseInput, SetInput };
