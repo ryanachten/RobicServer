@@ -1,5 +1,9 @@
 import * as graphql from 'graphql';
-import { ExerciseDefinitionDocument } from '../../interfaces';
+import {
+  ExerciseDefinitionDocument,
+  ExerciseDefinitionModel,
+  Unit
+} from '../../interfaces';
 
 import mongoose = require('mongoose');
 const {
@@ -10,7 +14,9 @@ const {
   GraphQLInt,
   GraphQLFloat
 } = graphql;
-const ExerciseDefinition = mongoose.model('exerciseDefinition');
+const ExerciseDefinition = mongoose.model(
+  'exerciseDefinition'
+) as ExerciseDefinitionModel;
 const { exerciseFields } = require('../fields');
 
 const SetExercise = new GraphQLObjectType({
@@ -21,11 +27,8 @@ const SetExercise = new GraphQLObjectType({
     value: { type: GraphQLFloat },
     unit: {
       type: GraphQLString,
-      resolve(
-        parentValue: ExerciseDefinitionDocument,
-        { id }: ExerciseDefinitionDocument
-      ) {
-        return ExerciseDefinition.schema.methods.getUnit(parentValue.id);
+      resolve(parentValue: ExerciseDefinitionDocument): Unit {
+        return ExerciseDefinition.getUnit(parentValue.id);
       }
     }
   })

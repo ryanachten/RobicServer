@@ -29,7 +29,7 @@ export enum MuscleGroup {
   // ABDUCTORS = "Abductors"
 }
 
-export enum IUnit {
+export enum Unit {
   kg = 'kg',
   min = 'min',
   bodyweight = 'body weight'
@@ -39,7 +39,7 @@ export interface SetExercise {
   id: string;
   reps: number;
   value: number;
-  unit: IUnit;
+  unit: Unit;
 }
 
 export type ISet = {
@@ -83,7 +83,7 @@ export interface ExerciseDefinitionDocument extends Document {
   primaryMuscleGroup: MuscleGroup[];
   title: string;
   type: ExerciseType;
-  unit?: IUnit;
+  unit?: Unit;
   user?: string;
 }
 
@@ -94,6 +94,7 @@ export interface ExerciseDefinitionModel
     sets: ISet[];
     timeTaken: string;
   }) => ExerciseDocument;
+  getUnit: (id: string) => Unit;
   // FIXME: occluded by Model.update
   update: (updatedExercise: ExerciseDefinitionDocument) => any;
   removeHistorySession: (
