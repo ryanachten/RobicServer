@@ -2,7 +2,8 @@ import {
   ExerciseDefinitionDocument,
   ExerciseDefinitionModel,
   ISet,
-  ExerciseDocument
+  ExerciseDocument,
+  Unit
 } from '../interfaces';
 
 import mongoose = require('mongoose');
@@ -97,17 +98,21 @@ ExerciseDefinitionSchema.statics.addNewSession = async ({
   exerciseDef.history.push(activeExercise);
   // Save both the updated definition and new active exercise, return new exercise
   return Promise.all([exerciseDef.save(), activeExercise.save()]).then(
-    ([definition, newExercise]) => newExercise as ExerciseDocument
+    ([, newExercise]) => newExercise as ExerciseDocument
   );
 };
 
-ExerciseDefinitionSchema.statics.getChildExercises = function(id: string) {
+ExerciseDefinitionSchema.statics.getChildExercises = function(
+  id: string
+): ExerciseDefinitionDocument[] {
   return this.findById(id)
     .populate('childExercises')
     .then((exercise: ExerciseDefinitionDocument) => exercise.childExercises);
 };
 
-ExerciseDefinitionSchema.statics.getHistory = function(id: string) {
+ExerciseDefinitionSchema.statics.getHistory = function(
+  id: string
+): ExerciseDocument[] {
   return (
     this.findById(id)
       // Find the definition and then return the history log
@@ -116,7 +121,7 @@ ExerciseDefinitionSchema.statics.getHistory = function(id: string) {
   );
 };
 
-ExerciseDefinitionSchema.statics.getUnit = function(id: string) {
+ExerciseDefinitionSchema.statics.getUnit = function(id: string): Unit {
   return this.findById(id).then(
     (exercise: ExerciseDefinitionDocument) => exercise.unit
   );
@@ -129,7 +134,7 @@ ExerciseDefinitionSchema.statics.update = async function({
   primaryMuscleGroup,
   type,
   childExercises
-}: ExerciseDefinitionDocument) {
+}: ExerciseDefinitionDocument): Promise<ExerciseDefinitionDocument> {
   const definition = await this.findById(id);
   definition.title = title;
   definition.unit = unit;
@@ -142,7 +147,7 @@ ExerciseDefinitionSchema.statics.update = async function({
 ExerciseDefinitionSchema.statics.removeHistorySession = async function(
   definitionId: string,
   exerciseId: string
-) {
+): Promise<ExerciseDefinitionDocument> {
   // Remove the exercise from definition history
   const definition = await this.findById(definitionId);
 
