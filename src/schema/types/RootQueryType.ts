@@ -1,6 +1,6 @@
 import * as graphql from 'graphql';
 import {
-  IRequest,
+  Request,
   UserDocument,
   ExerciseDefinitionDocument,
   ExerciseDocument,
@@ -26,9 +26,9 @@ const RootQuery = new GraphQLObjectType({
       description: 'Returns current user based on JSON web token from client',
       type: UserType,
       resolve(
-        parentValue: IRequest,
+        parentValue: Request,
         {},
-        { user }: IRequest
+        { user }: Request
       ): mongoose.DocumentQuery<UserDocument, UserDocument> {
         if (!user) {
           return null;
@@ -50,11 +50,7 @@ const RootQuery = new GraphQLObjectType({
 
     exerciseDefinitions: {
       type: new GraphQLList(ExerciseDefinitionType),
-      resolve(
-        parentValue: IRequest,
-        {},
-        { user }: IRequest
-      ): ExerciseDocument[] {
+      resolve(parentValue: Request, {}, { user }: Request): ExerciseDocument[] {
         return User.getExercises(user.id);
       }
     },

@@ -1,6 +1,6 @@
 import {
   ExerciseDocument,
-  ISet,
+  Set,
   ExerciseDefinitionDocument
 } from '../interfaces';
 
@@ -43,7 +43,7 @@ ExerciseSchema.statics.getDefinition = function(
 
 ExerciseSchema.statics.update = async function(
   exerciseId: string,
-  sets: ISet[],
+  sets: Set[],
   timeTaken: string
 ): Promise<ExerciseDocument> {
   const exercise = await this.findById(exerciseId);

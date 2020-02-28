@@ -1,7 +1,7 @@
 import {
   ExerciseDefinitionDocument,
   ExerciseDefinitionModel,
-  ISet,
+  Set,
   ExerciseDocument,
   Unit
 } from '../interfaces';
@@ -81,7 +81,7 @@ ExerciseDefinitionSchema.statics.addNewSession = async function({
   timeTaken
 }: {
   definitionId: string;
-  sets: ISet;
+  sets: Set;
   timeTaken: string;
 }): Promise<ExerciseDocument> {
   const exerciseDef = (await this.findById(

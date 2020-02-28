@@ -1,4 +1,4 @@
-import { IRequest } from './interfaces';
+import { Request } from './interfaces';
 
 import mongoose = require('mongoose');
 import bodyParser = require('body-parser');
@@ -39,12 +39,12 @@ app.use(cors());
 
 /** * JWT verification middleware ** */
 const { JWT_PASSWORD_SECRET } = process.env;
-const verifyJwtToken = async (req: IRequest): Promise<void> => {
+const verifyJwtToken = async (req: Request): Promise<void> => {
   // Access token off client request header
   const token = req.headers.authorization;
   try {
     // Verify user using JWT secret
-    const { user } = (await jwt.verify(token, JWT_PASSWORD_SECRET)) as IRequest;
+    const { user } = (await jwt.verify(token, JWT_PASSWORD_SECRET)) as Request;
     // Add the user to the request for parsing in the GQL middleware
     req.user = user;
   } catch (err) {
@@ -57,7 +57,7 @@ app.use(verifyJwtToken);
 /** * GraphQL middleware ** */
 app.use(
   '/graphql',
-  expressGraphQL((req: IRequest) => ({
+  expressGraphQL((req: Request) => ({
     schema,
     graphiql: true,
     context: {

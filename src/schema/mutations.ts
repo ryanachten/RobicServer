@@ -4,7 +4,7 @@ import {
   ExerciseModel,
   ExerciseDefinitionDocument,
   ExerciseDefinitionModel,
-  IRequest,
+  Request,
   UserDocument,
   UserModel
 } from '../interfaces';
@@ -82,7 +82,7 @@ const mutation = new GraphQLObjectType({
           type,
           childExercises
         }: ExerciseDefinitionDocument,
-        { user }: IRequest
+        { user }: Request
       ): ExerciseDefinitionDocument {
         const exercise = {
           title,

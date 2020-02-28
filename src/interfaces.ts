@@ -1,6 +1,6 @@
 import { Document, Model } from 'mongoose';
 
-export type IRequest = {
+export type Request = {
   headers: {
     authorization: string;
   };
@@ -42,7 +42,7 @@ export interface SetExercise {
   unit: Unit;
 }
 
-export type ISet = {
+export type Set = {
   exercises?: SetExercise[];
   reps: number; // TODO: should be optional
   value: number; // TODO: should be optional
@@ -66,14 +66,14 @@ export interface ExerciseDocument extends Document {
   id: string;
   date: string;
   definition: ExerciseDefinitionDocument;
-  sets: ISet[];
+  sets: Set[];
   timeTaken: string;
 }
 
 export interface ExerciseModel extends Model<ExerciseDocument> {
   getDefinition: (id: string) => ExerciseDefinitionDocument;
   // FIXME: occluded by Model.update
-  //  should be - update: (exerciseId: string, sets: ISet[], timeTaken: string) => ExerciseDocument
+  //  should be - update: (exerciseId: string, sets: Set[], timeTaken: string) => ExerciseDocument
   update: (exerciseId: any, sets: any, timeTaken: any) => any;
 }
 
@@ -92,7 +92,7 @@ export interface ExerciseDefinitionModel
   extends Model<ExerciseDefinitionDocument> {
   addNewSession: (exercise: {
     definitionId: string;
-    sets: ISet[];
+    sets: Set[];
     timeTaken: string;
   }) => ExerciseDocument;
   getChildExercises: (id: string) => ExerciseDefinitionDocument[];
