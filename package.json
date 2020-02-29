@@ -8,11 +8,12 @@
     "url": "https://github.com/ryanachten/RobicServer"
   },
   "scripts": {
-    "start": "tsc && node index.js",
+    "start": "node index.js",
     "build": "tsc",
     "watch": "nodemon index.js",
     "watch-ts": "tsc -w",
-    "lint": "./node_modules/.bin/eslint 'src/**"
+    "lint": "./node_modules/.bin/eslint 'src/**",
+    "postinstall": "npm run build"
   },
   "author": "Ryan Achten",
   "license": "ISC",
