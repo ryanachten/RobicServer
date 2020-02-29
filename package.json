@@ -8,7 +8,7 @@
     "url": "https://github.com/ryanachten/RobicServer"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "tsc && node index.js",
     "build": "tsc",
     "watch": "nodemon index.js",
     "watch-ts": "tsc -w",
