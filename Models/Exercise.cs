@@ -19,11 +19,11 @@ namespace RobicServer.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string session { get; set; }
 
-        // TODO: this should be calculated on the API, not stored in the DB
-        [BsonRepresentation(BsonType.Double)]
-        public double netValue { get; set; }
+        // TODO: this should be calculated on the API, not stored in the DB (isn't )
+        // [BsonRepresentation(BsonType.Double)]
+        // public double netValue { get; set; }
 
-        // TODO: sets
-        public string sets { get; set; }
+        // // TODO: sets
+        // public string sets { get; set; }
     }
 }

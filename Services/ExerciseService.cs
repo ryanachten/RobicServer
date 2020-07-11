@@ -8,7 +8,7 @@ namespace RobicServer.Services
     {
         private readonly IMongoCollection<Exercise> _exercises;
 
-        public ExerciseService(IExerciseDatabaseSettings settings)
+        public ExerciseService(IDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionString);
             var database = client.GetDatabase(settings.DatabaseName);

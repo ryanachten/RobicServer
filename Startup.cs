@@ -22,10 +22,10 @@ namespace RobicServer
         public void ConfigureServices(IServiceCollection services)
         {
             // Configures database using settings defined in the appsettings config
-            services.Configure<ExerciseDatabaseSettings>(Configuration.GetSection(nameof(ExerciseDatabaseSettings)));
+            services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
             // Database interface is registered with DI for a singleton service lifetime
-            services.AddSingleton<IExerciseDatabaseSettings>(
-                serviceProvider => serviceProvider.GetRequiredService<IOptions<ExerciseDatabaseSettings>>().Value
+            services.AddSingleton<IDatabaseSettings>(
+                serviceProvider => serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value
             );
             services.AddSingleton<ExerciseService>();
 
