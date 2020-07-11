@@ -8,5 +8,8 @@ namespace RobicServer.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+
+        [BsonElement("Name")]
+        public string ExerciseName { get; set; }
     }
 }
