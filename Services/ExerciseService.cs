@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using RobicServer.Models;
 
@@ -16,9 +17,11 @@ namespace RobicServer.Services
             _exercises = database.GetCollection<Exercise>(settings.ExerciseCollectionName);
         }
 
-        // TODO: shouldn't these methods be async?
-        public List<Exercise> Get() =>
-            _exercises.Find<Exercise>(exercise => true).ToList();
+        public async Task<List<Exercise>> Get()
+        {
+            var exercises = await _exercises.Find<Exercise>(exercise => true).ToListAsync();
+            return exercises;
+        }
 
         public Exercise Get(string id) =>
             _exercises.Find<Exercise>(exercise => exercise.Id == id).FirstOrDefault();

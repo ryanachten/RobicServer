@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RobicServer.Models;
 using RobicServer.Services;
@@ -17,6 +18,6 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Exercise>> Get() => _exerciseService.Get();
+        public async Task<List<Exercise>> Get() => await _exerciseService.Get();
     }
 }
