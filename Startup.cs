@@ -28,6 +28,7 @@ namespace RobicServer
                 serviceProvider => serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value
             );
             services.AddSingleton<ExerciseService>();
+            services.AddSingleton<ExerciseDefinitionService>();
 
             services.AddControllers();
         }
