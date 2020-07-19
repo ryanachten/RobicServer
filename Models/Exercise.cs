@@ -10,14 +10,13 @@ namespace RobicServer.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-        [BsonElement("Name")]
-        public string ExerciseName { get; set; }
-
+        [BsonElement("definition")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string definition { get; set; }
+        public string Definition { get; set; }
 
+        [BsonElement("session")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string session { get; set; }
+        public string Session { get; set; }
 
         // TODO: this should be calculated on the API, not stored in the DB (isn't )
         // [BsonRepresentation(BsonType.Double)]
