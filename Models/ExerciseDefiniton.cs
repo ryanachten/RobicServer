@@ -30,5 +30,13 @@ namespace RobicServer.Models
         [BsonElement("history")]
         [BsonRepresentation(BsonType.ObjectId)]
         public ICollection<string> History { get; set; }
+
+        [BsonElement("childExercises")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public ICollection<string> ChildExercises { get; set; }
+
+        [BsonElement("primaryMuscleGroup")]
+        [BsonRepresentation(BsonType.String)]
+        public string[] PrimaryMuscleGroup { get; set; }
     }
 }
