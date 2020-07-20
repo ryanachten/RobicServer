@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -18,11 +20,14 @@ namespace RobicServer.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Session { get; set; }
 
+        [BsonElement("timeTaken")]
+        public DateTime TimeTaken { get; set; }
+
         // TODO: this should be calculated on the API, not stored in the DB (isn't )
         // [BsonRepresentation(BsonType.Double)]
         // public double netValue { get; set; }
 
-        // // TODO: sets
-        // public string sets { get; set; }
+        [BsonElement("sets")]
+        public ICollection<Set> sets { get; set; }
     }
 }

@@ -37,6 +37,6 @@ namespace RobicServer.Models
 
         [BsonElement("primaryMuscleGroup")]
         [BsonRepresentation(BsonType.String)]
-        public string[] PrimaryMuscleGroup { get; set; }
+        public ICollection<string> PrimaryMuscleGroup { get; set; }
     }
 }
