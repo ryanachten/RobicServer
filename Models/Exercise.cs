@@ -23,11 +23,31 @@ namespace RobicServer.Models
         [BsonElement("timeTaken")]
         public DateTime TimeTaken { get; set; }
 
-        // TODO: this should be calculated on the API, not stored in the DB (isn't )
-        // [BsonRepresentation(BsonType.Double)]
-        // public double netValue { get; set; }
-
         [BsonElement("sets")]
         public ICollection<Set> sets { get; set; }
+
+        private double? netValue;
+        public double? NetValue
+        {
+            get
+            {
+                double? total = null;
+                foreach (Set set in this.sets)
+                {
+                    if (set.Reps.HasValue && set.Value.HasValue)
+                    {
+                        if (total == null)
+                        {
+                            total = 0.0;
+                        }
+                        total += ((int)set.Reps * (double)set.Value);
+                    }
+
+                }
+                return total;
+            }
+            set { NetValue = value; }
+        }
+
     }
 }
