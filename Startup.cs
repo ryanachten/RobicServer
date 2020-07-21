@@ -21,6 +21,7 @@ namespace RobicServer
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             // Configures database using settings defined in the appsettings config
             services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
             // Database interface is registered with DI for a singleton service lifetime
@@ -45,6 +46,8 @@ namespace RobicServer
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseAuthorization();
 
