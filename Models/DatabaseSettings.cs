@@ -6,7 +6,6 @@ namespace RobicServer.Models
         public string ConnectionString { get; set; }
         public string ExerciseCollectionName { get; set; }
         public string ExerciseDefinitionCollectionName { get; set; }
-        public string SessionCollectionName { get; set; }
         public string UserCollectionName { get; set; }
 
     }
@@ -16,7 +15,6 @@ namespace RobicServer.Models
         string ConnectionString { get; set; }
         string ExerciseCollectionName { get; set; }
         string ExerciseDefinitionCollectionName { get; set; }
-        string SessionCollectionName { get; set; }
         string UserCollectionName { get; set; }
     }
 }

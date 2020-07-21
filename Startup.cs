@@ -29,6 +29,7 @@ namespace RobicServer
             );
             services.AddSingleton<ExerciseService>();
             services.AddSingleton<ExerciseDefinitionService>();
+            services.AddSingleton<UserService>();
 
             services.AddControllers();
         }
