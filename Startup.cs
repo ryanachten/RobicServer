@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using RobicServer.Data;
 using RobicServer.Models;
 using RobicServer.Services;
 
@@ -28,6 +29,8 @@ namespace RobicServer
             services.AddSingleton<IDatabaseSettings>(
                 serviceProvider => serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value
             );
+            services.AddSingleton<DataContext>();
+            services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddSingleton<ExerciseService>();
             services.AddSingleton<ExerciseDefinitionService>();
             services.AddSingleton<UserService>();
