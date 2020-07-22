@@ -42,7 +42,7 @@ namespace RobicServer.Models
                 }
                 return total;
             }
-            set { NetValue = value; }
+            set { netValue = value; }
         }
 
     }
