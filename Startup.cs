@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -23,9 +24,8 @@ namespace RobicServer
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            // Configures database using settings defined in the appsettings config
+            services.AddAutoMapper(typeof(AuthRepository).Assembly);
             services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
-            // Database interface is registered with DI for a singleton service lifetime
             services.AddSingleton<IDatabaseSettings>(
                 serviceProvider => serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value
             );

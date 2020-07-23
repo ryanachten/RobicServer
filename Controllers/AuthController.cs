@@ -1,43 +1,37 @@
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using RobicServer.Data;
 using RobicServer.Models;
+using RobicServer.Models.DTOs;
 
 namespace RobicServer.Controllers
 {
-
-    // TODO: replace with proper DTOs
-    public struct UserDetailDto
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
 
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IMapper _mapper;
         private readonly IAuthRepository _repo;
 
-        public AuthController(IAuthRepository repo)
+        public AuthController(IAuthRepository repo, IMapper mapper)
         {
+            _mapper = mapper;
             _repo = repo;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserDetailDto userDetails)
+        public async Task<IActionResult> Register(UserForRegisterDto userDetails)
         {
-            // TODO: check for existence of email in DB via UserExists method
-            // TODO: user AutoMapper to concert DTO's to objects
-            User userToRegister = new User();
-            userToRegister.Email = userDetails.Email;
-            var createdUser = await _repo.Register(userToRegister, userDetails.Password);
+            User user = _mapper.Map<User>(userDetails);
+            var createdUser = await _repo.Register(user, userDetails.Password);
 
             return Ok(createdUser);
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserDetailDto userDetails)
+        public async Task<IActionResult> Login(UserForLoginDto userDetails)
         {
             User user = await _repo.Login(userDetails.Email.ToLower(), userDetails.Password);
             if (user == null)
