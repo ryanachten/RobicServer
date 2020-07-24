@@ -30,6 +30,7 @@ namespace RobicServer
                 serviceProvider => serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value
             );
             services.AddSingleton<DataContext>();
+            services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddSingleton<ExerciseService>();

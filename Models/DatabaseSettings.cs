@@ -13,6 +13,8 @@ namespace RobicServer.Models
     {
         string DatabaseName { get; set; }
         string ConnectionString { get; set; }
+
+        // TODO: deprecate the following after generalisation
         string ExerciseCollectionName { get; set; }
         string ExerciseDefinitionCollectionName { get; set; }
         string UserCollectionName { get; set; }
