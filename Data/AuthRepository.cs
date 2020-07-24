@@ -44,7 +44,7 @@ namespace RobicServer.Data
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
 
-            // TODO: Add user to database and save changes
+            await _context.Users.InsertOneAsync(user);
 
             return user;
         }

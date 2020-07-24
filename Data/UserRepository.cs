@@ -13,11 +13,6 @@ namespace RobicServer.Data
             _context = context;
         }
 
-        public Task<User> Create(User user)
-        {
-            throw new System.NotImplementedException();
-        }
-
         public async Task<User> Get(string id)
         {
             User user = await _context.Users.Find<User>(user => user.Id == id).FirstOrDefaultAsync();
