@@ -1,9 +1,7 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RobicServer.Data;
 using RobicServer.Models;
-using RobicServer.Services;
 
 namespace RobicServer.Controllers
 {
@@ -11,14 +9,14 @@ namespace RobicServer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly IUserRepository _repo;
+        private readonly IMongoRepository<User> _userRepo;
 
-        public UserController(IUserRepository repo)
+        public UserController(IMongoRepository<User> userRepo)
         {
-            _repo = repo;
+            _userRepo = userRepo;
         }
 
         [HttpGet("{id}")]
-        public async Task<User> Get(string id) => await _repo.Get(id);
+        public async Task<User> Get(string id) => await _userRepo.FindByIdAsync(id);
     }
 }

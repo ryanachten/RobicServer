@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using RobicServer.Helpers;
 
 namespace RobicServer.Models
 {
+    [BsonCollection("users")]
     [BsonIgnoreExtraElements]
-    public class User
+    public class User : Document
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
 
         [BsonElement("firstName")]
         public string FirstName { get; set; }

@@ -6,15 +6,15 @@ namespace RobicServer.Data
 {
     public class AuthRepository : IAuthRepository
     {
-        private readonly DataContext _context;
+        private readonly IMongoRepository<User> _userRepo;
 
-        public AuthRepository(DataContext context)
+        public AuthRepository(IMongoRepository<User> userRepo)
         {
-            _context = context;
+            _userRepo = userRepo;
         }
         public async Task<User> Login(string email, string password)
         {
-            var user = await _context.Users.Find<User>(user => user.Email == email).FirstOrDefaultAsync();
+            var user = await _userRepo.FindOneAsync(user => user.Email == email);
             if (user == null)
                 return null;
 
@@ -44,7 +44,7 @@ namespace RobicServer.Data
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
 
-            await _context.Users.InsertOneAsync(user);
+            await _userRepo.InsertOneAsync(user);
 
             return user;
         }
