@@ -31,9 +31,9 @@ namespace RobicServer
             );
             services.AddSingleton<DataContext>();
             services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
             services.AddSingleton<ExerciseService>();
             services.AddSingleton<ExerciseDefinitionService>();
-            services.AddSingleton<UserService>();
 
             services.AddControllers();
         }

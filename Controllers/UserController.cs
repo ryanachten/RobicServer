@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RobicServer.Data;
 using RobicServer.Models;
 using RobicServer.Services;
 
@@ -10,14 +11,14 @@ namespace RobicServer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
+        private readonly IUserRepository _repo;
 
-        public UserController(UserService userService)
+        public UserController(IUserRepository repo)
         {
-            _userService = userService;
+            _repo = repo;
         }
 
         [HttpGet("{id}")]
-        public async Task<User> Get(string id) => await _userService.Get(id);
+        public async Task<User> Get(string id) => await _repo.Get(id);
     }
 }
