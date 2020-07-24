@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using RobicServer.Data;
 using RobicServer.Models;
 using RobicServer.Services;
 
@@ -10,14 +12,21 @@ namespace RobicServer.Controllers
     [ApiController]
     public class ExerciseController : ControllerBase
     {
-        private readonly ExerciseService _exerciseService;
+        private readonly IMongoRepository<Exercise> _exerciseExpo;
 
-        public ExerciseController(ExerciseService exerciseService)
+        public ExerciseController(IMongoRepository<Exercise> exerciseExpo)
         {
-            _exerciseService = exerciseService;
+            _exerciseExpo = exerciseExpo;
         }
 
         [HttpGet]
-        public async Task<List<Exercise>> Get() => await _exerciseService.Get();
+        public List<Exercise> Get()
+        {
+            IQueryable<Exercise> query = _exerciseExpo.AsQueryable();
+            return query.ToList();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<Exercise> Get(string id) => await _exerciseExpo.FindByIdAsync(id);
     }
 }

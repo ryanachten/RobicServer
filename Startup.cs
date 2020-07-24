@@ -32,7 +32,6 @@ namespace RobicServer
 
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
-            services.AddSingleton<ExerciseService>();
             services.AddSingleton<ExerciseDefinitionService>();
 
             services.AddControllers();

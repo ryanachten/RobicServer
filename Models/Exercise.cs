@@ -2,16 +2,14 @@ using System;
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using RobicServer.Helpers;
 
 namespace RobicServer.Models
 {
+    [BsonCollection("users")]
     [BsonIgnoreExtraElements]
-    public class Exercise
+    public class Exercise : Document
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-
         [BsonElement("definition")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Definition { get; set; }
@@ -28,6 +26,9 @@ namespace RobicServer.Models
             get
             {
                 double? total = null;
+                if (this.sets == null)
+                    return total;
+
                 foreach (Set set in this.sets)
                 {
                     if (set.Reps.HasValue && set.Value.HasValue)
