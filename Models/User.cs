@@ -19,10 +19,10 @@ namespace RobicServer.Models
         [BsonElement("email")]
         public string Email { get; set; }
 
-        // [BsonElement("passwordHash")]
+        [BsonElement("passwordHash")]
         public byte[] PasswordHash { get; set; }
 
-        // [BsonElement("passwordSalt")]
+        [BsonElement("passwordSalt")]
         public byte[] PasswordSalt { get; set; }
 
         [BsonElement("exercises")]
