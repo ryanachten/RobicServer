@@ -21,7 +21,14 @@ namespace RobicServer.Controllers
         [HttpGet]
         public List<Exercise> Get() => _exerciseExpo.AsQueryable().ToList();
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetExercise")]
         public async Task<Exercise> Get(string id) => await _exerciseExpo.FindByIdAsync(id);
+
+        [HttpPost]
+        public async Task<IActionResult> Create(Exercise exercise)
+        {
+            await _exerciseExpo.InsertOneAsync(exercise);
+            return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
+        }
     }
 }
