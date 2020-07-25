@@ -16,7 +16,7 @@ namespace RobicServer.Controllers
             _userRepo = userRepo;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetUser")]
         public async Task<User> Get(string id) => await _userRepo.FindByIdAsync(id);
     }
 }

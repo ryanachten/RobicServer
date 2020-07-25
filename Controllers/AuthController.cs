@@ -27,7 +27,7 @@ namespace RobicServer.Controllers
             User user = _mapper.Map<User>(userDetails);
             var createdUser = await _repo.Register(user, userDetails.Password);
 
-            return Ok(createdUser);
+            return CreatedAtRoute("GetUser", new { controller = "User", id = createdUser.Id }, createdUser);
         }
 
         [HttpPost("login")]
