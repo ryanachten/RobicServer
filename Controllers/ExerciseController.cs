@@ -22,7 +22,15 @@ namespace RobicServer.Controllers
         public List<Exercise> Get() => _exerciseExpo.AsQueryable().ToList();
 
         [HttpGet("{id:length(24)}", Name = "GetExercise")]
-        public async Task<Exercise> Get(string id) => await _exerciseExpo.FindByIdAsync(id);
+        public async Task<IActionResult> Get(string id)
+        {
+            Exercise exercise = await _exerciseExpo.FindByIdAsync(id);
+            if (exercise == null)
+            {
+                return NotFound();
+            }
+            return Ok(exercise);
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create(Exercise exercise)
@@ -34,7 +42,7 @@ namespace RobicServer.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, Exercise updatedExercise)
         {
-            Exercise exercise = _exerciseExpo.FindById(id);
+            Exercise exercise = await _exerciseExpo.FindByIdAsync(id);
             if (exercise == null)
             {
                 return NotFound();
@@ -42,6 +50,19 @@ namespace RobicServer.Controllers
 
             await _exerciseExpo.ReplaceOneAsync(updatedExercise);
             return Ok(exercise);
+        }
+
+        [HttpDelete("{id:length(24)}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            Exercise exercise = await _exerciseExpo.FindByIdAsync(id);
+            if (exercise == null)
+            {
+                return NotFound();
+            }
+
+            await _exerciseExpo.DeleteByIdAsync(id);
+            return NoContent();
         }
     }
 }
