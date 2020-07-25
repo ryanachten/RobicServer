@@ -21,7 +21,7 @@ namespace RobicServer.Controllers
         [HttpGet]
         public List<Exercise> Get() => _exerciseExpo.AsQueryable().ToList();
 
-        [HttpGet("{id}", Name = "GetExercise")]
+        [HttpGet("{id:length(24)}", Name = "GetExercise")]
         public async Task<Exercise> Get(string id) => await _exerciseExpo.FindByIdAsync(id);
 
         [HttpPost]
@@ -29,6 +29,19 @@ namespace RobicServer.Controllers
         {
             await _exerciseExpo.InsertOneAsync(exercise);
             return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
+        }
+
+        [HttpPut("{id:length(24)}")]
+        public async Task<IActionResult> Update(string id, Exercise updatedExercise)
+        {
+            Exercise exercise = _exerciseExpo.FindById(id);
+            if (exercise == null)
+            {
+                return NotFound();
+            }
+
+            await _exerciseExpo.ReplaceOneAsync(updatedExercise);
+            return Ok(exercise);
         }
     }
 }
