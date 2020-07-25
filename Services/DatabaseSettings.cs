@@ -1,4 +1,4 @@
-namespace RobicServer.Models
+namespace RobicServer.Services
 {
     public class DatabaseSettings : IDatabaseSettings
     {
