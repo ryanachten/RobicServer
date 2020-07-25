@@ -42,6 +42,7 @@ namespace RobicServer.Services
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
             user.PasswordSalt = passwordSalt;
             user.PasswordHash = passwordHash;
+            user.Exercises = new string[] { };
 
             await _userRepo.InsertOneAsync(user);
 
