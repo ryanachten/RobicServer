@@ -19,11 +19,7 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public List<Exercise> Get()
-        {
-            IQueryable<Exercise> query = _exerciseExpo.AsQueryable();
-            return query.ToList();
-        }
+        public List<Exercise> Get() => _exerciseExpo.AsQueryable().ToList();
 
         [HttpGet("{id}")]
         public async Task<Exercise> Get(string id) => await _exerciseExpo.FindByIdAsync(id);

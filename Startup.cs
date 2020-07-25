@@ -7,7 +7,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using RobicServer.Data;
 using RobicServer.Models;
-using RobicServer.Services;
 
 namespace RobicServer
 {
@@ -32,7 +31,6 @@ namespace RobicServer
 
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
-            services.AddSingleton<ExerciseDefinitionService>();
 
             services.AddControllers();
         }

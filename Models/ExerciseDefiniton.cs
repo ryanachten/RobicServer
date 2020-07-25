@@ -1,17 +1,14 @@
 using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Options;
+using RobicServer.Helpers;
 
 namespace RobicServer.Models
 {
+    [BsonCollection("exercisedefinitions")]
     [BsonIgnoreExtraElements]
-    public class ExerciseDefiniton
+    public class ExerciseDefiniton : Document
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
-
         [BsonElement("title")]
         public string Title { get; set; }
 
