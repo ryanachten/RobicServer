@@ -49,7 +49,7 @@ namespace RobicServer.Controllers
             }
 
             await _exerciseExpo.ReplaceOneAsync(updatedExercise);
-            return Ok(exercise);
+            return Ok(updatedExercise);
         }
 
         [HttpDelete("{id:length(24)}")]
