@@ -58,9 +58,10 @@ namespace RobicServer.Services
             }
         }
 
-        public Task<bool> UserExists(string username)
+        public async Task<bool> UserExists(string email)
         {
-            throw new System.NotImplementedException();
+            User user = await _userRepo.FindOneAsync(user => user.Email == email);
+            return user != null;
         }
     }
 }

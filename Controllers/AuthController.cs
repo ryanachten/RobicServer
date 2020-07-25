@@ -31,6 +31,9 @@ namespace RobicServer.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userDetails)
         {
+            if (await _repo.UserExists(userDetails.Email))
+                return BadRequest($"Email {userDetails.Email} already registered to Robic");
+
             User user = _mapper.Map<User>(userDetails);
             var createdUser = await _repo.Register(user, userDetails.Password);
 
