@@ -4,9 +4,12 @@ using RobicServer.Services;
 using RobicServer.Models;
 using AutoMapper;
 using RobicServer.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace RobicServer.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -21,11 +24,18 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet("{id:length(24)}", Name = "GetUser")]
-        public async Task<UserForDetailDto> Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (userId != id)
+                return Unauthorized();
+
             User user = await _userRepo.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
             var userForReturn = _mapper.Map<UserForDetailDto>(user);
-            return userForReturn;
+            return Ok(userForReturn);
         }
     }
 }

@@ -66,9 +66,7 @@ namespace RobicServer.Controllers
 
             Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
             if (exercise == null)
-            {
                 return NotFound();
-            }
 
             await _exerciseRepo.ReplaceOneAsync(updatedExercise);
             return Ok(updatedExercise);
@@ -79,9 +77,7 @@ namespace RobicServer.Controllers
         {
             Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
             if (exercise == null)
-            {
                 return NotFound();
-            }
 
             if (await isUserDefinition(exercise) == false)
                 return Unauthorized();
