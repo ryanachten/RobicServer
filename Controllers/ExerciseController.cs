@@ -42,6 +42,7 @@ namespace RobicServer.Controllers
             if (exercise == null)
                 return NotFound();
 
+            string userID = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (await isUserDefinition(exercise) == false)
                 return Unauthorized();
 
@@ -51,10 +52,18 @@ namespace RobicServer.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Exercise exercise)
         {
-            if (await isUserDefinition(exercise) == false)
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+
+            if (definiton == null || definiton.User != userId)
                 return Unauthorized();
 
             await _exerciseRepo.InsertOneAsync(exercise);
+
+            // Add exercise to definition history
+            definiton.History.Add(exercise.Id);
+            await _exerciseDefinitionRepo.ReplaceOneAsync(definiton);
+
             return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
         }
 
@@ -79,10 +88,18 @@ namespace RobicServer.Controllers
             if (exercise == null)
                 return NotFound();
 
-            if (await isUserDefinition(exercise) == false)
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+
+            if (definiton == null || definiton.User != userId)
                 return Unauthorized();
 
             await _exerciseRepo.DeleteByIdAsync(id);
+
+            // Remove exercise from definition history
+            definiton.History.Remove(id);
+            await _exerciseDefinitionRepo.ReplaceOneAsync(definiton);
+
             return NoContent();
         }
 
