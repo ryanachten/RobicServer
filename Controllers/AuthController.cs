@@ -43,9 +43,9 @@ namespace RobicServer.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(UserForLoginDto userDetails)
+        public async Task<IActionResult> Login(UserForLoginDto userLoginDetails)
         {
-            User user = await _repo.Login(userDetails.Email.ToLower(), userDetails.Password);
+            User user = await _repo.Login(userLoginDetails.Email.ToLower(), userLoginDetails.Password);
             if (user == null)
                 return Unauthorized();
 
@@ -70,10 +70,12 @@ namespace RobicServer.Controllers
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
+            var userDetails = _mapper.Map<UserForDetailDto>(user);
+
             return Ok(new
             {
                 token = tokenHandler.WriteToken(token),
-                user
+                userDetails
             });
         }
     }
