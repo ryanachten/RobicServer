@@ -6,6 +6,8 @@ using RobicServer.Models;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using AutoMapper;
+using RobicServer.Models.DTOs;
 
 namespace RobicServer.Controllers
 {
@@ -17,23 +19,28 @@ namespace RobicServer.Controllers
         private readonly IMongoRepository<Exercise> _exerciseRepo;
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefintionRepo;
         private readonly IMongoRepository<User> _userRepo;
+        private readonly IMapper _mapper;
 
         public ExerciseDefinitionController(
             IMongoRepository<Exercise> exerciseRepo,
             IMongoRepository<ExerciseDefiniton> exerciseDefintionRepo,
-            IMongoRepository<User> userRepo
+            IMongoRepository<User> userRepo,
+            IMapper mapper
         )
         {
             _exerciseRepo = exerciseRepo;
             _exerciseDefintionRepo = exerciseDefintionRepo;
             _userRepo = userRepo;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public List<ExerciseDefiniton> Get()
+        public List<ExerciseDefinitionForListDto> Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            return _exerciseDefintionRepo.AsQueryable().Where(exercise => exercise.User == userId).ToList();
+            var exercises = _exerciseDefintionRepo.AsQueryable().Where(exercise => exercise.User == userId).ToList();
+            var exerciseForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(exercises);
+            return exerciseForReturn;
         }
 
         [HttpGet("{id:length(24)}", Name = "GetExerciseDefinition")]

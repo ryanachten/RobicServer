@@ -6,6 +6,6 @@ To run with iOS simulator, we need to run the server in HTTPS. However, iOS does
 
 Steps:
 
-- Run .NET Core while watching for changes: `dotnet run watch`
+- Run .NET Core while watching for changes: `dotnet watch run`
 - Point ngrok at localhost: `ngrok http https://localhost:5001`
 - Use forwarding address printed by ngrok as API URL for React Native local development

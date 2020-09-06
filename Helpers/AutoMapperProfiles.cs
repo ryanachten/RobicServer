@@ -10,6 +10,7 @@ namespace RobicServer.Helpers
         {
             CreateMap<UserForRegisterDto, User>();
             CreateMap<User, UserForDetailDto>();
+            CreateMap<ExerciseDefiniton, ExerciseDefinitionForListDto>();
         }
     }
 }
