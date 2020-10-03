@@ -16,7 +16,7 @@ namespace RobicServer.Services
 
         public MongoRepository(IDatabaseSettings settings)
         {
-            var database = new MongoClient(settings.ConnectionString).GetDatabase(settings.DatabaseName);
+            var database = new MongoClient(Environment.GetEnvironmentVariable("ConnectionString")).GetDatabase(Environment.GetEnvironmentVariable("DatabaseName"));
             _collection = database.GetCollection<TDocument>(GetCollectionName(typeof(TDocument)));
         }
 

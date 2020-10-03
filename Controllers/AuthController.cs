@@ -55,7 +55,7 @@ namespace RobicServer.Controllers
             };
 
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config.GetSection("TokenKey").Value)
+                Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("TokenKey"))
             );
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

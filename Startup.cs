@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,7 +41,7 @@ namespace RobicServer
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
-                            .GetBytes(Configuration.GetSection("TokenKey").Value)),
+                            .GetBytes(Environment.GetEnvironmentVariable("TokenKey"))),
                         ValidateIssuer = false,
                         ValidateAudience = false
                     };
