@@ -27,10 +27,6 @@ namespace RobicServer
         {
             services.AddCors();
             services.AddAutoMapper(typeof(AuthRepository).Assembly);
-            services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
-            services.AddSingleton<IDatabaseSettings>(
-                serviceProvider => serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value
-            );
 
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
             services.AddScoped<IAuthRepository, AuthRepository>();
