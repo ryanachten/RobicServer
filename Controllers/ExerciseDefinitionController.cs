@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using RobicServer.Models.DTOs;
+using System;
 
 namespace RobicServer.Controllers
 {
@@ -38,8 +39,18 @@ namespace RobicServer.Controllers
         public List<ExerciseDefinitionForListDto> Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var exercises = _exerciseDefintionRepo.AsQueryable().Where(exercise => exercise.User == userId).ToList();
+            var exercises = _exerciseDefintionRepo.AsQueryable().Where(defintion => defintion.User == userId).ToList();
             var exerciseForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(exercises);
+
+            // We assign the date of teh latest exercise as the timestamp for last modified
+            exerciseForReturn.ForEach((definition) =>
+            {
+                var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definition.Id).OrderByDescending(d => d.Date).FirstOrDefault();
+                if (latestExercise != null)
+                {
+                    definition.LastModified = latestExercise.Date;
+                }
+            });
             return exerciseForReturn;
         }
 
