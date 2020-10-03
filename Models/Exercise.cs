@@ -14,6 +14,9 @@ namespace RobicServer.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Definition { get; set; }
 
+        [BsonElement("date")]
+        public DateTime Date { get; set; }
+
         [BsonElement("timeTaken")]
         public DateTime TimeTaken { get; set; }
 

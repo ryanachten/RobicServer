@@ -53,16 +53,20 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> Create(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definition = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
 
-            if (definiton == null || definiton.User != userId)
+            if (definition == null || definition.User != userId)
                 return Unauthorized();
+
+            // Currently setting exercise timestamp to system time
+            // - TODO: invesitigate locale-specific solution
+            exercise.Date = DateTime.Now;
 
             await _exerciseRepo.InsertOneAsync(exercise);
 
             // Add exercise to definition history
-            definiton.History.Add(exercise.Id);
-            await _exerciseDefinitionRepo.ReplaceOneAsync(definiton);
+            definition.History.Add(exercise.Id);
+            await _exerciseDefinitionRepo.ReplaceOneAsync(definition);
 
             return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
         }
