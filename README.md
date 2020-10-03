@@ -20,6 +20,8 @@ dotnet run
 
 For simplicity's sake, we keep this in `startup.sh` (omitted from Git)
 
+**Note:** when deploying to a remote environment, these variables will need to be set (i.e. in our case we use Heroku, so we need to set them via https://devcenter.heroku.com/articles/config-vars#managing-config-vars )
+
 ## Developing locally with React Native
 
 To run with iOS simulator, we need to run the server in HTTPS. However, iOS does not seem to work with `localhost` domains when running .NET Core locally. To work around this, we route the local server using [ngrok](https://ngrok.com/).
