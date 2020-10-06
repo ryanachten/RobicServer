@@ -48,7 +48,7 @@ namespace RobicServer.Controllers
                 var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definition.Id).OrderByDescending(d => d.Date).FirstOrDefault();
                 if (latestExercise != null)
                 {
-                    definition.LastModified = latestExercise.Date;
+                    definition.LastActive = latestExercise.Date;
                 }
             });
             return exerciseForReturn;
