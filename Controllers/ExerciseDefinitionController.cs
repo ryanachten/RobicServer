@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using RobicServer.Models.DTOs;
 using System;
+using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
@@ -42,14 +43,13 @@ namespace RobicServer.Controllers
             var exercises = _exerciseDefintionRepo.AsQueryable().Where(defintion => defintion.User == userId).ToList();
             var exerciseForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(exercises);
 
-            // We assign the date of teh latest exercise as the timestamp for last modified
+            var utils = new ExerciseUtilities(_exerciseRepo);
+
+            // We assign the date of the latest exercise as the timestamp for last active
             exerciseForReturn.ForEach((definition) =>
             {
-                var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definition.Id).OrderByDescending(d => d.Date).FirstOrDefault();
-                if (latestExercise != null)
-                {
-                    definition.LastActive = latestExercise.Date;
-                }
+                definition.LastActive = utils.GetLatestExerciseDate(definition);
+                definition.LastImprovement = utils.GetLatestExerciseImprovement(definition);
             });
             return exerciseForReturn;
         }
