@@ -57,7 +57,7 @@ namespace RobicServer.Helpers
             // If most recent value is less than average, this is a negative correlation
             if (averageNetValue < mostRecentNetValue)
                 improvement *= -1;
-            return improvement;
+            return Math.Round(improvement);
         }
     }
 }
