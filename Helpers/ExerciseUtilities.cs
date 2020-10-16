@@ -14,10 +14,10 @@ namespace RobicServer.Helpers
         {
             _exerciseRepo = exerciseRepo;
         }
-        public DateTime? GetLatestExerciseDate(ExerciseDefinitionForListDto definition)
+        public DateTime? GetLatestExerciseDate(string definitionId)
         {
 
-            var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definition.Id).OrderByDescending(d => d.Date).FirstOrDefault();
+            var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId).OrderByDescending(d => d.Date).FirstOrDefault();
             if (latestExercise != null)
             {
                 return latestExercise.Date;
@@ -25,10 +25,10 @@ namespace RobicServer.Helpers
             return null;
         }
 
-        public double? GetLatestExerciseImprovement(ExerciseDefinitionForListDto definition)
+        public double? GetLatestExerciseImprovement(string definitionId)
         {
 
-            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definition.Id);
+            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId);
             var mostRecentExercise = exercises.OrderByDescending(d => d.Date).FirstOrDefault();
             if (mostRecentExercise == null || !mostRecentExercise.NetValue.HasValue)
             {

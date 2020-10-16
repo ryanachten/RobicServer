@@ -21,6 +21,7 @@ namespace RobicServer.Controllers
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefintionRepo;
         private readonly IMongoRepository<User> _userRepo;
         private readonly IMapper _mapper;
+        private readonly ExerciseUtilities _utils;
 
         public ExerciseDefinitionController(
             IMongoRepository<Exercise> exerciseRepo,
@@ -33,6 +34,7 @@ namespace RobicServer.Controllers
             _exerciseDefintionRepo = exerciseDefintionRepo;
             _userRepo = userRepo;
             _mapper = mapper;
+            _utils = new ExerciseUtilities(_exerciseRepo);
         }
 
         [HttpGet]
@@ -42,13 +44,11 @@ namespace RobicServer.Controllers
             var exercises = _exerciseDefintionRepo.AsQueryable().Where(defintion => defintion.User == userId).ToList();
             var exerciseForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(exercises);
 
-            var utils = new ExerciseUtilities(_exerciseRepo);
-
             // We assign the date of the latest exercise as the timestamp for last active
             exerciseForReturn.ForEach((definition) =>
             {
-                definition.LastActive = utils.GetLatestExerciseDate(definition);
-                definition.LastImprovement = utils.GetLatestExerciseImprovement(definition);
+                definition.LastActive = _utils.GetLatestExerciseDate(definition.Id);
+                definition.LastImprovement = _utils.GetLatestExerciseImprovement(definition.Id);
             });
             return exerciseForReturn;
         }
@@ -62,6 +62,9 @@ namespace RobicServer.Controllers
 
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
+
+            exercise.LastActive = _utils.GetLatestExerciseDate(exercise.Id);
+            exercise.LastImprovement = _utils.GetLatestExerciseImprovement(exercise.Id);
 
             return Ok(exercise);
         }
