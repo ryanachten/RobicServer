@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using RobicServer.Models;
-using RobicServer.Models.DTOs;
 using RobicServer.Services;
 
 namespace RobicServer.Helpers
@@ -58,6 +57,52 @@ namespace RobicServer.Helpers
             if (averageNetValue < mostRecentNetValue)
                 improvement *= -1;
             return Math.Round(improvement);
+        }
+#nullable enable
+        public PersonalBest? GetPersonalBest(string definitionId)
+        {
+            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId);
+            if (exercises == null)
+            {
+                return null;
+            }
+            Exercise? exerciseWithHighestNetValue = null;
+            double highestAvgValue = 0;
+            int highestReps = 0;
+            int highestSets = 0;
+            exercises.ToList().ForEach(e =>
+            {
+                if (e.NetValue.HasValue && (exerciseWithHighestNetValue == null || exerciseWithHighestNetValue.NetValue < e.NetValue))
+                    exerciseWithHighestNetValue = e;
+
+                if (e.Sets.Count > highestSets)
+                    highestSets = e.Sets.Count;
+
+                double totalValue = 0;
+                e.Sets.ToList().ForEach(s =>
+                {
+                    if (s.Reps.HasValue && s.Reps > highestReps)
+                    {
+                        highestReps = (int)s.Reps;
+                    }
+
+                    if (s.Value.HasValue)
+                    {
+                        totalValue += (int)s.Value;
+                    }
+                });
+                double avgValue = totalValue / e.Sets.Count();
+                if (avgValue > highestAvgValue)
+                    highestAvgValue = avgValue;
+
+            });
+            return new PersonalBest
+            {
+                TopNetExercise = exerciseWithHighestNetValue,
+                TopAvgValue = highestAvgValue,
+                TopSets = highestSets,
+                TopReps = highestReps,
+            };
         }
     }
 }

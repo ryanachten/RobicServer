@@ -65,6 +65,7 @@ namespace RobicServer.Controllers
 
             exercise.LastActive = _utils.GetLatestExerciseDate(exercise.Id);
             exercise.LastImprovement = _utils.GetLatestExerciseImprovement(exercise.Id);
+            exercise.PersonalBest = _utils.GetPersonalBest(exercise.Id);
 
             return Ok(exercise);
         }

@@ -21,7 +21,7 @@ namespace RobicServer.Models
         public DateTime TimeTaken { get; set; }
 
         [BsonElement("sets")]
-        public ICollection<Set> sets { get; set; }
+        public ICollection<Set> Sets { get; set; }
 
         private double? netValue;
         public double? NetValue
@@ -29,7 +29,7 @@ namespace RobicServer.Models
             get
             {
                 double? total = null;
-                foreach (Set set in this.sets)
+                foreach (Set set in this.Sets)
                 {
                     if (set.Reps.HasValue && set.Value.HasValue)
                     {
