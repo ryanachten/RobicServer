@@ -47,7 +47,7 @@ namespace RobicServer.Controllers
             // We assign the date of the latest exercise as the timestamp for last active
             exerciseForReturn.ForEach((definition) =>
             {
-                definition.LastActive = _utils.GetLatestExerciseDate(definition.Id);
+                definition.LastSession = _utils.GetLatestExercise(definition.Id);
                 definition.LastImprovement = _utils.GetLatestExerciseImprovement(definition.Id);
             });
             return exerciseForReturn;
@@ -63,7 +63,7 @@ namespace RobicServer.Controllers
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            exercise.LastActive = _utils.GetLatestExerciseDate(exercise.Id);
+            exercise.LastSession = _utils.GetLatestExercise(exercise.Id);
             exercise.LastImprovement = _utils.GetLatestExerciseImprovement(exercise.Id);
             exercise.PersonalBest = _utils.GetPersonalBest(exercise.Id);
 

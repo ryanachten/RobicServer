@@ -13,13 +13,14 @@ namespace RobicServer.Helpers
         {
             _exerciseRepo = exerciseRepo;
         }
-        public DateTime? GetLatestExerciseDate(string definitionId)
+#nullable enable
+        public Exercise? GetLatestExercise(string definitionId)
         {
 
             var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId).OrderByDescending(d => d.Date).FirstOrDefault();
             if (latestExercise != null)
             {
-                return latestExercise.Date;
+                return latestExercise;
             }
             return null;
         }
