@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using RobicServer.Models;
 using RobicServer.Services;
@@ -104,6 +105,43 @@ namespace RobicServer.Helpers
                 TopSets = highestSets,
                 TopReps = highestReps,
             };
+        }
+
+        public List<ExerciseHistory> GetHistory(string definitionId)
+        {
+            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId);
+            var exerciseHistory = new List<ExerciseHistory>();
+            if (exercises == null)
+            {
+                return exerciseHistory;
+            }
+            exercises.ToList().ForEach(e =>
+            {
+                var totalReps = 0.0;
+                var totalValue = 0.0;
+                e.Sets.ToList().ForEach(s =>
+                {
+                    if (s.Reps.HasValue)
+                    {
+                        totalReps += (double)s.Reps;
+                    }
+                    if (s.Value.HasValue)
+                    {
+                        totalValue += (double)s.Value;
+                    }
+                });
+                var history = new ExerciseHistory()
+                {
+                    Date = e.Date,
+                    NetValue = e.NetValue,
+                    Sets = e.Sets.Count,
+                    TimeTaken = e.TimeTaken,
+                    AvgReps = totalReps / e.Sets.Count,
+                    AvgValue = totalValue / e.Sets.Count,
+                };
+                exerciseHistory.Add(history);
+            });
+            return exerciseHistory;
         }
     }
 }
