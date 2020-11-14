@@ -2,7 +2,7 @@ using System;
 
 namespace RobicServer.Models
 {
-    public class ExerciseRecords
+    public class PersonalBestHistory
     {
         public DateTime Date { get; set; }
         public double? NetValue { get; set; }

@@ -72,7 +72,7 @@ namespace RobicServer.Helpers
             double highestAvgValue = 0;
             int highestReps = 0;
             int highestSets = 0;
-            var history = new List<ExerciseRecords>();
+            var history = new List<PersonalBestHistory>();
 
             exercises.ToList().ForEach(e =>
             {
@@ -112,7 +112,7 @@ namespace RobicServer.Helpers
             };
         }
 
-        private ExerciseRecords GetPersonalBestHistory(Exercise exercise)
+        private PersonalBestHistory GetPersonalBestHistory(Exercise exercise)
         {
             var totalReps = 0.0;
             var totalValue = 0.0;
@@ -127,7 +127,7 @@ namespace RobicServer.Helpers
                     totalValue += (double)s.Value;
                 }
             });
-            var record = new ExerciseRecords()
+            var record = new PersonalBestHistory()
             {
                 Date = exercise.Date,
                 NetValue = exercise.NetValue,
