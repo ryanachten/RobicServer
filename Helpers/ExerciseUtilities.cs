@@ -72,6 +72,8 @@ namespace RobicServer.Helpers
             double highestAvgValue = 0;
             int highestReps = 0;
             int highestSets = 0;
+            var history = new List<ExerciseRecords>();
+
             exercises.ToList().ForEach(e =>
             {
                 if (e.NetValue.HasValue && (exerciseWithHighestNetValue == null || exerciseWithHighestNetValue.NetValue < e.NetValue))
@@ -97,6 +99,8 @@ namespace RobicServer.Helpers
                 if (avgValue > highestAvgValue)
                     highestAvgValue = avgValue;
 
+                history.Add(this.GetPersonalBestHistory(e));
+
             });
             return new PersonalBest
             {
@@ -104,44 +108,35 @@ namespace RobicServer.Helpers
                 TopAvgValue = highestAvgValue,
                 TopSets = highestSets,
                 TopReps = highestReps,
+                History = history
             };
         }
 
-        public List<ExerciseHistory> GetHistory(string definitionId)
+        private ExerciseRecords GetPersonalBestHistory(Exercise exercise)
         {
-            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId);
-            var exerciseHistory = new List<ExerciseHistory>();
-            if (exercises == null)
+            var totalReps = 0.0;
+            var totalValue = 0.0;
+            exercise.Sets.ToList().ForEach(s =>
             {
-                return exerciseHistory;
-            }
-            exercises.ToList().ForEach(e =>
-            {
-                var totalReps = 0.0;
-                var totalValue = 0.0;
-                e.Sets.ToList().ForEach(s =>
+                if (s.Reps.HasValue)
                 {
-                    if (s.Reps.HasValue)
-                    {
-                        totalReps += (double)s.Reps;
-                    }
-                    if (s.Value.HasValue)
-                    {
-                        totalValue += (double)s.Value;
-                    }
-                });
-                var history = new ExerciseHistory()
+                    totalReps += (double)s.Reps;
+                }
+                if (s.Value.HasValue)
                 {
-                    Date = e.Date,
-                    NetValue = e.NetValue,
-                    Sets = e.Sets.Count,
-                    TimeTaken = e.TimeTaken,
-                    AvgReps = totalReps / e.Sets.Count,
-                    AvgValue = totalValue / e.Sets.Count,
-                };
-                exerciseHistory.Add(history);
+                    totalValue += (double)s.Value;
+                }
             });
-            return exerciseHistory;
+            var record = new ExerciseRecords()
+            {
+                Date = exercise.Date,
+                NetValue = exercise.NetValue,
+                Sets = exercise.Sets.Count,
+                TimeTaken = exercise.TimeTaken,
+                AvgReps = totalReps / exercise.Sets.Count,
+                AvgValue = totalValue / exercise.Sets.Count,
+            };
+            return record;
         }
     }
 }

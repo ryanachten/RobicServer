@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace RobicServer.Models
 {
     public class PersonalBest
@@ -6,5 +8,6 @@ namespace RobicServer.Models
         public double TopAvgValue { get; set; }
         public int TopReps { get; set; }
         public int TopSets { get; set; }
+        public List<ExerciseRecords> History { get; set; }
     }
 }
