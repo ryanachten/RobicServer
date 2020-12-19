@@ -36,7 +36,7 @@ namespace RobicServer.Controllers
             Analytics analytics = new Analytics()
             {
                 ExerciseFrequency = exerciseFrequency,
-                MostFrequentExercise = this.GetMostFrequentExercise(),
+                MostFrequentExercise = this.GetMostFrequentExercise(exerciseFrequency),
                 MuscleGroupFrequency = muscleGroupFrequency,
                 MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency)
             };
@@ -72,15 +72,15 @@ namespace RobicServer.Controllers
             return exerciseFrequency;
         }
 
-        private AnalyticsItem GetMostFrequentExercise()
+        private AnalyticsItem GetMostFrequentExercise(List<AnalyticsItem> exerciseFrequency)
         {
             AnalyticsItem mostFrequentExercise = new AnalyticsItem();
-            _userExerciseDefinitions.AsQueryable().ToList().ForEach(e =>
+            exerciseFrequency.ForEach(e =>
            {
-               if (e.History != null && e.History.Count > mostFrequentExercise.count)
+               if (e.count > mostFrequentExercise.count)
                {
-                   mostFrequentExercise.label = e.Title;
-                   mostFrequentExercise.count = e.History.Count;
+                   mostFrequentExercise.label = e.label;
+                   mostFrequentExercise.count = e.count;
                }
            });
             return mostFrequentExercise;
