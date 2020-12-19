@@ -35,11 +35,24 @@ namespace RobicServer.Controllers
             Analytics analytics = new Analytics()
             {
                 // MostFrequentExercise = this.GetMostFrequentExercise(),
-                // MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency),
+                MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency),
                 MuscleGroupFrequency = muscleGroupFrequency
             };
 
             return analytics;
+        }
+
+        // Gets exercises and exercise definitions based on user ID in claims
+        private void GetUserExercises()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            _userExerciseDefinitions = _exerciseDefinitionRepo.AsQueryable().Where(e => e.User == userId).ToList();
+            _userExercises = new List<Exercise>();
+            _userExerciseDefinitions.ForEach(def =>
+            {
+                var defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
+                _userExercises.AddRange(defExercises.ToList());
+            });
         }
 
         private AnalyticsItem GetMostFrequentExercise()
@@ -91,25 +104,12 @@ namespace RobicServer.Controllers
             return muscleGroupFrequencyList;
         }
 
-        // Gets exercises and exercise definitions based on user ID in claims
-        private void GetUserExercises()
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            _userExerciseDefinitions = _exerciseDefinitionRepo.AsQueryable().Where(e => e.User == userId).ToList();
-            _userExercises = new List<Exercise>();
-            _userExerciseDefinitions.ForEach(def =>
-            {
-                var defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
-                _userExercises.AddRange(defExercises.ToList());
-            });
-        }
-
         private AnalyticsItem GetMostFrequentMuscleGroup(List<AnalyticsItem> muscleGroupFrequency)
         {
             AnalyticsItem mostFrequentMuscleGroup = new AnalyticsItem();
             muscleGroupFrequency.ForEach(m =>
             {
-                if (m.count < mostFrequentMuscleGroup.count)
+                if (m.count > mostFrequentMuscleGroup.count)
                 {
                     mostFrequentMuscleGroup.label = m.label;
                     mostFrequentMuscleGroup.count = m.count;
