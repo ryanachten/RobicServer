@@ -17,6 +17,8 @@ namespace RobicServer.Controllers
     {
         private readonly IMongoRepository<Exercise> _exerciseRepo;
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionRepo;
+        private List<ExerciseDefiniton> _userExerciseDefinitions;
+        private List<Exercise> _userExercises;
 
         public AnalyticsController(IMongoRepository<Exercise> exerciseRepo, IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo)
         {
@@ -27,7 +29,9 @@ namespace RobicServer.Controllers
         [HttpGet]
         public Analytics Get()
         {
+            this.GetUserExercises();
             List<AnalyticsItem> muscleGroupFrequency = this.GetMuscleGroupFrequency();
+
             Analytics analytics = new Analytics()
             {
                 // MostFrequentExercise = this.GetMostFrequentExercise(),
@@ -56,9 +60,9 @@ namespace RobicServer.Controllers
         {
             // Increment muscle group by occurance
             Dictionary<string, int> muscleGroupFrequency = new Dictionary<string, int>();
-            foreach (var e in _exerciseRepo.AsQueryable())
+            _userExercises.ForEach(e =>
             {
-                ExerciseDefiniton exerciseDefiniton = _exerciseDefinitionRepo.AsQueryable().FirstOrDefault(def => def.Id == e.Definition);
+                ExerciseDefiniton exerciseDefiniton = _userExerciseDefinitions.Find(def => def.Id == e.Definition);
                 if (exerciseDefiniton != null && exerciseDefiniton.PrimaryMuscleGroup != null)
                 {
                     exerciseDefiniton.PrimaryMuscleGroup.ToList().ForEach(m =>
@@ -73,7 +77,7 @@ namespace RobicServer.Controllers
                      }
                  });
                 }
-            }
+            });
             // Convert dictionary to analytics list
             List<AnalyticsItem> muscleGroupFrequencyList = new List<AnalyticsItem>();
             foreach (KeyValuePair<string, int> muscleGroup in muscleGroupFrequency)
@@ -85,6 +89,19 @@ namespace RobicServer.Controllers
                 });
             }
             return muscleGroupFrequencyList;
+        }
+
+        // Gets exercises and exercise definitions based on user ID in claims
+        private void GetUserExercises()
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            _userExerciseDefinitions = _exerciseDefinitionRepo.AsQueryable().Where(e => e.User == userId).ToList();
+            _userExercises = new List<Exercise>();
+            _userExerciseDefinitions.ForEach(def =>
+            {
+                var defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
+                _userExercises.AddRange(defExercises.ToList());
+            });
         }
 
         private AnalyticsItem GetMostFrequentMuscleGroup(List<AnalyticsItem> muscleGroupFrequency)
