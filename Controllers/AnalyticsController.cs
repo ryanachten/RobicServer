@@ -31,12 +31,14 @@ namespace RobicServer.Controllers
         {
             this.GetUserExercises();
             List<AnalyticsItem> muscleGroupFrequency = this.GetMuscleGroupFrequency();
+            List<AnalyticsItem> exerciseFrequency = this.GetExerciseFrequency();
 
             Analytics analytics = new Analytics()
             {
+                ExerciseFrequency = exerciseFrequency,
                 MostFrequentExercise = this.GetMostFrequentExercise(),
-                MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency),
-                MuscleGroupFrequency = muscleGroupFrequency
+                MuscleGroupFrequency = muscleGroupFrequency,
+                MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency)
             };
 
             return analytics;
@@ -53,6 +55,21 @@ namespace RobicServer.Controllers
                 var defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
                 _userExercises.AddRange(defExercises.ToList());
             });
+        }
+
+        private List<AnalyticsItem> GetExerciseFrequency()
+        {
+            // Increment muscle group by occurance
+            List<AnalyticsItem> exerciseFrequency = new List<AnalyticsItem>();
+            _userExerciseDefinitions.ForEach(e =>
+            {
+                exerciseFrequency.Add(new AnalyticsItem()
+                {
+                    label = e.Title,
+                    count = e.History == null ? 0 : e.History.Count
+                });
+            });
+            return exerciseFrequency;
         }
 
         private AnalyticsItem GetMostFrequentExercise()
@@ -91,6 +108,7 @@ namespace RobicServer.Controllers
                  });
                 }
             });
+
             // Convert dictionary to analytics list
             List<AnalyticsItem> muscleGroupFrequencyList = new List<AnalyticsItem>();
             foreach (KeyValuePair<string, int> muscleGroup in muscleGroupFrequency)
