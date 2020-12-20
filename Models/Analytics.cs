@@ -8,6 +8,6 @@ namespace RobicServer.Models
         public AnalyticsItem MostFrequentExercise { get; set; }
         public List<AnalyticsItem> MuscleGroupFrequency { get; set; }
         public List<AnalyticsItem> ExerciseFrequency { get; set; }
-        public List<AnalyticsItem> MaxMinExerciseProgress { get; set; }
+        public List<AnalyticsItem> ExerciseProgress { get; set; }
     }
 }

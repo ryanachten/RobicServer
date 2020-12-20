@@ -7,14 +7,24 @@ using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System;
+using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
+
     [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AnalyticsController : ControllerBase
     {
+        struct ExerciseProgressValue
+        {
+            public string Id { get; set; }
+            public string Title { get; set; }
+            public double Total { get; set; }
+            public int NumberOfSessions { get; set; }
+        };
+
         private readonly IMongoRepository<Exercise> _exerciseRepo;
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionRepo;
         private List<ExerciseDefiniton> _userExerciseDefinitions;
@@ -37,8 +47,9 @@ namespace RobicServer.Controllers
             {
                 ExerciseFrequency = exerciseFrequency,
                 MostFrequentExercise = this.GetMostFrequentExercise(exerciseFrequency),
+                ExerciseProgress = this.GetExerciseProgress(),
                 MuscleGroupFrequency = muscleGroupFrequency,
-                MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency)
+                MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency),
             };
 
             return analytics;
@@ -52,7 +63,7 @@ namespace RobicServer.Controllers
             _userExercises = new List<Exercise>();
             _userExerciseDefinitions.ForEach(def =>
             {
-                var defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
+                IQueryable<Exercise> defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
                 _userExercises.AddRange(defExercises.ToList());
             });
         }
@@ -84,6 +95,59 @@ namespace RobicServer.Controllers
                }
            });
             return mostFrequentExercise;
+        }
+
+        private List<AnalyticsItem> GetExerciseProgress()
+        {
+            Dictionary<string, ExerciseProgressValue> exerciseProgressDict = new Dictionary<string, ExerciseProgressValue>();
+            foreach (var e in _userExercises)
+            {
+                string defId = e.Definition;
+                if (exerciseProgressDict.ContainsKey(defId))
+                {
+                    ExerciseProgressValue val = exerciseProgressDict[defId];
+                    val.Total += ExerciseUtilities.GetNetExerciseValue(e);
+                    val.NumberOfSessions += 1;
+                    exerciseProgressDict[defId] = val;
+                }
+                else
+                {
+                    ExerciseDefiniton def = _userExerciseDefinitions.Find(d => d.Id == defId);
+                    exerciseProgressDict.Add(defId, new ExerciseProgressValue
+                    {
+                        Id = def.Id,
+                        Title = def.Title,
+                        Total = ExerciseUtilities.GetNetExerciseValue(e),
+                        NumberOfSessions = 1
+                    });
+                }
+            }
+
+            // Convert dict to analytics list
+            List<AnalyticsItem> exerciseProgress = new List<AnalyticsItem>();
+            foreach (KeyValuePair<string, ExerciseProgressValue> progressItem in exerciseProgressDict)
+            {
+                ExerciseDefiniton def = _userExerciseDefinitions.Find(d => d.Id == progressItem.Value.Id);
+                Exercise firstExercise = _userExercises.Find(ex => ex.Id == def.History?.FirstOrDefault());
+
+                double progressPercent = 0.0;
+                if (firstExercise != null)
+                {
+                    double initialNetValue = ExerciseUtilities.GetNetExerciseValue(firstExercise);
+
+                    // Progress percent = average net value - initial net value
+                    progressPercent = (progressItem.Value.Total / progressItem.Value.NumberOfSessions) - initialNetValue;
+                }
+
+
+                exerciseProgress.Add(new AnalyticsItem
+                {
+                    label = progressItem.Value.Title,
+                    count = progressPercent,
+                });
+            }
+
+            return exerciseProgress;
         }
 
         private List<AnalyticsItem> GetMuscleGroupFrequency()
