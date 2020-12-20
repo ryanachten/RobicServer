@@ -76,8 +76,8 @@ namespace RobicServer.Controllers
             {
                 exerciseFrequency.Add(new AnalyticsItem()
                 {
-                    label = e.Title,
-                    count = e.History == null ? 0 : e.History.Count
+                    Label = e.Title,
+                    Count = e.History == null ? 0 : e.History.Count
                 });
             });
             return exerciseFrequency;
@@ -88,10 +88,10 @@ namespace RobicServer.Controllers
             AnalyticsItem mostFrequentExercise = new AnalyticsItem();
             exerciseFrequency.ForEach(e =>
            {
-               if (e.count > mostFrequentExercise.count)
+               if (e.Count > mostFrequentExercise.Count)
                {
-                   mostFrequentExercise.label = e.label;
-                   mostFrequentExercise.count = e.count;
+                   mostFrequentExercise.Label = e.Label;
+                   mostFrequentExercise.Count = e.Count;
                }
            });
             return mostFrequentExercise;
@@ -142,8 +142,8 @@ namespace RobicServer.Controllers
 
                 exerciseProgress.Add(new AnalyticsItem
                 {
-                    label = progressItem.Value.Title,
-                    count = progressPercent,
+                    Label = progressItem.Value.Title,
+                    Count = progressPercent,
                 });
             }
 
@@ -179,8 +179,8 @@ namespace RobicServer.Controllers
             {
                 muscleGroupFrequencyList.Add(new AnalyticsItem()
                 {
-                    label = muscleGroup.Key,
-                    count = muscleGroup.Value
+                    Label = muscleGroup.Key,
+                    Count = muscleGroup.Value
                 });
             }
             return muscleGroupFrequencyList;
@@ -191,10 +191,10 @@ namespace RobicServer.Controllers
             AnalyticsItem mostFrequentMuscleGroup = new AnalyticsItem();
             muscleGroupFrequency.ForEach(m =>
             {
-                if (m.count > mostFrequentMuscleGroup.count)
+                if (m.Count > mostFrequentMuscleGroup.Count)
                 {
-                    mostFrequentMuscleGroup.label = m.label;
-                    mostFrequentMuscleGroup.count = m.count;
+                    mostFrequentMuscleGroup.Label = m.Label;
+                    mostFrequentMuscleGroup.Count = m.Count;
                 }
             });
             return mostFrequentMuscleGroup;

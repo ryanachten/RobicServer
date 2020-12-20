@@ -2,7 +2,7 @@ namespace RobicServer.Models
 {
     public class AnalyticsItem
     {
-        public string label { get; set; }
-        public double count { get; set; }
+        public string Label { get; set; }
+        public double Count { get; set; }
     }
 }
