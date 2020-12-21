@@ -97,8 +97,12 @@ namespace RobicServer.Controllers
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            await _exerciseDefintionRepo.ReplaceOneAsync(updatedExercise);
-            return Ok(updatedExercise);
+            exercise.Title = updatedExercise.Title;
+            exercise.Unit = updatedExercise.Unit;
+            exercise.PrimaryMuscleGroup = updatedExercise.PrimaryMuscleGroup;
+
+            await _exerciseDefintionRepo.ReplaceOneAsync(exercise);
+            return Ok(exercise);
         }
 
         [HttpDelete("{id:length(24)}")]
