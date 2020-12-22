@@ -74,7 +74,7 @@ namespace RobicServer.Controllers
             {
                 exerciseFrequency.Add(new AnalyticsItem()
                 {
-                    Label = e.Title,
+                    Marker = e.Title,
                     Count = e.History == null ? 0 : e.History.Count
                 });
             });
@@ -88,7 +88,7 @@ namespace RobicServer.Controllers
            {
                if (e.Count > mostFrequentExercise.Count)
                {
-                   mostFrequentExercise.Label = e.Label;
+                   mostFrequentExercise.Marker = e.Marker;
                    mostFrequentExercise.Count = e.Count;
                }
            });
@@ -140,7 +140,7 @@ namespace RobicServer.Controllers
 
                 exerciseProgress.Add(new AnalyticsItem
                 {
-                    Label = progressItem.Value.Title,
+                    Marker = progressItem.Value.Title,
                     Count = progressPercent,
                 });
             }
@@ -177,7 +177,7 @@ namespace RobicServer.Controllers
             {
                 muscleGroupFrequencyList.Add(new AnalyticsItem()
                 {
-                    Label = muscleGroup.Key,
+                    Marker = muscleGroup.Key,
                     Count = muscleGroup.Value
                 });
             }
@@ -191,7 +191,7 @@ namespace RobicServer.Controllers
             {
                 if (m.Count > mostFrequentMuscleGroup.Count)
                 {
-                    mostFrequentMuscleGroup.Label = m.Label;
+                    mostFrequentMuscleGroup.Marker = m.Marker;
                     mostFrequentMuscleGroup.Count = m.Count;
                 }
             });
