@@ -72,11 +72,14 @@ namespace RobicServer.Controllers
             List<AnalyticsItem> exerciseFrequency = new List<AnalyticsItem>();
             _userExerciseDefinitions.ForEach(e =>
             {
-                exerciseFrequency.Add(new AnalyticsItem()
+                if (e.History != null)
                 {
-                    Marker = e.Title,
-                    Count = e.History == null ? 0 : e.History.Count
-                });
+                    exerciseFrequency.Add(new AnalyticsItem()
+                    {
+                        Marker = e.Title,
+                        Count = e.History.Count
+                    });
+                }
             });
             return exerciseFrequency;
         }
