@@ -8,11 +8,11 @@ namespace RobicServer.Helpers
 {
     public class ExerciseUtilities
     {
-        private readonly IMongoRepository<Exercise> _exerciseRepo;
+        private readonly IQueryable<Exercise> _exercises;
 
-        public ExerciseUtilities(IMongoRepository<Exercise> exerciseRepo)
+        public ExerciseUtilities(IQueryable<Exercise> exercises)
         {
-            _exerciseRepo = exerciseRepo;
+            _exercises = exercises;
         }
 
         public static double GetNetExerciseValue(Exercise exercise)
@@ -26,23 +26,9 @@ namespace RobicServer.Helpers
             return total;
         }
 
-#nullable enable
-        public Exercise? GetLatestExercise(string definitionId)
-        {
-
-            var latestExercise = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId).OrderByDescending(d => d.Date).FirstOrDefault();
-            if (latestExercise != null)
-            {
-                return latestExercise;
-            }
-            return null;
-        }
-
         public double? GetLatestExerciseImprovement(string definitionId)
         {
-
-            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId);
-            var mostRecentExercise = exercises.OrderByDescending(d => d.Date).FirstOrDefault();
+            var mostRecentExercise = _exercises.FirstOrDefault();
             if (mostRecentExercise == null || !mostRecentExercise.NetValue.HasValue)
             {
                 return null;
@@ -50,16 +36,16 @@ namespace RobicServer.Helpers
 
             // Get net values for all exercises
             double totalNetValues = 0.0;
-            exercises.ToList().ForEach(e =>
+            foreach (var e in _exercises)
             {
                 if (e.NetValue.HasValue)
                 {
                     totalNetValues += (double)e.NetValue;
                 }
-            });
+            }
 
             // Get average exercise net value
-            var averageNetValue = totalNetValues / exercises.Count();
+            var averageNetValue = totalNetValues / _exercises.Count();
             var mostRecentNetValue = mostRecentExercise.NetValue;
             var min = Math.Min(averageNetValue, (double)mostRecentNetValue);
             var max = Math.Max(averageNetValue, (double)mostRecentNetValue);
@@ -70,13 +56,13 @@ namespace RobicServer.Helpers
             // If most recent value is less than average, this is a negative correlation
             if (averageNetValue < mostRecentNetValue)
                 improvement *= -1;
+
             return Math.Round(improvement);
         }
 #nullable enable
         public PersonalBest? GetPersonalBest(string definitionId)
         {
-            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exercise.Definition == definitionId);
-            if (exercises == null)
+            if (_exercises == null)
             {
                 return null;
             }
@@ -86,7 +72,7 @@ namespace RobicServer.Helpers
             int highestSets = 0;
             var history = new List<PersonalBestHistory>();
 
-            exercises.ToList().ForEach(e =>
+            foreach (var e in _exercises)
             {
                 if (e.NetValue.HasValue && (exerciseWithHighestNetValue == null || exerciseWithHighestNetValue.NetValue < e.NetValue))
                     exerciseWithHighestNetValue = e;
@@ -112,8 +98,8 @@ namespace RobicServer.Helpers
                     highestAvgValue = avgValue;
 
                 history.Add(this.GetPersonalBestHistory(e));
+            }
 
-            });
             return new PersonalBest
             {
                 TopNetExercise = exerciseWithHighestNetValue,
