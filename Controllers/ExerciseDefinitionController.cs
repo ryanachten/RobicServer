@@ -40,19 +40,20 @@ namespace RobicServer.Controllers
         public List<ExerciseDefinitionForListDto> Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var definitons = _exerciseDefintionRepo.AsQueryable().Where(defintion => defintion.User == userId).ToList();
+            var definitons = _exerciseDefintionRepo.FilterBy(defintion => defintion.User == userId);
             var definitionsForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(definitons);
-            var definitionIds = definitons.Select(d => d.Id);
 
-            var exercises = _exerciseRepo.AsQueryable().Where(e => definitionIds.Contains(e.Definition)).OrderByDescending(d => d.Date);
+            // var definitionIds = definitons.Select(d => d.Id);
+            // var exercises = _exerciseRepo.AsQueryable().Where(e => definitionIds.Contains(e.Definition)).OrderByDescending(d => d.Date);
+            // var utils = new ExerciseUtilities(exercises);
 
             // We assign the date of the latest exercise as the timestamp for last active
-            definitionsForReturn.ForEach((definition) =>
+            definitionsForReturn.AsParallel().ForAll(definition =>
             {
-                var definitionExercises = exercises.Where(e => e.Definition == definition.Id);
-                // FIXME: the following aggregates still cause massive performance penalties
-                // definition.LastSession = definitionExercises.FirstOrDefault();
-                // definition.LastImprovement = _utils.GetLatestExerciseImprovement(definition.Id, definitionExercises);
+                var definitionExercises = _exerciseRepo.FilterBy(e => e.Definition == definition.Id);
+                definition.LastSession = definitionExercises.FirstOrDefault();
+                // FIXME: the following aggregate still causes massive performance penalties
+                // definition.LastImprovement = utils.GetLatestExerciseImprovement(definition.Id);
             });
             return definitionsForReturn;
         }
