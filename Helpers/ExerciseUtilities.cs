@@ -81,7 +81,7 @@ namespace RobicServer.Helpers
                     highestSets = e.Sets.Count;
 
                 double totalValue = 0;
-                e.Sets.ToList().ForEach(s =>
+                foreach (var s in e.Sets)
                 {
                     if (s.Reps.HasValue && s.Reps > highestReps)
                     {
@@ -92,7 +92,7 @@ namespace RobicServer.Helpers
                     {
                         totalValue += (int)s.Value;
                     }
-                });
+                }
                 double avgValue = totalValue / e.Sets.Count();
                 if (avgValue > highestAvgValue)
                     highestAvgValue = avgValue;
@@ -114,7 +114,7 @@ namespace RobicServer.Helpers
         {
             var totalReps = 0.0;
             var totalValue = 0.0;
-            exercise.Sets.ToList().ForEach(s =>
+            foreach (var s in exercise.Sets)
             {
                 if (s.Reps.HasValue)
                 {
@@ -124,7 +124,7 @@ namespace RobicServer.Helpers
                 {
                     totalValue += (double)s.Value;
                 }
-            });
+            }
             var record = new PersonalBestHistory()
             {
                 Date = exercise.Date,
