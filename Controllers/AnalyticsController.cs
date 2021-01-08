@@ -35,7 +35,7 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public Analytics Get()
+        public IActionResult Get()
         {
             this.GetUserExercises();
             List<AnalyticsItem> muscleGroupFrequency = this.GetMuscleGroupFrequency();
@@ -50,7 +50,7 @@ namespace RobicServer.Controllers
                 MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency),
             };
 
-            return analytics;
+            return Ok(analytics);
         }
 
         // Gets exercises and exercise definitions based on user ID in claims
@@ -62,7 +62,8 @@ namespace RobicServer.Controllers
             _userExerciseDefinitions.AsParallel().ForAll(def =>
             {
                 IQueryable<Exercise> defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
-                _userExercises.AddRange(defExercises);
+                if (defExercises != null)
+                    _userExercises.AddRange(defExercises);
             });
         }
 
