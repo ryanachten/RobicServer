@@ -59,10 +59,10 @@ namespace RobicServer.Controllers
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             _userExerciseDefinitions = _exerciseDefinitionRepo.AsQueryable().Where(e => e.User == userId).ToList();
             _userExercises = new List<Exercise>();
-            _userExerciseDefinitions.ForEach(def =>
+            _userExerciseDefinitions.AsParallel().ForAll(def =>
             {
                 IQueryable<Exercise> defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
-                _userExercises.AddRange(defExercises.ToList());
+                _userExercises.AddRange(defExercises);
             });
         }
 
@@ -70,17 +70,17 @@ namespace RobicServer.Controllers
         {
             // Increment muscle group by occurance
             List<AnalyticsItem> exerciseFrequency = new List<AnalyticsItem>();
-            _userExerciseDefinitions.ForEach(e =>
+            foreach (var def in _userExerciseDefinitions)
             {
-                if (e.History != null)
+                if (def.History != null)
                 {
                     exerciseFrequency.Add(new AnalyticsItem()
                     {
-                        Marker = e.Title,
-                        Count = e.History.Count
+                        Marker = def.Title,
+                        Count = def.History.Count
                     });
                 }
-            });
+            }
             return exerciseFrequency;
         }
 
