@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -44,10 +45,10 @@ namespace RobicServer.Controllers
             Analytics analytics = new Analytics()
             {
                 ExerciseFrequency = exerciseFrequency,
-                MostFrequentExercise = this.GetMostFrequentExercise(exerciseFrequency),
+                MostFrequentExercise = exerciseFrequency.FirstOrDefault(),
                 ExerciseProgress = this.GetExerciseProgress(),
                 MuscleGroupFrequency = muscleGroupFrequency,
-                MostFrequentMuscleGroup = this.GetMostFrequentMuscleGroup(muscleGroupFrequency),
+                MostFrequentMuscleGroup = muscleGroupFrequency.FirstOrDefault(),
             };
 
             return Ok(analytics);
@@ -62,7 +63,7 @@ namespace RobicServer.Controllers
             _userExerciseDefinitions.AsParallel().ForAll(def =>
             {
                 IQueryable<Exercise> defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
-                if (defExercises != null)
+                if (defExercises.Count() != 0 && defExercises != null)
                     _userExercises.AddRange(defExercises);
             });
         }
@@ -82,21 +83,8 @@ namespace RobicServer.Controllers
                     });
                 }
             }
+            exerciseFrequency.Sort((a, b) => a.Count < b.Count ? 1 : -1);
             return exerciseFrequency;
-        }
-
-        private AnalyticsItem GetMostFrequentExercise(List<AnalyticsItem> exerciseFrequency)
-        {
-            AnalyticsItem mostFrequentExercise = new AnalyticsItem();
-            exerciseFrequency.ForEach(e =>
-           {
-               if (e.Count > mostFrequentExercise.Count)
-               {
-                   mostFrequentExercise.Marker = e.Marker;
-                   mostFrequentExercise.Count = e.Count;
-               }
-           });
-            return mostFrequentExercise;
         }
 
         private List<AnalyticsItem> GetExerciseProgress()
@@ -148,7 +136,7 @@ namespace RobicServer.Controllers
                     Count = progressPercent,
                 });
             }
-
+            exerciseProgress.Sort((a, b) => a.Count < b.Count ? 1 : -1);
             return exerciseProgress;
         }
 
@@ -185,21 +173,8 @@ namespace RobicServer.Controllers
                     Count = muscleGroup.Value
                 });
             }
+            muscleGroupFrequencyList.Sort((a, b) => a.Count < b.Count ? 1 : -1);
             return muscleGroupFrequencyList;
-        }
-
-        private AnalyticsItem GetMostFrequentMuscleGroup(List<AnalyticsItem> muscleGroupFrequency)
-        {
-            AnalyticsItem mostFrequentMuscleGroup = new AnalyticsItem();
-            muscleGroupFrequency.ForEach(m =>
-            {
-                if (m.Count > mostFrequentMuscleGroup.Count)
-                {
-                    mostFrequentMuscleGroup.Marker = m.Marker;
-                    mostFrequentMuscleGroup.Count = m.Count;
-                }
-            });
-            return mostFrequentMuscleGroup;
         }
     }
 }
