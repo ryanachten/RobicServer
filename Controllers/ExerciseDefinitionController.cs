@@ -8,8 +8,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using RobicServer.Models.DTOs;
-using RobicServer.Helpers;
-using System;
 
 namespace RobicServer.Controllers
 {
@@ -43,18 +41,6 @@ namespace RobicServer.Controllers
             var definitons = _exerciseDefintionRepo.FilterBy(defintion => defintion.User == userId);
             var definitionsForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(definitons);
 
-            // var definitionIds = definitons.Select(d => d.Id);
-            // var exercises = _exerciseRepo.AsQueryable().Where(e => definitionIds.Contains(e.Definition)).OrderByDescending(d => d.Date);
-            // var utils = new ExerciseUtilities(exercises);
-
-            // We assign the date of the latest exercise as the timestamp for last active
-            definitionsForReturn.AsParallel().ForAll(definition =>
-            {
-                var definitionExercises = _exerciseRepo.FilterBy(e => e.Definition == definition.Id);
-                definition.LastSession = definitionExercises.FirstOrDefault();
-                // FIXME: the following aggregate still causes massive performance penalties
-                // definition.LastImprovement = utils.GetLatestExerciseImprovement(definition.Id);
-            });
             return definitionsForReturn;
         }
 
@@ -67,12 +53,6 @@ namespace RobicServer.Controllers
 
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
-
-            var exercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == id);
-            var utils = new ExerciseUtilities(exercises);
-            exercise.LastSession = exercises.FirstOrDefault();
-            exercise.LastImprovement = utils.GetLatestExerciseImprovement(exercise.Id);
-            exercise.PersonalBest = utils.GetPersonalBest(exercise.Id);
 
             return Ok(exercise);
         }

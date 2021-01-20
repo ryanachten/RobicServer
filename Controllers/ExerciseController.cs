@@ -7,6 +7,7 @@ using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System;
+using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
@@ -64,8 +65,16 @@ namespace RobicServer.Controllers
 
             await _exerciseRepo.InsertOneAsync(exercise);
 
+            var latestExercise = await _exerciseRepo.FindByIdAsync(definition.History.LastOrDefault());
+
             // Add exercise to definition history
             definition.History.Add(exercise.Id);
+
+            // Update definition aggregate fields
+            definition.LastSession = exercise;
+            if (latestExercise != null)
+                definition.LastImprovement = ExerciseUtilities.GetLatestExerciseImprovement(exercise, latestExercise);
+
             await _exerciseDefinitionRepo.ReplaceOneAsync(definition);
 
             return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
