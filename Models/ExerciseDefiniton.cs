@@ -46,6 +46,8 @@ namespace RobicServer.Models
         [BsonElement("lastImprovement")]
         [Range(0, 100, ErrorMessage = "Value for {0} must be a percentage between {1} and {2}")]
         public double? LastImprovement { get; set; }
+
+        // [BsonElement("personalBest")]
         // public PersonalBest? PersonalBest { get; set; }
     }
 }

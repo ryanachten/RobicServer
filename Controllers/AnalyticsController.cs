@@ -54,6 +54,16 @@ namespace RobicServer.Controllers
             return Ok(analytics);
         }
 
+        [HttpGet("definition/{id:length(24)}")]
+        public IActionResult GetDefinitionAnalytics(string id)
+        {
+            this.GetUserExercises();
+            var util = new ExerciseUtilities(this._exerciseRepo.AsQueryable());
+            PersonalBest pb = util.GetPersonalBest(id);
+
+            return Ok(pb);
+        }
+
         // Gets exercises and exercise definitions based on user ID in claims
         private void GetUserExercises()
         {
