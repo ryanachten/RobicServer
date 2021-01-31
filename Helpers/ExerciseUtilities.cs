@@ -80,7 +80,8 @@ namespace RobicServer.Helpers
                 if (avgValue > highestAvgValue)
                     highestAvgValue = avgValue;
 
-                history.Add(this.GetPersonalBestHistory(e));
+                if (e.Sets.Count > 0)
+                    history.Add(this.GetPersonalBestHistory(e));
             }
 
             return new PersonalBest

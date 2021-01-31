@@ -8,6 +8,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using RobicServer.Models.DTOs;
+using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
@@ -53,6 +54,9 @@ namespace RobicServer.Controllers
 
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
+
+            var util = new ExerciseUtilities(this._exerciseRepo.FilterBy(e => e.Definition == id).AsQueryable());
+            exercise.PersonalBest = util.GetPersonalBest(id);
 
             return Ok(exercise);
         }
