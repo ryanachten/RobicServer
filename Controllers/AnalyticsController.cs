@@ -6,6 +6,7 @@ using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using RobicServer.Helpers;
+using System.Collections.Concurrent;
 
 namespace RobicServer.Controllers
 {
@@ -63,7 +64,8 @@ namespace RobicServer.Controllers
             {
                 IQueryable<Exercise> defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
                 if (defExercises.Count() != 0 && defExercises != null)
-                    _userExercises.AddRange(defExercises);
+                    lock (_userExercises)
+                        _userExercises.AddRange(defExercises);
             });
         }
 
