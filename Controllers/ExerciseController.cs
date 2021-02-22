@@ -65,7 +65,7 @@ namespace RobicServer.Controllers
 
             await _exerciseRepo.InsertOneAsync(exercise);
 
-            var latestExercise = await _exerciseRepo.FindByIdAsync(definition.History.LastOrDefault());
+            Exercise latestExercise = await _exerciseRepo.FindByIdAsync(definition.History.LastOrDefault());
 
             // Add exercise to definition history
             definition.History.Add(exercise.Id);

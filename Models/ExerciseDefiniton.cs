@@ -28,7 +28,20 @@ namespace RobicServer.Models
 
         [BsonElement("history")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public ICollection<string> History { get; set; }
+        private ICollection<string> history;
+        public ICollection<string> History
+        {
+            get
+            {
+                if (history == null)
+                {
+                    return new List<string>();
+                }
+                return history;
+            }
+            set { history = value; }
+        }
+
 
         [BsonElement("childExercises")]
         [BsonRepresentation(BsonType.ObjectId)]
