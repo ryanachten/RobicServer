@@ -35,7 +35,7 @@ namespace RobicServer.Models
             {
                 if (history == null)
                 {
-                    return new List<string>();
+                    history = new List<string>();
                 }
                 return history;
             }
