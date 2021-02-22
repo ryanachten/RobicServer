@@ -45,7 +45,7 @@ namespace RobicServer.Helpers
 #nullable enable
         public PersonalBest? GetPersonalBest(string definitionId)
         {
-            if (_exercises == null)
+            if (_exercises == null || _exercises.Count() == 0)
             {
                 return null;
             }
