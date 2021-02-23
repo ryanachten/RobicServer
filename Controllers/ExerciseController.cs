@@ -26,18 +26,40 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public List<Exercise> Get()
+        public IActionResult Get([FromQuery(Name = "definition")] string definitionId)
         {
+            if (definitionId != null)
+            {
+                return this.GetExercisesByDefintion(definitionId);
+            }
+
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             // Filter exercises to only those  associated with the user's definitions
             var exerciseDefinitionIds = _exerciseDefinitionRepo.AsQueryable()
                 .Where(exercise => exercise.User == userId)
                 .Select(exerciseDefinitions => exerciseDefinitions.Id).ToArray();
-            return _exerciseRepo.AsQueryable().Where(exercise => exerciseDefinitionIds.Contains(exercise.Definition)).ToList();
+            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exerciseDefinitionIds.Contains(exercise.Definition)).ToList();
+            return Ok(exercises);
+        }
+
+        private IActionResult GetExercisesByDefintion(string definitionId)
+        {
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ExerciseDefiniton definition = _exerciseDefinitionRepo.FindById(definitionId);
+            if (definition == null)
+                return NotFound();
+
+            if (definition.User != userId)
+                return Unauthorized();
+
+            // Filter exercises to only those  associated with the user's definitions
+            var exercises = _exerciseRepo.AsQueryable()
+                .Where(exercise => exercise.Definition == definitionId).ToList();
+            return Ok(exercises);
         }
 
         [HttpGet("{id:length(24)}", Name = "GetExercise")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> GetExerciseById(string id)
         {
             Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
             if (exercise == null)
