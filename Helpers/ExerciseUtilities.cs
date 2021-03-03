@@ -30,11 +30,13 @@ namespace RobicServer.Helpers
         {
             var newNetValue = ExerciseUtilities.GetNetExerciseValue(newExercise);
             var lastNetValue = ExerciseUtilities.GetNetExerciseValue(lastExercise);
+
             var min = Math.Min(newNetValue, lastNetValue);
             var max = Math.Max(newNetValue, lastNetValue);
+            var delta = max - min;
 
             // Get a percentage of deviation based on average net value
-            var improvement = (min / max) * 100;
+            var improvement = (delta / max) * 100;
 
             // If most recent value is less than average, this is a negative correlation
             if (lastNetValue > newNetValue)
