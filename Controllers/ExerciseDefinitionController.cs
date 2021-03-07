@@ -17,29 +17,32 @@ namespace RobicServer.Controllers
     [ApiController]
     public class ExerciseDefinitionController : ControllerBase
     {
-        private readonly IMongoRepository<Exercise> _exerciseRepo;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefintionRepo;
-        private readonly IMongoRepository<User> _userRepo;
+        private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
+        private readonly IMongoRepository<Exercise> _exerciseContext;
+        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefintionContext;
+        private readonly IMongoRepository<User> _userContext;
         private readonly IMapper _mapper;
 
         public ExerciseDefinitionController(
-            IMongoRepository<Exercise> exerciseRepo,
-            IMongoRepository<ExerciseDefiniton> exerciseDefintionRepo,
-            IMongoRepository<User> userRepo,
+            IExerciseDefinitionRepository exerciseDefinitionRepo,
+            IMongoRepository<Exercise> exerciseContext,
+            IMongoRepository<ExerciseDefiniton> exerciseDefintionContext,
+            IMongoRepository<User> userContext,
             IMapper mapper
         )
         {
-            _exerciseRepo = exerciseRepo;
-            _exerciseDefintionRepo = exerciseDefintionRepo;
-            _userRepo = userRepo;
+            _exerciseDefinitionRepo = exerciseDefinitionRepo;
+            _exerciseContext = exerciseContext;
+            _exerciseDefintionContext = exerciseDefintionContext;
+            _userContext = userContext;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public List<ExerciseDefinitionForListDto> Get()
+        public List<ExerciseDefinitionForListDto> GetDefinition()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var definitons = _exerciseDefintionRepo.FilterBy(defintion => defintion.User == userId);
+            var definitons = _exerciseDefinitionRepo.GetUserDefinitions(userId);
             var definitionsForReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(definitons);
 
             return definitionsForReturn;
@@ -48,14 +51,14 @@ namespace RobicServer.Controllers
         [HttpGet("{id:length(24)}", Name = "GetExerciseDefinition")]
         public async Task<IActionResult> Get(string id)
         {
-            ExerciseDefiniton exercise = await _exerciseDefintionRepo.FindByIdAsync(id);
+            ExerciseDefiniton exercise = await _exerciseDefintionContext.FindByIdAsync(id);
             if (exercise == null)
                 return NotFound();
 
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            var util = new ExerciseUtilities(this._exerciseRepo.FilterBy(e => e.Definition == id).AsQueryable());
+            var util = new ExerciseUtilities(this._exerciseContext.FilterBy(e => e.Definition == id).AsQueryable());
             exercise.PersonalBest = util.GetPersonalBest(id);
 
             return Ok(exercise);
@@ -68,12 +71,12 @@ namespace RobicServer.Controllers
             if (exercise.User != userId)
                 return Unauthorized();
 
-            await _exerciseDefintionRepo.InsertOneAsync(exercise);
+            await _exerciseDefintionContext.InsertOneAsync(exercise);
 
             // Update user's exercises with new exercise
-            User user = await _userRepo.FindByIdAsync(userId);
+            User user = await _userContext.FindByIdAsync(userId);
             user.Exercises.Add(exercise.Id);
-            await _userRepo.ReplaceOneAsync(user);
+            await _userContext.ReplaceOneAsync(user);
 
             return CreatedAtRoute("GetExerciseDefinition", new { id = exercise.Id }, exercise);
         }
@@ -81,7 +84,7 @@ namespace RobicServer.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, ExerciseDefiniton updatedExercise)
         {
-            ExerciseDefiniton exercise = await _exerciseDefintionRepo.FindByIdAsync(id);
+            ExerciseDefiniton exercise = await _exerciseDefintionContext.FindByIdAsync(id);
             if (exercise == null)
                 return NotFound();
 
@@ -92,14 +95,14 @@ namespace RobicServer.Controllers
             exercise.Unit = updatedExercise.Unit;
             exercise.PrimaryMuscleGroup = updatedExercise.PrimaryMuscleGroup;
 
-            await _exerciseDefintionRepo.ReplaceOneAsync(exercise);
+            await _exerciseDefintionContext.ReplaceOneAsync(exercise);
             return Ok(exercise);
         }
 
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
-            ExerciseDefiniton exercise = await _exerciseDefintionRepo.FindByIdAsync(id);
+            ExerciseDefiniton exercise = await _exerciseDefintionContext.FindByIdAsync(id);
             if (exercise == null)
                 return NotFound();
 
@@ -107,15 +110,15 @@ namespace RobicServer.Controllers
             if (exercise.User != userId)
                 return Unauthorized();
 
-            await _exerciseDefintionRepo.DeleteByIdAsync(id);
+            await _exerciseDefintionContext.DeleteByIdAsync(id);
 
             // Remove definition from user exercises
-            User user = await _userRepo.FindByIdAsync(userId);
+            User user = await _userContext.FindByIdAsync(userId);
             user.Exercises.Remove(exercise.Id);
-            await _userRepo.ReplaceOneAsync(user);
+            await _userContext.ReplaceOneAsync(user);
 
             // Remove exercises associated with definition
-            await _exerciseRepo.DeleteManyAsync(e => e.Definition == id);
+            await _exerciseContext.DeleteManyAsync(e => e.Definition == id);
 
             return NoContent();
         }
