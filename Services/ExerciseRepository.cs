@@ -39,6 +39,15 @@ namespace RobicServer.Services
             return exercise;
         }
 
+        public async Task DeleteExercise(string id, ExerciseDefiniton definiton)
+        {
+            await _exerciseContext.DeleteByIdAsync(id);
+
+            // Remove exercise from definition history
+            definiton.History.Remove(id);
+            await _exerciseDefinitionContext.ReplaceOneAsync(definiton);
+        }
+
         public List<Exercise> GetDefinitionExercises(string definitionId)
         {
             // Filter exercises to only those  associated with the user's definitions
@@ -56,6 +65,11 @@ namespace RobicServer.Services
         {
             ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
             return definiton != null && definiton.User == userId;
+        }
+
+        public async Task UpdateExercise(Exercise updatedExercise)
+        {
+            await _exerciseContext.ReplaceOneAsync(updatedExercise);
         }
 
         private double GetLatestExerciseImprovement(Exercise newExercise, Exercise lastExercise)

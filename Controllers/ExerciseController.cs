@@ -1,12 +1,9 @@
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RobicServer.Services;
 using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System;
-using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
@@ -16,13 +13,11 @@ namespace RobicServer.Controllers
     public class ExerciseController : ControllerBase
     {
         private readonly IExerciseRepository _exerciseRepository;
-        private readonly IMongoRepository<Exercise> _exerciseContext;
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
 
-        public ExerciseController(IExerciseRepository exerciseRepository, IMongoRepository<Exercise> exerciseContext, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
+        public ExerciseController(IExerciseRepository exerciseRepository, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
         {
             _exerciseRepository = exerciseRepository;
-            _exerciseContext = exerciseContext;
             _exerciseDefinitionContext = exerciseDefinitionContext;
         }
 
@@ -71,25 +66,25 @@ namespace RobicServer.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, Exercise updatedExercise)
+        public async Task<IActionResult> UpdateExercise(string id, Exercise updatedExercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var isUserExercise = await _exerciseRepository.IsUsersDefinition(userId, updatedExercise.Definition);
             if (!isUserExercise)
                 return Unauthorized();
 
-            Exercise exercise = await _exerciseContext.FindByIdAsync(id);
+            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
             if (exercise == null)
                 return NotFound();
 
-            await _exerciseContext.ReplaceOneAsync(updatedExercise);
+            await _exerciseRepository.UpdateExercise(updatedExercise);
             return Ok(updatedExercise);
         }
 
         [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> DeleteExercise(string id)
         {
-            Exercise exercise = await _exerciseContext.FindByIdAsync(id);
+            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
             if (exercise == null)
                 return NotFound();
 
@@ -99,12 +94,7 @@ namespace RobicServer.Controllers
             if (definiton == null || definiton.User != userId)
                 return Unauthorized();
 
-            await _exerciseContext.DeleteByIdAsync(id);
-
-            // Remove exercise from definition history
-            definiton.History.Remove(id);
-            await _exerciseDefinitionContext.ReplaceOneAsync(definiton);
-
+            await _exerciseRepository.DeleteExercise(id, definiton);
             return NoContent();
         }
     }
