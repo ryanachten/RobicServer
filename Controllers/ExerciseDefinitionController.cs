@@ -18,6 +18,7 @@ namespace RobicServer.Controllers
     public class ExerciseDefinitionController : ControllerBase
     {
         private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
+        private readonly IExerciseRepository _exerciseRepo;
         private readonly IMongoRepository<Exercise> _exerciseContext;
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefintionContext;
         private readonly IMongoRepository<User> _userContext;
@@ -25,6 +26,7 @@ namespace RobicServer.Controllers
 
         public ExerciseDefinitionController(
             IExerciseDefinitionRepository exerciseDefinitionRepo,
+            IExerciseRepository exerciseRepo,
             IMongoRepository<Exercise> exerciseContext,
             IMongoRepository<ExerciseDefiniton> exerciseDefintionContext,
             IMongoRepository<User> userContext,
@@ -32,6 +34,7 @@ namespace RobicServer.Controllers
         )
         {
             _exerciseDefinitionRepo = exerciseDefinitionRepo;
+            _exerciseRepo = exerciseRepo;
             _exerciseContext = exerciseContext;
             _exerciseDefintionContext = exerciseDefintionContext;
             _userContext = userContext;
@@ -51,15 +54,15 @@ namespace RobicServer.Controllers
         [HttpGet("{id:length(24)}", Name = "GetExerciseDefinition")]
         public async Task<IActionResult> Get(string id)
         {
-            ExerciseDefiniton exercise = await _exerciseDefintionContext.FindByIdAsync(id);
+            ExerciseDefiniton exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
             if (exercise == null)
                 return NotFound();
 
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            var util = new ExerciseUtilities(this._exerciseContext.FilterBy(e => e.Definition == id).AsQueryable());
-            exercise.PersonalBest = util.GetPersonalBest(id);
+            // var util = new ExerciseUtilities(this._exerciseContext.FilterBy(e => e.Definition == id).AsQueryable());
+            // exercise.PersonalBest = util.GetPersonalBest(id);
 
             return Ok(exercise);
         }

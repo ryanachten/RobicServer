@@ -13,19 +13,19 @@ namespace RobicServer.Controllers
     public class ExerciseController : ControllerBase
     {
         private readonly IExerciseRepository _exerciseRepository;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
+        private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
 
-        public ExerciseController(IExerciseRepository exerciseRepository, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
+        public ExerciseController(IExerciseRepository exerciseRepository, IExerciseDefinitionRepository exerciseDefinitionRepo, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
         {
             _exerciseRepository = exerciseRepository;
-            _exerciseDefinitionContext = exerciseDefinitionContext;
+            _exerciseDefinitionRepo = exerciseDefinitionRepo;
         }
 
         [HttpGet]
-        public IActionResult GetDefinitionExercises([FromQuery(Name = "definition")] string definitionId)
+        public async Task<IActionResult> GetDefinitionExercises([FromQuery(Name = "definition")] string definitionId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = _exerciseDefinitionContext.FindById(definitionId);
+            ExerciseDefiniton definition = await _exerciseDefinitionRepo.GetExerciseDefinition(definitionId);
             if (definition == null)
                 return NotFound();
 
@@ -44,7 +44,7 @@ namespace RobicServer.Controllers
                 return NotFound();
 
             string userID = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var isUserExercise = await _exerciseRepository.IsUsersDefinition(userID, exercise.Definition);
+            var isUserExercise = await _exerciseDefinitionRepo.IsUsersDefinition(userID, exercise.Definition);
             if (!isUserExercise)
                 return Unauthorized();
 
@@ -55,7 +55,7 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> CreateExercise(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definition = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
 
             if (definition == null || definition.User != userId)
                 return Unauthorized();
@@ -69,7 +69,7 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> UpdateExercise(string id, Exercise updatedExercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var isUserExercise = await _exerciseRepository.IsUsersDefinition(userId, updatedExercise.Definition);
+            var isUserExercise = await _exerciseDefinitionRepo.IsUsersDefinition(userId, updatedExercise.Definition);
             if (!isUserExercise)
                 return Unauthorized();
 
@@ -89,7 +89,7 @@ namespace RobicServer.Controllers
                 return NotFound();
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
 
             if (definiton == null || definiton.User != userId)
                 return Unauthorized();

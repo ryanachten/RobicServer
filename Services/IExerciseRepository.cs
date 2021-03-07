@@ -11,8 +11,5 @@ namespace RobicServer.Services
         Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefiniton definiton);
         Task UpdateExercise(Exercise exercise);
         Task DeleteExercise(string id, ExerciseDefiniton definiton);
-
-        // TODO: should be in exercise def repo
-        Task<bool> IsUsersDefinition(string userId, string definitionId);
     }
 }
