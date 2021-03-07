@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +15,15 @@ namespace RobicServer.Controllers
     [ApiController]
     public class ExerciseController : ControllerBase
     {
-        private readonly IMongoRepository<Exercise> _exerciseRepo;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionRepo;
+        private readonly IExerciseRepository _exerciseRepository;
+        private readonly IMongoRepository<Exercise> _exerciseContext;
+        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
 
-        public ExerciseController(IMongoRepository<Exercise> exerciseRepo, IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo)
+        public ExerciseController(IExerciseRepository exerciseRepository, IMongoRepository<Exercise> exerciseContext, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
         {
-            _exerciseRepo = exerciseRepo;
-            _exerciseDefinitionRepo = exerciseDefinitionRepo;
+            _exerciseRepository = exerciseRepository;
+            _exerciseContext = exerciseContext;
+            _exerciseDefinitionContext = exerciseDefinitionContext;
         }
 
         [HttpGet]
@@ -34,18 +35,14 @@ namespace RobicServer.Controllers
             }
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            // Filter exercises to only those  associated with the user's definitions
-            var exerciseDefinitionIds = _exerciseDefinitionRepo.AsQueryable()
-                .Where(exercise => exercise.User == userId)
-                .Select(exerciseDefinitions => exerciseDefinitions.Id).ToArray();
-            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exerciseDefinitionIds.Contains(exercise.Definition)).ToList();
+            var exercises = _exerciseRepository.GetUserExercises(userId);
             return Ok(exercises);
         }
 
         private IActionResult GetExercisesByDefintion(string definitionId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = _exerciseDefinitionRepo.FindById(definitionId);
+            ExerciseDefiniton definition = _exerciseDefinitionContext.FindById(definitionId);
             if (definition == null)
                 return NotFound();
 
@@ -53,7 +50,7 @@ namespace RobicServer.Controllers
                 return Unauthorized();
 
             // Filter exercises to only those  associated with the user's definitions
-            var exercises = _exerciseRepo.AsQueryable()
+            var exercises = _exerciseContext.AsQueryable()
                 .Where(exercise => exercise.Definition == definitionId).ToList();
             return Ok(exercises);
         }
@@ -61,7 +58,7 @@ namespace RobicServer.Controllers
         [HttpGet("{id:length(24)}", Name = "GetExercise")]
         public async Task<IActionResult> GetExerciseById(string id)
         {
-            Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
+            Exercise exercise = await _exerciseContext.FindByIdAsync(id);
             if (exercise == null)
                 return NotFound();
 
@@ -76,7 +73,7 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> Create(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definition = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
 
             if (definition == null || definition.User != userId)
                 return Unauthorized();
@@ -85,9 +82,9 @@ namespace RobicServer.Controllers
             // - TODO: invesitigate locale-specific solution
             exercise.Date = DateTime.Now;
 
-            await _exerciseRepo.InsertOneAsync(exercise);
+            await _exerciseContext.InsertOneAsync(exercise);
 
-            Exercise latestExercise = await _exerciseRepo.FindByIdAsync(definition.History.LastOrDefault());
+            Exercise latestExercise = await _exerciseContext.FindByIdAsync(definition.History.LastOrDefault());
 
             // Add exercise to definition history
             definition.History.Add(exercise.Id);
@@ -97,7 +94,7 @@ namespace RobicServer.Controllers
             if (latestExercise != null)
                 definition.LastImprovement = ExerciseUtilities.GetLatestExerciseImprovement(exercise, latestExercise);
 
-            await _exerciseDefinitionRepo.ReplaceOneAsync(definition);
+            await _exerciseDefinitionContext.ReplaceOneAsync(definition);
 
             return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
         }
@@ -108,32 +105,32 @@ namespace RobicServer.Controllers
             if (await isUserDefinition(updatedExercise) == false)
                 return Unauthorized();
 
-            Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
+            Exercise exercise = await _exerciseContext.FindByIdAsync(id);
             if (exercise == null)
                 return NotFound();
 
-            await _exerciseRepo.ReplaceOneAsync(updatedExercise);
+            await _exerciseContext.ReplaceOneAsync(updatedExercise);
             return Ok(updatedExercise);
         }
 
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
-            Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
+            Exercise exercise = await _exerciseContext.FindByIdAsync(id);
             if (exercise == null)
                 return NotFound();
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
 
             if (definiton == null || definiton.User != userId)
                 return Unauthorized();
 
-            await _exerciseRepo.DeleteByIdAsync(id);
+            await _exerciseContext.DeleteByIdAsync(id);
 
             // Remove exercise from definition history
             definiton.History.Remove(id);
-            await _exerciseDefinitionRepo.ReplaceOneAsync(definiton);
+            await _exerciseDefinitionContext.ReplaceOneAsync(definiton);
 
             return NoContent();
         }
@@ -141,7 +138,7 @@ namespace RobicServer.Controllers
         private async Task<bool> isUserDefinition(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
             return definiton != null && definiton.User == userId;
         }
     }
