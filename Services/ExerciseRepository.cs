@@ -16,13 +16,11 @@ namespace RobicServer.Services
             _exerciseDefinitionContext = exerciseDefinitionContext;
         }
 
-        public List<Exercise> GetUserExercises(string userId)
+        public List<Exercise> GetDefinitionExercises(string definitionId)
         {
             // Filter exercises to only those  associated with the user's definitions
-            var exerciseDefinitionIds = _exerciseDefinitionContext.AsQueryable()
-                .Where(exercise => exercise.User == userId)
-                .Select(exerciseDefinitions => exerciseDefinitions.Id).ToArray();
-            var exercises = _exerciseContext.AsQueryable().Where(exercise => exerciseDefinitionIds.Contains(exercise.Definition)).ToList();
+            var exercises = _exerciseContext.AsQueryable()
+                .Where(exercise => exercise.Definition == definitionId).ToList();
             return exercises;
         }
     }

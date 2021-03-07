@@ -27,19 +27,7 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get([FromQuery(Name = "definition")] string definitionId)
-        {
-            if (definitionId != null)
-            {
-                return this.GetExercisesByDefintion(definitionId);
-            }
-
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var exercises = _exerciseRepository.GetUserExercises(userId);
-            return Ok(exercises);
-        }
-
-        private IActionResult GetExercisesByDefintion(string definitionId)
+        public IActionResult GetDefinitionExercises([FromQuery(Name = "definition")] string definitionId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ExerciseDefiniton definition = _exerciseDefinitionContext.FindById(definitionId);
@@ -49,9 +37,7 @@ namespace RobicServer.Controllers
             if (definition.User != userId)
                 return Unauthorized();
 
-            // Filter exercises to only those  associated with the user's definitions
-            var exercises = _exerciseContext.AsQueryable()
-                .Where(exercise => exercise.Definition == definitionId).ToList();
+            var exercises = _exerciseRepository.GetDefinitionExercises(definition.Id);
             return Ok(exercises);
         }
 

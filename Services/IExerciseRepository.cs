@@ -6,6 +6,6 @@ namespace RobicServer.Services
 {
     public interface IExerciseRepository
     {
-        List<Exercise> GetUserExercises(string userId);
+        List<Exercise> GetDefinitionExercises(string definitionId);
     }
 }
