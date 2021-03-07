@@ -44,12 +44,13 @@ namespace RobicServer.Controllers
         [HttpGet("{id:length(24)}", Name = "GetExercise")]
         public async Task<IActionResult> GetExerciseById(string id)
         {
-            Exercise exercise = await _exerciseContext.FindByIdAsync(id);
+            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
             if (exercise == null)
                 return NotFound();
 
             string userID = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (await isUserDefinition(exercise) == false)
+            var isUserExercise = await _exerciseRepository.IsUsersDefinition(userID, exercise.Definition);
+            if (!isUserExercise)
                 return Unauthorized();
 
             return Ok(exercise);
@@ -88,7 +89,9 @@ namespace RobicServer.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, Exercise updatedExercise)
         {
-            if (await isUserDefinition(updatedExercise) == false)
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var isUserExercise = await _exerciseRepository.IsUsersDefinition(userId, updatedExercise.Definition);
+            if (!isUserExercise)
                 return Unauthorized();
 
             Exercise exercise = await _exerciseContext.FindByIdAsync(id);
@@ -119,13 +122,6 @@ namespace RobicServer.Controllers
             await _exerciseDefinitionContext.ReplaceOneAsync(definiton);
 
             return NoContent();
-        }
-
-        private async Task<bool> isUserDefinition(Exercise exercise)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
-            return definiton != null && definiton.User == userId;
         }
     }
 }

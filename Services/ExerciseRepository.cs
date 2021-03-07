@@ -23,5 +23,16 @@ namespace RobicServer.Services
                 .Where(exercise => exercise.Definition == definitionId).ToList();
             return exercises;
         }
+
+        public async Task<Exercise> GetExerciseById(string id)
+        {
+            return await _exerciseContext.FindByIdAsync(id);
+        }
+
+        public async Task<bool> IsUsersDefinition(string userId, string definitionId)
+        {
+            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
+            return definiton != null && definiton.User == userId;
+        }
     }
 }
