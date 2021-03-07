@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RobicServer.Helpers;
 using RobicServer.Models;
 
 namespace RobicServer.Services
@@ -14,6 +16,27 @@ namespace RobicServer.Services
         {
             _exerciseContext = exerciseContext;
             _exerciseDefinitionContext = exerciseDefinitionContext;
+        }
+
+        public async Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefiniton definition)
+        {
+            exercise.Date = DateTime.Now;
+
+            await _exerciseContext.InsertOneAsync(exercise);
+
+            Exercise latestExercise = await _exerciseContext.FindByIdAsync(definition.History.LastOrDefault());
+
+            // Add exercise to definition history
+            definition.History.Add(exercise.Id);
+
+            // Update definition aggregate fields
+            definition.LastSession = exercise;
+            if (latestExercise != null)
+                definition.LastImprovement = GetLatestExerciseImprovement(exercise, latestExercise);
+
+            await _exerciseDefinitionContext.ReplaceOneAsync(definition);
+
+            return exercise;
         }
 
         public List<Exercise> GetDefinitionExercises(string definitionId)
@@ -33,6 +56,25 @@ namespace RobicServer.Services
         {
             ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
             return definiton != null && definiton.User == userId;
+        }
+
+        private double GetLatestExerciseImprovement(Exercise newExercise, Exercise lastExercise)
+        {
+            var newNetValue = ExerciseUtilities.GetNetExerciseValue(newExercise);
+            var lastNetValue = ExerciseUtilities.GetNetExerciseValue(lastExercise);
+
+            var min = Math.Min(newNetValue, lastNetValue);
+            var max = Math.Max(newNetValue, lastNetValue);
+            var delta = max - min;
+
+            // Get a percentage of deviation based on average net value
+            var improvement = (delta / max) * 100;
+
+            // If most recent value is less than average, this is a negative correlation
+            if (lastNetValue > newNetValue)
+                improvement *= -1;
+
+            return Math.Round(improvement);
         }
     }
 }

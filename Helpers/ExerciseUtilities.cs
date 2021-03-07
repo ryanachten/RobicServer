@@ -26,24 +26,6 @@ namespace RobicServer.Helpers
             return total;
         }
 
-        public static double? GetLatestExerciseImprovement(Exercise newExercise, Exercise lastExercise)
-        {
-            var newNetValue = ExerciseUtilities.GetNetExerciseValue(newExercise);
-            var lastNetValue = ExerciseUtilities.GetNetExerciseValue(lastExercise);
-
-            var min = Math.Min(newNetValue, lastNetValue);
-            var max = Math.Max(newNetValue, lastNetValue);
-            var delta = max - min;
-
-            // Get a percentage of deviation based on average net value
-            var improvement = (delta / max) * 100;
-
-            // If most recent value is less than average, this is a negative correlation
-            if (lastNetValue > newNetValue)
-                improvement *= -1;
-
-            return Math.Round(improvement);
-        }
 #nullable enable
         public PersonalBest? GetPersonalBest(string definitionId)
         {

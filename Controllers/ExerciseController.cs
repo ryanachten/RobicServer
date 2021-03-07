@@ -57,7 +57,7 @@ namespace RobicServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Exercise exercise)
+        public async Task<IActionResult> CreateExercise(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             ExerciseDefiniton definition = await _exerciseDefinitionContext.FindByIdAsync(exercise.Definition);
@@ -65,25 +65,9 @@ namespace RobicServer.Controllers
             if (definition == null || definition.User != userId)
                 return Unauthorized();
 
-            // Currently setting exercise timestamp to system time
-            // - TODO: invesitigate locale-specific solution
-            exercise.Date = DateTime.Now;
+            var createdExercise = await _exerciseRepository.CreateExercise(exercise, definition);
 
-            await _exerciseContext.InsertOneAsync(exercise);
-
-            Exercise latestExercise = await _exerciseContext.FindByIdAsync(definition.History.LastOrDefault());
-
-            // Add exercise to definition history
-            definition.History.Add(exercise.Id);
-
-            // Update definition aggregate fields
-            definition.LastSession = exercise;
-            if (latestExercise != null)
-                definition.LastImprovement = ExerciseUtilities.GetLatestExerciseImprovement(exercise, latestExercise);
-
-            await _exerciseDefinitionContext.ReplaceOneAsync(definition);
-
-            return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
+            return CreatedAtRoute("GetExercise", new { id = createdExercise.Id }, createdExercise);
         }
 
         [HttpPut("{id:length(24)}")]
