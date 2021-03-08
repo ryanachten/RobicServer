@@ -1,13 +1,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Services;
+using RobicServer.Interfaces;
 using RobicServer.Models;
 using AutoMapper;
 using RobicServer.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System;
-using System.Collections.Generic;
 
 namespace RobicServer.Controllers
 {
