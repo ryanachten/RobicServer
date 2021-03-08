@@ -88,11 +88,8 @@ namespace RobicServer.Controllers
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            exercise.Title = updatedExercise.Title;
-            exercise.Unit = updatedExercise.Unit;
-            exercise.PrimaryMuscleGroup = updatedExercise.PrimaryMuscleGroup;
+            await _exerciseDefinitionRepo.UpdateDefinition(exercise, updatedExercise);
 
-            await _exerciseDefintionContext.ReplaceOneAsync(exercise);
             return Ok(exercise);
         }
 

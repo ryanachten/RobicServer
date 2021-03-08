@@ -40,5 +40,14 @@ namespace RobicServer.Services
             ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
             return definiton != null && definiton.User == userId;
         }
+
+        public async Task UpdateDefinition(ExerciseDefiniton existingDefinition, ExerciseDefiniton updatedDefinition)
+        {
+            existingDefinition.Title = updatedDefinition.Title;
+            existingDefinition.Unit = updatedDefinition.Unit;
+            existingDefinition.PrimaryMuscleGroup = updatedDefinition.PrimaryMuscleGroup;
+
+            await _exerciseDefinitionContext.ReplaceOneAsync(existingDefinition);
+        }
     }
 }
