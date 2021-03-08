@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using RobicServer.Services;
 using RobicServer.Models;
@@ -8,7 +7,6 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using AutoMapper;
 using RobicServer.Models.DTOs;
-using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
@@ -19,9 +17,6 @@ namespace RobicServer.Controllers
     {
         private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
         private readonly IExerciseRepository _exerciseRepo;
-        private readonly IMongoRepository<Exercise> _exerciseContext;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefintionContext;
-        private readonly IMongoRepository<User> _userContext;
         private readonly IMapper _mapper;
 
         public ExerciseDefinitionController(
@@ -35,9 +30,6 @@ namespace RobicServer.Controllers
         {
             _exerciseDefinitionRepo = exerciseDefinitionRepo;
             _exerciseRepo = exerciseRepo;
-            _exerciseContext = exerciseContext;
-            _exerciseDefintionContext = exerciseDefintionContext;
-            _userContext = userContext;
             _mapper = mapper;
         }
 
@@ -81,7 +73,7 @@ namespace RobicServer.Controllers
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, ExerciseDefiniton updatedExercise)
         {
-            ExerciseDefiniton exercise = await _exerciseDefintionContext.FindByIdAsync(id);
+            ExerciseDefiniton exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
             if (exercise == null)
                 return NotFound();
 
@@ -96,7 +88,7 @@ namespace RobicServer.Controllers
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
-            ExerciseDefiniton exercise = await _exerciseDefintionContext.FindByIdAsync(id);
+            ExerciseDefiniton exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
             if (exercise == null)
                 return NotFound();
 
@@ -104,15 +96,7 @@ namespace RobicServer.Controllers
             if (exercise.User != userId)
                 return Unauthorized();
 
-            await _exerciseDefintionContext.DeleteByIdAsync(id);
-
-            // Remove definition from user exercises
-            User user = await _userContext.FindByIdAsync(userId);
-            user.Exercises.Remove(exercise.Id);
-            await _userContext.ReplaceOneAsync(user);
-
-            // Remove exercises associated with definition
-            await _exerciseContext.DeleteManyAsync(e => e.Definition == id);
+            await _exerciseDefinitionRepo.DeleteDefinition(userId, id);
 
             return NoContent();
         }

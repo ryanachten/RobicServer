@@ -7,11 +7,13 @@ namespace RobicServer.Services
     public class ExerciseDefinitionRepository : IExerciseDefinitionRepository
     {
         private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
+        private readonly IMongoRepository<Exercise> _exerciseContext;
         private readonly IMongoRepository<User> _userContext;
 
-        public ExerciseDefinitionRepository(IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext, IMongoRepository<User> userContext)
+        public ExerciseDefinitionRepository(IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext, IMongoRepository<Exercise> exerciseContext, IMongoRepository<User> userContext)
         {
             _exerciseDefinitionContext = exerciseDefinitionContext;
+            _exerciseContext = exerciseContext;
             _userContext = userContext;
         }
 
@@ -23,6 +25,19 @@ namespace RobicServer.Services
             User user = await _userContext.FindByIdAsync(userId);
             user.Exercises.Add(definition.Id);
             await _userContext.ReplaceOneAsync(user);
+        }
+
+        public async Task DeleteDefinition(string userId, string id)
+        {
+            await _exerciseDefinitionContext.DeleteByIdAsync(id);
+
+            // Remove definition from user exercises
+            User user = await _userContext.FindByIdAsync(userId);
+            user.Exercises.Remove(id);
+            await _userContext.ReplaceOneAsync(user);
+
+            // Remove exercises associated with definition
+            await _exerciseContext.DeleteManyAsync(e => e.Definition == id);
         }
 
         public async Task<ExerciseDefiniton> GetExerciseDefinition(string id)

@@ -10,6 +10,7 @@ namespace RobicServer.Services
         Task<ExerciseDefiniton> GetExerciseDefinition(string id);
         Task CreateDefinition(string userId, ExerciseDefiniton definition);
         Task UpdateDefinition(ExerciseDefiniton existingDefinition, ExerciseDefiniton updatedDefinition);
+        Task DeleteDefinition(string userId, string id);
         Task<bool> IsUsersDefinition(string userId, string definitionId);
     }
 }
