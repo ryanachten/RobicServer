@@ -1,13 +1,9 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using RobicServer.Services;
 using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System;
-using RobicServer.Helpers;
 
 namespace RobicServer.Controllers
 {
@@ -16,133 +12,90 @@ namespace RobicServer.Controllers
     [ApiController]
     public class ExerciseController : ControllerBase
     {
-        private readonly IMongoRepository<Exercise> _exerciseRepo;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionRepo;
+        private readonly IExerciseRepository _exerciseRepository;
+        private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
 
-        public ExerciseController(IMongoRepository<Exercise> exerciseRepo, IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo)
+        public ExerciseController(IExerciseRepository exerciseRepository, IExerciseDefinitionRepository exerciseDefinitionRepo, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
         {
-            _exerciseRepo = exerciseRepo;
+            _exerciseRepository = exerciseRepository;
             _exerciseDefinitionRepo = exerciseDefinitionRepo;
         }
 
         [HttpGet]
-        public IActionResult Get([FromQuery(Name = "definition")] string definitionId)
-        {
-            if (definitionId != null)
-            {
-                return this.GetExercisesByDefintion(definitionId);
-            }
-
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            // Filter exercises to only those  associated with the user's definitions
-            var exerciseDefinitionIds = _exerciseDefinitionRepo.AsQueryable()
-                .Where(exercise => exercise.User == userId)
-                .Select(exerciseDefinitions => exerciseDefinitions.Id).ToArray();
-            var exercises = _exerciseRepo.AsQueryable().Where(exercise => exerciseDefinitionIds.Contains(exercise.Definition)).ToList();
-            return Ok(exercises);
-        }
-
-        private IActionResult GetExercisesByDefintion(string definitionId)
+        public async Task<IActionResult> GetDefinitionExercises([FromQuery(Name = "definition")] string definitionId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = _exerciseDefinitionRepo.FindById(definitionId);
+            ExerciseDefiniton definition = await _exerciseDefinitionRepo.GetExerciseDefinition(definitionId);
             if (definition == null)
                 return NotFound();
 
             if (definition.User != userId)
                 return Unauthorized();
 
-            // Filter exercises to only those  associated with the user's definitions
-            var exercises = _exerciseRepo.AsQueryable()
-                .Where(exercise => exercise.Definition == definitionId).ToList();
+            var exercises = _exerciseRepository.GetDefinitionExercises(definition.Id);
             return Ok(exercises);
         }
 
         [HttpGet("{id:length(24)}", Name = "GetExercise")]
         public async Task<IActionResult> GetExerciseById(string id)
         {
-            Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
+            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
             if (exercise == null)
                 return NotFound();
 
             string userID = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (await isUserDefinition(exercise) == false)
+            var isUserExercise = await _exerciseDefinitionRepo.IsUsersDefinition(userID, exercise.Definition);
+            if (!isUserExercise)
                 return Unauthorized();
 
             return Ok(exercise);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Exercise exercise)
+        public async Task<IActionResult> CreateExercise(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definition = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
 
             if (definition == null || definition.User != userId)
                 return Unauthorized();
 
-            // Currently setting exercise timestamp to system time
-            // - TODO: invesitigate locale-specific solution
-            exercise.Date = DateTime.Now;
+            var createdExercise = await _exerciseRepository.CreateExercise(exercise, definition);
 
-            await _exerciseRepo.InsertOneAsync(exercise);
-
-            Exercise latestExercise = await _exerciseRepo.FindByIdAsync(definition.History.LastOrDefault());
-
-            // Add exercise to definition history
-            definition.History.Add(exercise.Id);
-
-            // Update definition aggregate fields
-            definition.LastSession = exercise;
-            if (latestExercise != null)
-                definition.LastImprovement = ExerciseUtilities.GetLatestExerciseImprovement(exercise, latestExercise);
-
-            await _exerciseDefinitionRepo.ReplaceOneAsync(definition);
-
-            return CreatedAtRoute("GetExercise", new { id = exercise.Id }, exercise);
+            return CreatedAtRoute("GetExercise", new { id = createdExercise.Id }, createdExercise);
         }
 
         [HttpPut("{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, Exercise updatedExercise)
+        public async Task<IActionResult> UpdateExercise(string id, Exercise updatedExercise)
         {
-            if (await isUserDefinition(updatedExercise) == false)
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var isUserExercise = await _exerciseDefinitionRepo.IsUsersDefinition(userId, updatedExercise.Definition);
+            if (!isUserExercise)
                 return Unauthorized();
 
-            Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
+            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
             if (exercise == null)
                 return NotFound();
 
-            await _exerciseRepo.ReplaceOneAsync(updatedExercise);
+            await _exerciseRepository.UpdateExercise(updatedExercise);
             return Ok(updatedExercise);
         }
 
         [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> DeleteExercise(string id)
         {
-            Exercise exercise = await _exerciseRepo.FindByIdAsync(id);
+            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
             if (exercise == null)
                 return NotFound();
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
+            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
 
             if (definiton == null || definiton.User != userId)
                 return Unauthorized();
 
-            await _exerciseRepo.DeleteByIdAsync(id);
-
-            // Remove exercise from definition history
-            definiton.History.Remove(id);
-            await _exerciseDefinitionRepo.ReplaceOneAsync(definiton);
-
+            await _exerciseRepository.DeleteExercise(id, definiton);
             return NoContent();
-        }
-
-        private async Task<bool> isUserDefinition(Exercise exercise)
-        {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.FindByIdAsync(exercise.Definition);
-            return definiton != null && definiton.User == userId;
         }
     }
 }
