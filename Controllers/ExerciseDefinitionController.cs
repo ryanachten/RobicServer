@@ -52,7 +52,7 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet("{id:length(24)}", Name = "GetExerciseDefinition")]
-        public async Task<IActionResult> Get(string id)
+        public async Task<IActionResult> GetExeciseDefinition(string id)
         {
             ExerciseDefiniton exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
             if (exercise == null)
@@ -67,18 +67,13 @@ namespace RobicServer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ExerciseDefiniton exercise)
+        public async Task<IActionResult> CreateDefinition(ExerciseDefiniton exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (exercise.User != userId)
                 return Unauthorized();
 
-            await _exerciseDefintionContext.InsertOneAsync(exercise);
-
-            // Update user's exercises with new exercise
-            User user = await _userContext.FindByIdAsync(userId);
-            user.Exercises.Add(exercise.Id);
-            await _userContext.ReplaceOneAsync(user);
+            await _exerciseDefinitionRepo.CreateDefinition(userId, exercise);
 
             return CreatedAtRoute("GetExerciseDefinition", new { id = exercise.Id }, exercise);
         }
