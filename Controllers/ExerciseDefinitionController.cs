@@ -61,8 +61,7 @@ namespace RobicServer.Controllers
             if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            // var util = new ExerciseUtilities(this._exerciseContext.FilterBy(e => e.Definition == id).AsQueryable());
-            // exercise.PersonalBest = util.GetPersonalBest(id);
+            exercise.PersonalBest = _exerciseRepo.GetPersonalBest(id);
 
             return Ok(exercise);
         }

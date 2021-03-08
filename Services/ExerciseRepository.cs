@@ -61,9 +61,88 @@ namespace RobicServer.Services
             return await _exerciseContext.FindByIdAsync(id);
         }
 
+        public PersonalBest GetPersonalBest(string definitionId)
+        {
+            var exercises = GetDefinitionExercises(definitionId);
+            if (exercises == null || exercises.Count() == 0)
+            {
+                return null;
+            }
+            Exercise exerciseWithHighestNetValue = null;
+            double highestAvgValue = 0;
+            int highestReps = 0;
+            int highestSets = 0;
+            var history = new List<PersonalBestHistory>();
+
+            foreach (var e in exercises)
+            {
+                if (e.NetValue.HasValue && (exerciseWithHighestNetValue == null || exerciseWithHighestNetValue.NetValue < e.NetValue))
+                    exerciseWithHighestNetValue = e;
+
+                if (e.Sets.Count > highestSets)
+                    highestSets = e.Sets.Count;
+
+                double totalValue = 0;
+                foreach (var s in e.Sets)
+                {
+                    if (s.Reps.HasValue && s.Reps > highestReps)
+                    {
+                        highestReps = (int)s.Reps;
+                    }
+
+                    if (s.Value.HasValue)
+                    {
+                        totalValue += (int)s.Value;
+                    }
+                }
+                double avgValue = totalValue / e.Sets.Count();
+                if (avgValue > highestAvgValue)
+                    highestAvgValue = avgValue;
+
+                if (e.Sets.Count > 0)
+                    history.Add(this.GetPersonalBestHistory(e));
+            }
+
+            return new PersonalBest
+            {
+                TopNetExercise = exerciseWithHighestNetValue,
+                TopAvgValue = highestAvgValue,
+                TopSets = highestSets,
+                TopReps = highestReps,
+                History = history
+            };
+        }
+
         public async Task UpdateExercise(Exercise updatedExercise)
         {
             await _exerciseContext.ReplaceOneAsync(updatedExercise);
+        }
+
+        private PersonalBestHistory GetPersonalBestHistory(Exercise exercise)
+        {
+            var totalReps = 0.0;
+            var totalValue = 0.0;
+            foreach (var s in exercise.Sets)
+            {
+                if (s.Reps.HasValue)
+                {
+                    totalReps += (double)s.Reps;
+                }
+                if (s.Value.HasValue)
+                {
+                    totalValue += (double)s.Value;
+                }
+            }
+            var record = new PersonalBestHistory()
+            {
+                Date = exercise.Date,
+                NetValue = exercise.NetValue,
+                Sets = exercise.Sets.Count,
+                TimeTaken = exercise.TimeTaken,
+                AvgReps = totalReps / exercise.Sets.Count,
+                AvgValue = totalValue / exercise.Sets.Count,
+            };
+            return record;
         }
 
         private double GetLatestExerciseImprovement(Exercise newExercise, Exercise lastExercise)

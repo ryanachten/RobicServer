@@ -11,5 +11,6 @@ namespace RobicServer.Services
         Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefiniton definiton);
         Task UpdateExercise(Exercise exercise);
         Task DeleteExercise(string id, ExerciseDefiniton definiton);
+        PersonalBest GetPersonalBest(string defintionId);
     }
 }
