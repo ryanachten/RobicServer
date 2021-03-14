@@ -29,6 +29,9 @@ namespace RobicServer.Models
             get
             {
                 double? total = null;
+                if (this.Sets == null)
+                    return total;
+
                 foreach (Set set in this.Sets)
                 {
                     if (set.Reps.HasValue && set.Value.HasValue)
