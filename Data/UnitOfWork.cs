@@ -20,5 +20,7 @@ namespace RobicServer.Data
         public IExerciseRepository ExerciseRepo => new ExerciseRepository(_exerciseContext, _exerciseDefinitionContext);
 
         public IExerciseDefinitionRepository ExerciseDefinitionRepo => new ExerciseDefinitionRepository(_exerciseDefinitionContext, _exerciseContext, _userContext);
+
+        public IUserRepository UserRepo => new UserRepository(_userContext, _exerciseContext, _exerciseDefinitionContext);
     }
 }
