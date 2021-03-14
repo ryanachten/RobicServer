@@ -21,11 +21,11 @@ namespace RobicServer.Controllers
         private readonly IMapper _mapper;
         private readonly IAuthRepository _repo;
 
-        public AuthController(IAuthRepository repo, IMapper mapper, IConfiguration config)
+        public AuthController(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
         {
             _config = config;
             _mapper = mapper;
-            _repo = repo;
+            _repo = unitOfWork.AuthRepo;
         }
 
         [HttpPost("register")]

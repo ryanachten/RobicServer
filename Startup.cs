@@ -29,9 +29,9 @@ namespace RobicServer
             services.AddAutoMapper(typeof(AuthRepository).Assembly);
 
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-            services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IExerciseRepository, ExerciseRepository>();
             services.AddScoped<IExerciseDefinitionRepository, ExerciseDefinitionRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
