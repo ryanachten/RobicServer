@@ -20,16 +20,12 @@ namespace RobicServer.Controllers
         private readonly IMapper _mapper;
 
         public ExerciseDefinitionController(
-            IExerciseDefinitionRepository exerciseDefinitionRepo,
-            IExerciseRepository exerciseRepo,
-            IMongoRepository<Exercise> exerciseContext,
-            IMongoRepository<ExerciseDefiniton> exerciseDefintionContext,
-            IMongoRepository<User> userContext,
+            IUnitOfWork unitOfWork,
             IMapper mapper
         )
         {
-            _exerciseDefinitionRepo = exerciseDefinitionRepo;
-            _exerciseRepo = exerciseRepo;
+            _exerciseDefinitionRepo = unitOfWork.ExerciseDefinitionRepo;
+            _exerciseRepo = unitOfWork.ExerciseRepo;
             _mapper = mapper;
         }
 

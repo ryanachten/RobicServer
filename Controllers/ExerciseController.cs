@@ -15,10 +15,10 @@ namespace RobicServer.Controllers
         private readonly IExerciseRepository _exerciseRepository;
         private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
 
-        public ExerciseController(IExerciseRepository exerciseRepository, IExerciseDefinitionRepository exerciseDefinitionRepo, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
+        public ExerciseController(IUnitOfWork unitOfWork)
         {
-            _exerciseRepository = exerciseRepository;
-            _exerciseDefinitionRepo = exerciseDefinitionRepo;
+            _exerciseRepository = unitOfWork.ExerciseRepo;
+            _exerciseDefinitionRepo = unitOfWork.ExerciseDefinitionRepo;
         }
 
         [HttpGet]
