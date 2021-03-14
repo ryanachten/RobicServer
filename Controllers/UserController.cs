@@ -1,13 +1,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Services;
+using RobicServer.Interfaces;
 using RobicServer.Models;
 using AutoMapper;
 using RobicServer.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
-using System;
-using System.Collections.Generic;
 
 namespace RobicServer.Controllers
 {
@@ -17,21 +15,18 @@ namespace RobicServer.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IMongoRepository<User> _userRepo;
-        private readonly IMongoRepository<Exercise> _exerciseRepo;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionRepo;
+        private readonly IUserRepository _userRepo;
 
         public UserController(
-            IMongoRepository<User> userRepo,
+            IUnitOfWork unitOfWork,
+            IUserRepository userRepo,
             IMongoRepository<Exercise> exerciseRepo,
             IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo,
             IMapper mapper
         )
         {
             _mapper = mapper;
-            _userRepo = userRepo;
-            _exerciseRepo = exerciseRepo;
-            _exerciseDefinitionRepo = exerciseDefinitionRepo;
+            _userRepo = unitOfWork.UserRepo;
         }
 
         [HttpGet("{id:length(24)}", Name = "GetUser")]
@@ -41,7 +36,8 @@ namespace RobicServer.Controllers
             if (userId != id)
                 return Unauthorized();
 
-            User user = await _userRepo.FindByIdAsync(id);
+            User user = await _userRepo.GetUser(id);
+
             if (user == null)
                 return NotFound();
 
@@ -56,24 +52,12 @@ namespace RobicServer.Controllers
             if (userId != id)
                 return Unauthorized();
 
-            User user = await _userRepo.FindByIdAsync(id);
+            User user = await _userRepo.GetUser(id);
             if (user == null)
                 return NotFound();
 
-            // Clean up associated user data
-            foreach (var definitionId in user.Exercises)
-            {
-                var definiton = await _exerciseDefinitionRepo.FindByIdAsync(definitionId);
-                foreach (var exerciseId in definiton.History)
-                {
-                    // Remove all associated exercise sesssions
-                    await _exerciseRepo.DeleteByIdAsync(exerciseId);
-                }
-                // Remove all associated exercise definitions
-                await _exerciseDefinitionRepo.DeleteByIdAsync(definitionId);
-            }
+            await _userRepo.DeleteUser(user);
 
-            await _userRepo.DeleteByIdAsync(user.Id);
             return NoContent();
         }
     }

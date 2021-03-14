@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using RobicServer.Helpers;
 using RobicServer.Models;
+using RobicServer.Interfaces;
 
-namespace RobicServer.Services
+namespace RobicServer.Data
 {
     public class MongoRepository<TDocument> : IMongoRepository<TDocument>
         where TDocument : IDocument

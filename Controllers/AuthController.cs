@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Services;
+using RobicServer.Interfaces;
 using RobicServer.Models;
 using RobicServer.Models.DTOs;
 using System.Security.Claims;
@@ -21,11 +21,11 @@ namespace RobicServer.Controllers
         private readonly IMapper _mapper;
         private readonly IAuthRepository _repo;
 
-        public AuthController(IAuthRepository repo, IMapper mapper, IConfiguration config)
+        public AuthController(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
         {
             _config = config;
             _mapper = mapper;
-            _repo = repo;
+            _repo = unitOfWork.AuthRepo;
         }
 
         [HttpPost("register")]

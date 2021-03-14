@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using RobicServer.Services;
+using RobicServer.Interfaces;
+using RobicServer.Data;
 
 namespace RobicServer
 {
@@ -29,9 +29,9 @@ namespace RobicServer
             services.AddAutoMapper(typeof(AuthRepository).Assembly);
 
             services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-            services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IExerciseRepository, ExerciseRepository>();
             services.AddScoped<IExerciseDefinitionRepository, ExerciseDefinitionRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

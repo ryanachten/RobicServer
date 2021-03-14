@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RobicServer.Models;
+using RobicServer.Interfaces;
 
-namespace RobicServer.Services
+namespace RobicServer.Data
 {
     public class ExerciseDefinitionRepository : IExerciseDefinitionRepository
     {
