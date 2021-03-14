@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobicServer", "RobicServer.csproj", "{6F6868DD-CBE7-4E95-92FE-4D54B78EDA62}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobicServer", "RobicServer\RobicServer.csproj", "{6F6868DD-CBE7-4E95-92FE-4D54B78EDA62}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobicServer.Tests", "RobicServer.Tests\RobicServer.Tests.csproj", "{88893499-38C1-4119-AA08-15A39F5AE38F}"
 EndProject
