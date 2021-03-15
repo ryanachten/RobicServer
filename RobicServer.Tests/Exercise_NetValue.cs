@@ -61,9 +61,8 @@ namespace RobicServer.Tests
         [TestCase(2, 200)]
         public void NetValue_Sets_ReturnTotal(int dataIndex, double expectedValue)
         {
-            var sets = _data[dataIndex];
-
             // Arrange
+            var sets = _data[dataIndex];
             var exercise = new Exercise()
             {
                 Sets = sets
