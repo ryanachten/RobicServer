@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using RobicServer.Helpers;
 using RobicServer.Models;
-using RobicServer.Interfaces;
 
 namespace RobicServer.Data
 {

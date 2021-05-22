@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using RobicServer.Models;
 
-namespace RobicServer.Interfaces
+namespace RobicServer.Data
 {
     public interface IExerciseRepository
     {

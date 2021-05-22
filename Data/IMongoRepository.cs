@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using RobicServer.Models;
 
-namespace RobicServer.Interfaces
+namespace RobicServer.Data
 {
     public interface IMongoRepository<TDocument> where TDocument : IDocument
     {
