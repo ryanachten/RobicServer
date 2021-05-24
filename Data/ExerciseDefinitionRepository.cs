@@ -7,18 +7,18 @@ namespace RobicServer.Data
 {
     public class ExerciseDefinitionRepository : IExerciseDefinitionRepository
     {
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
+        private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionContext;
         private readonly IMongoRepository<Exercise> _exerciseContext;
         private readonly IMongoRepository<User> _userContext;
 
-        public ExerciseDefinitionRepository(IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext, IMongoRepository<Exercise> exerciseContext, IMongoRepository<User> userContext)
+        public ExerciseDefinitionRepository(IMongoRepository<ExerciseDefinition> exerciseDefinitionContext, IMongoRepository<Exercise> exerciseContext, IMongoRepository<User> userContext)
         {
             _exerciseDefinitionContext = exerciseDefinitionContext;
             _exerciseContext = exerciseContext;
             _userContext = userContext;
         }
 
-        public async Task CreateDefinition(string userId, ExerciseDefiniton definition)
+        public async Task CreateDefinition(string userId, ExerciseDefinition definition)
         {
             await _exerciseDefinitionContext.InsertOneAsync(definition);
 
@@ -41,23 +41,23 @@ namespace RobicServer.Data
             await _exerciseContext.DeleteManyAsync(e => e.Definition == id);
         }
 
-        public async Task<ExerciseDefiniton> GetExerciseDefinition(string id)
+        public async Task<ExerciseDefinition> GetExerciseDefinition(string id)
         {
             return await _exerciseDefinitionContext.FindByIdAsync(id);
         }
 
-        public IEnumerable<ExerciseDefiniton> GetUserDefinitions(string userId)
+        public IEnumerable<ExerciseDefinition> GetUserDefinitions(string userId)
         {
             return _exerciseDefinitionContext.FilterBy(defintion => defintion.User == userId);
         }
 
         public async Task<bool> IsUsersDefinition(string userId, string definitionId)
         {
-            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
+            ExerciseDefinition definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
             return definiton != null && definiton.User == userId;
         }
 
-        public async Task UpdateDefinition(ExerciseDefiniton existingDefinition, ExerciseDefiniton updatedDefinition)
+        public async Task UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition)
         {
             existingDefinition.Title = updatedDefinition.Title;
             existingDefinition.Unit = updatedDefinition.Unit;

@@ -25,7 +25,7 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> GetDefinitionExercises([FromQuery(Name = "definition")] string definitionId)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = await _exerciseDefinitionRepo.GetExerciseDefinition(definitionId);
+            ExerciseDefinition definition = await _exerciseDefinitionRepo.GetExerciseDefinition(definitionId);
             if (definition == null)
                 return NotFound();
 
@@ -55,7 +55,7 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> CreateExercise(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definition = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
+            ExerciseDefinition definition = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
 
             if (definition == null || definition.User != userId)
                 return Unauthorized();
@@ -89,7 +89,7 @@ namespace RobicServer.Controllers
                 return NotFound();
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefiniton definiton = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
+            ExerciseDefinition definiton = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
 
             if (definiton == null || definiton.User != userId)
                 return Unauthorized();

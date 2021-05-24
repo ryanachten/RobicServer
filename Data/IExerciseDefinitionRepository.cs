@@ -6,10 +6,10 @@ namespace RobicServer.Data
 {
     public interface IExerciseDefinitionRepository
     {
-        IEnumerable<ExerciseDefiniton> GetUserDefinitions(string userId);
-        Task<ExerciseDefiniton> GetExerciseDefinition(string id);
-        Task CreateDefinition(string userId, ExerciseDefiniton definition);
-        Task UpdateDefinition(ExerciseDefiniton existingDefinition, ExerciseDefiniton updatedDefinition);
+        IEnumerable<ExerciseDefinition> GetUserDefinitions(string userId);
+        Task<ExerciseDefinition> GetExerciseDefinition(string id);
+        Task CreateDefinition(string userId, ExerciseDefinition definition);
+        Task UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition);
         Task DeleteDefinition(string userId, string id);
         Task<bool> IsUsersDefinition(string userId, string definitionId);
     }

@@ -9,7 +9,7 @@ namespace RobicServer.Models
 {
     [BsonCollection("exercisedefinitions")]
     [BsonIgnoreExtraElements]
-    public class ExerciseDefiniton : Document
+    public class ExerciseDefinition : Document
     {
         [BsonElement("title")]
         public string Title { get; set; }

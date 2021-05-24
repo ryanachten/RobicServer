@@ -16,13 +16,13 @@ namespace RobicServer.Data
         };
 
         private readonly IMongoRepository<Exercise> _exerciseRepo;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionRepo;
-        private List<ExerciseDefiniton> _userExerciseDefinitions;
+        private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionRepo;
+        private List<ExerciseDefinition> _userExerciseDefinitions;
         private List<Exercise> _userExercises;
 
         public AnalyticsRepository(
             IMongoRepository<Exercise> exerciseRepo,
-            IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo
+            IMongoRepository<ExerciseDefinition> exerciseDefinitionRepo
         )
         {
             _exerciseRepo = exerciseRepo;
@@ -59,7 +59,7 @@ namespace RobicServer.Data
                 }
                 else
                 {
-                    ExerciseDefiniton def = _userExerciseDefinitions.Find(d => d.Id == defId);
+                    ExerciseDefinition def = _userExerciseDefinitions.Find(d => d.Id == defId);
                     exerciseProgressDict.Add(defId, new ExerciseProgressValue
                     {
                         Id = def.Id,
@@ -74,7 +74,7 @@ namespace RobicServer.Data
             List<AnalyticsItem> exerciseProgress = new List<AnalyticsItem>();
             foreach (KeyValuePair<string, ExerciseProgressValue> progressItem in exerciseProgressDict)
             {
-                ExerciseDefiniton def = _userExerciseDefinitions.Find(d => d.Id == progressItem.Value.Id);
+                ExerciseDefinition def = _userExerciseDefinitions.Find(d => d.Id == progressItem.Value.Id);
                 Exercise firstExercise = _userExercises.Find(ex => ex.Id == def.History?.FirstOrDefault());
 
                 double progressPercent = 0.0;
@@ -122,7 +122,7 @@ namespace RobicServer.Data
             Dictionary<string, int> muscleGroupFrequency = new Dictionary<string, int>();
             _userExercises.ForEach(e =>
             {
-                ExerciseDefiniton exerciseDefiniton = _userExerciseDefinitions.Find(def => def.Id == e.Definition);
+                ExerciseDefinition exerciseDefiniton = _userExerciseDefinitions.Find(def => def.Id == e.Definition);
                 if (exerciseDefiniton != null && exerciseDefiniton.PrimaryMuscleGroup != null)
                 {
                     exerciseDefiniton.PrimaryMuscleGroup.ToList().ForEach(m =>

@@ -8,9 +8,9 @@ namespace RobicServer.Data
     {
         List<Exercise> GetDefinitionExercises(string definitionId);
         Task<Exercise> GetExerciseById(string id);
-        Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefiniton definiton);
+        Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefinition definiton);
         Task UpdateExercise(Exercise exercise);
-        Task DeleteExercise(string id, ExerciseDefiniton definiton);
+        Task DeleteExercise(string id, ExerciseDefinition definiton);
         PersonalBest GetPersonalBest(string defintionId);
     }
 }

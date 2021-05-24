@@ -21,7 +21,7 @@ namespace RobicServer.Controllers
             IUnitOfWork unitOfWork,
             IUserRepository userRepo,
             IMongoRepository<Exercise> exerciseRepo,
-            IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo,
+            IMongoRepository<ExerciseDefinition> exerciseDefinitionRepo,
             IMapper mapper
         )
         {

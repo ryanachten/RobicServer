@@ -10,15 +10,15 @@ namespace RobicServer.Data
     public class ExerciseRepository : IExerciseRepository
     {
         private readonly IMongoRepository<Exercise> _exerciseContext;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
+        private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionContext;
 
-        public ExerciseRepository(IMongoRepository<Exercise> exerciseContext, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
+        public ExerciseRepository(IMongoRepository<Exercise> exerciseContext, IMongoRepository<ExerciseDefinition> exerciseDefinitionContext)
         {
             _exerciseContext = exerciseContext;
             _exerciseDefinitionContext = exerciseDefinitionContext;
         }
 
-        public async Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefiniton definition)
+        public async Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefinition definition)
         {
             exercise.Date = DateTime.Now;
 
@@ -39,7 +39,7 @@ namespace RobicServer.Data
             return exercise;
         }
 
-        public async Task DeleteExercise(string id, ExerciseDefiniton definiton)
+        public async Task DeleteExercise(string id, ExerciseDefinition definiton)
         {
             await _exerciseContext.DeleteByIdAsync(id);
 
