@@ -51,9 +51,7 @@ namespace RobicServer.Data
         public List<Exercise> GetDefinitionExercises(string definitionId)
         {
             // Filter exercises to only those  associated with the user's definitions
-            var exercises = _exerciseContext.AsQueryable()
-                .Where(exercise => exercise.Definition == definitionId).ToList();
-            return exercises;
+            return _exerciseContext.FilterBy(exercise => exercise.Definition == definitionId).ToList();
         }
 
         public async Task<Exercise> GetExerciseById(string id)

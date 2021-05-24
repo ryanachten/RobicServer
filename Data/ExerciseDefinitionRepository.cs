@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RobicServer.Models;
-using RobicServer.Data;
 
 namespace RobicServer.Data
 {
@@ -18,7 +17,7 @@ namespace RobicServer.Data
             _userContext = userContext;
         }
 
-        public async Task CreateDefinition(string userId, ExerciseDefinition definition)
+        public async Task<ExerciseDefinition> CreateDefinition(string userId, ExerciseDefinition definition)
         {
             await _exerciseDefinitionContext.InsertOneAsync(definition);
 
@@ -26,6 +25,7 @@ namespace RobicServer.Data
             User user = await _userContext.FindByIdAsync(userId);
             user.Exercises.Add(definition.Id);
             await _userContext.ReplaceOneAsync(user);
+            return definition;
         }
 
         public async Task DeleteDefinition(string userId, string id)

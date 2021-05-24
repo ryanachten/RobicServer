@@ -10,6 +10,7 @@ using RobicServer.Models.DTOs;
 using MediatR;
 using RobicServer.Query;
 using System;
+using RobicServer.Command;
 
 namespace RobicServer.Controllers
 {
@@ -19,7 +20,6 @@ namespace RobicServer.Controllers
     public class ExerciseDefinitionController : ControllerBase
     {
         private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
-        private readonly IExerciseRepository _exerciseRepo;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
@@ -30,7 +30,6 @@ namespace RobicServer.Controllers
         )
         {
             _exerciseDefinitionRepo = unitOfWork.ExerciseDefinitionRepo;
-            _exerciseRepo = unitOfWork.ExerciseRepo;
             _mapper = mapper;
             _mediator = mediator;
         }
@@ -57,28 +56,48 @@ namespace RobicServer.Controllers
         [HttpGet("{id:length(24)}", Name = "GetExerciseDefinition")]
         public async Task<IActionResult> GetExeciseDefinition(string id)
         {
-            ExerciseDefinition exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
-            if (exercise == null)
-                return NotFound();
+            try
+            {
+                var definition = await _mediator.Send(new GetExerciseDefinitionById
+                {
+                    ExerciseId = id
+                });
+                if (definition == null)
+                    return NotFound();
 
-            if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
-                return Unauthorized();
+                if (definition.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                    return Unauthorized();
 
-            exercise.PersonalBest = _exerciseRepo.GetPersonalBest(id);
-
-            return Ok(exercise);
+                return Ok(definition);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateDefinition(ExerciseDefinition exercise)
+        public async Task<IActionResult> CreateDefinition(ExerciseDefinition exerciseToCreate)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (exercise.User != userId)
-                return Unauthorized();
+            try
+            {
+                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                
+                if (exerciseToCreate.User != userId)
+                    return Unauthorized();
 
-            await _exerciseDefinitionRepo.CreateDefinition(userId, exercise);
+                var definition = await _mediator.Send(new CreateExerciseDefinition
+                {
+                    UserId = userId,
+                    Definition = exerciseToCreate
+                });
 
-            return CreatedAtRoute("GetExerciseDefinition", new { id = exercise.Id }, exercise);
+                return CreatedAtRoute("GetExerciseDefinition", new { id = definition.Id }, definition);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("{id:length(24)}")]
