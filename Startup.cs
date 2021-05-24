@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -43,7 +44,7 @@ namespace RobicServer
                         ValidateAudience = false
                     };
                 });
-
+            services.AddMediatR(typeof(Startup));
             services.AddControllers();
         }
 
