@@ -111,9 +111,10 @@ namespace RobicServer.Data
             };
         }
 
-        public async Task UpdateExercise(Exercise updatedExercise)
+        public async Task<Exercise> UpdateExercise(Exercise updatedExercise)
         {
             await _exerciseContext.ReplaceOneAsync(updatedExercise);
+            return updatedExercise;
         }
 
         private PersonalBestHistory GetPersonalBestHistory(Exercise exercise)

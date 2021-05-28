@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Data;
 using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using MediatR;
+using RobicServer.Command;
 using RobicServer.Query;
 
 namespace RobicServer.Controllers
@@ -14,14 +14,10 @@ namespace RobicServer.Controllers
     [ApiController]
     public class ExerciseController : ControllerBase
     {
-        private readonly IExerciseRepository _exerciseRepository;
-        private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
         private readonly IMediator _mediator;
 
-        public ExerciseController(IUnitOfWork unitOfWork, IMediator mediator)
+        public ExerciseController(IMediator mediator)
         {
-            _exerciseRepository = unitOfWork.ExerciseRepo;
-            _exerciseDefinitionRepo = unitOfWork.ExerciseDefinitionRepo;
             _mediator = mediator;
         }
 
@@ -67,12 +63,19 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> CreateExercise(Exercise exercise)
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefinition definition = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
+            var definition = await _mediator.Send(new GetExerciseDefinitionById
+            {
+                DefinitionId = exercise.Definition
+            });
 
             if (definition == null || definition.User != userId)
                 return Unauthorized();
 
-            var createdExercise = await _exerciseRepository.CreateExercise(exercise, definition);
+            var createdExercise = await _mediator.Send(new CreateExercise
+            {
+                Definition = definition,
+                Exercise = exercise
+            });
 
             return CreatedAtRoute("GetExercise", new { id = createdExercise.Id }, createdExercise);
         }
@@ -84,28 +87,44 @@ namespace RobicServer.Controllers
             if (!isUserExercise)
                 return Unauthorized();
 
-            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
+            var exercise = await _mediator.Send(new GetExerciseById
+            {
+                ExerciseId = id
+            });
             if (exercise == null)
                 return NotFound();
 
-            await _exerciseRepository.UpdateExercise(updatedExercise);
-            return Ok(updatedExercise);
+            var result = await _mediator.Send(new UpdateExercise
+            {
+                Exercise = updatedExercise
+            });
+            return Ok(result);
         }
 
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> DeleteExercise(string id)
         {
-            Exercise exercise = await _exerciseRepository.GetExerciseById(id);
+            var exercise = await _mediator.Send(new GetExerciseById
+            {
+                ExerciseId = id
+            });
             if (exercise == null)
                 return NotFound();
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            ExerciseDefinition definiton = await _exerciseDefinitionRepo.GetExerciseDefinition(exercise.Definition);
+            var definition = await _mediator.Send(new GetExerciseDefinitionById
+            {
+                DefinitionId = exercise.Definition
+            });
 
-            if (definiton == null || definiton.User != userId)
+            if (definition == null || definition.User != userId)
                 return Unauthorized();
 
-            await _exerciseRepository.DeleteExercise(id, definiton);
+            await _mediator.Send(new DeleteExercise
+            {
+                ExerciseId = id,
+                Definition = definition
+            });
             return NoContent();
         }
 

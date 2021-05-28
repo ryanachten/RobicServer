@@ -9,7 +9,7 @@ namespace RobicServer.Data
         Task<IEnumerable<Exercise>> GetDefinitionExercises(string definitionId);
         Task<Exercise> GetExerciseById(string id);
         Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefinition definiton);
-        Task UpdateExercise(Exercise exercise);
+        Task<Exercise> UpdateExercise(Exercise exercise);
         Task DeleteExercise(string id, ExerciseDefinition definiton);
         Task<PersonalBest> GetPersonalBest(string defintionId);
     }
