@@ -28,17 +28,17 @@ namespace RobicServer.Data
             return definition;
         }
 
-        public async Task DeleteDefinition(string userId, string id)
+        public async Task DeleteDefinition(ExerciseDefinition definition)
         {
-            await _exerciseDefinitionContext.DeleteByIdAsync(id);
+            await _exerciseDefinitionContext.DeleteByIdAsync(definition.Id);
 
             // Remove definition from user exercises
-            User user = await _userContext.FindByIdAsync(userId);
-            user.Exercises.Remove(id);
+            User user = await _userContext.FindByIdAsync(definition.User);
+            user.Exercises.Remove(definition.Id);
             await _userContext.ReplaceOneAsync(user);
 
             // Remove exercises associated with definition
-            await _exerciseContext.DeleteManyAsync(e => e.Definition == id);
+            await _exerciseContext.DeleteManyAsync(e => e.Definition == definition.Id);
         }
 
         public async Task<ExerciseDefinition> GetExerciseDefinition(string id)
@@ -57,13 +57,15 @@ namespace RobicServer.Data
             return definiton != null && definiton.User == userId;
         }
 
-        public async Task UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition)
+        public async Task<ExerciseDefinition> UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition)
         {
             existingDefinition.Title = updatedDefinition.Title;
             existingDefinition.Unit = updatedDefinition.Unit;
             existingDefinition.PrimaryMuscleGroup = updatedDefinition.PrimaryMuscleGroup;
 
             await _exerciseDefinitionContext.ReplaceOneAsync(existingDefinition);
+
+            return existingDefinition;
         }
     }
 }

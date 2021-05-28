@@ -9,8 +9,8 @@ namespace RobicServer.Data
         IEnumerable<ExerciseDefinition> GetUserDefinitions(string userId);
         Task<ExerciseDefinition> GetExerciseDefinition(string id);
         Task<ExerciseDefinition> CreateDefinition(string userId, ExerciseDefinition definition);
-        Task UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition);
-        Task DeleteDefinition(string userId, string id);
+        Task<ExerciseDefinition> UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition);
+        Task DeleteDefinition(ExerciseDefinition definition);
         Task<bool> IsUsersDefinition(string userId, string definitionId);
     }
 }

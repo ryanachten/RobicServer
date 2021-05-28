@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Data;
 using RobicServer.Models;
 using System.Threading.Tasks;
 using System.Security.Claims;
@@ -9,7 +8,6 @@ using AutoMapper;
 using RobicServer.Models.DTOs;
 using MediatR;
 using RobicServer.Query;
-using System;
 using RobicServer.Command;
 
 namespace RobicServer.Controllers
@@ -19,17 +17,14 @@ namespace RobicServer.Controllers
     [ApiController]
     public class ExerciseDefinitionController : ControllerBase
     {
-        private readonly IExerciseDefinitionRepository _exerciseDefinitionRepo;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
 
         public ExerciseDefinitionController(
-            IUnitOfWork unitOfWork,
             IMapper mapper,
             IMediator mediator
         )
         {
-            _exerciseDefinitionRepo = unitOfWork.ExerciseDefinitionRepo;
             _mapper = mapper;
             _mediator = mediator;
         }
@@ -38,95 +33,88 @@ namespace RobicServer.Controllers
         public async Task<IActionResult> GetDefinition()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            try
+            var definitions = await _mediator.Send(new GetExerciseDefinitions
             {
-                var definitions = await _mediator.Send(new GetExerciseDefinitions
-                {
-                    UserId = userId
-                });
-                var defintionsToReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(definitions);
-                return Ok(defintionsToReturn);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+                UserId = userId
+            });
+            var defintionsToReturn = _mapper.Map<List<ExerciseDefinitionForListDto>>(definitions);
+            return Ok(defintionsToReturn);
         }
 
         [HttpGet("{id:length(24)}", Name = "GetExerciseDefinition")]
         public async Task<IActionResult> GetExeciseDefinition(string id)
         {
-            try
+            var definition = await _mediator.Send(new GetExerciseDefinitionById
             {
-                var definition = await _mediator.Send(new GetExerciseDefinitionById
-                {
-                    ExerciseId = id
-                });
-                if (definition == null)
-                    return NotFound();
+                ExerciseId = id
+            });
+            if (definition == null)
+                return NotFound();
 
-                if (definition.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
-                    return Unauthorized();
+            if (definition.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
+                return Unauthorized();
 
-                return Ok(definition);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            return Ok(definition);
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateDefinition(ExerciseDefinition exerciseToCreate)
         {
-            try
-            {
-                string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                
-                if (exerciseToCreate.User != userId)
-                    return Unauthorized();
+            string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                var definition = await _mediator.Send(new CreateExerciseDefinition
-                {
-                    UserId = userId,
-                    Definition = exerciseToCreate
-                });
+            if (exerciseToCreate.User != userId)
+                return Unauthorized();
 
-                return CreatedAtRoute("GetExerciseDefinition", new { id = definition.Id }, definition);
-            }
-            catch (Exception ex)
+            var definition = await _mediator.Send(new CreateExerciseDefinition
             {
-                return BadRequest(ex.Message);
-            }
+                UserId = userId,
+                Definition = exerciseToCreate
+            });
+
+            return CreatedAtRoute("GetExerciseDefinition", new { id = definition.Id }, definition);
         }
 
         [HttpPut("{id:length(24)}")]
         public async Task<IActionResult> Update(string id, ExerciseDefinition updatedExercise)
         {
-            ExerciseDefinition exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
-            if (exercise == null)
+            var definition = await _mediator.Send(new GetExerciseDefinitionById
+            {
+                ExerciseId = id
+            });
+
+            if (definition == null)
                 return NotFound();
 
-            if (exercise.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
+            if (definition.User != User.FindFirst(ClaimTypes.NameIdentifier).Value)
                 return Unauthorized();
 
-            await _exerciseDefinitionRepo.UpdateDefinition(exercise, updatedExercise);
+            var updatedDefinition = await _mediator.Send(new UpdateExerciseDefinition
+            {
+                ExistingDefinition = definition,
+                UpdatedDefinition = updatedExercise
+            });
 
-            return Ok(exercise);
+            return Ok(updatedDefinition);
         }
 
         [HttpDelete("{id:length(24)}")]
         public async Task<IActionResult> Delete(string id)
         {
-            ExerciseDefinition exercise = await _exerciseDefinitionRepo.GetExerciseDefinition(id);
-            if (exercise == null)
+            var definition = await _mediator.Send(new GetExerciseDefinitionById
+            {
+                ExerciseId = id
+            });
+            if (definition == null)
                 return NotFound();
 
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (exercise.User != userId)
+            if (definition.User != userId)
                 return Unauthorized();
 
-            await _exerciseDefinitionRepo.DeleteDefinition(userId, id);
+            await _mediator.Send(new DeleteExerciseDefinition
+            {
+                Definition = definition
+            });
 
             return NoContent();
         }
