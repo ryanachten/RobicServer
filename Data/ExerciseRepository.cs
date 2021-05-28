@@ -48,10 +48,10 @@ namespace RobicServer.Data
             await _exerciseDefinitionContext.ReplaceOneAsync(definiton);
         }
 
-        public List<Exercise> GetDefinitionExercises(string definitionId)
+        public Task<IEnumerable<Exercise>> GetDefinitionExercises(string definitionId)
         {
             // Filter exercises to only those  associated with the user's definitions
-            return _exerciseContext.FilterBy(exercise => exercise.Definition == definitionId).ToList();
+            return _exerciseContext.FilterByAsync(exercise => exercise.Definition == definitionId);
         }
 
         public async Task<Exercise> GetExerciseById(string id)
@@ -59,9 +59,9 @@ namespace RobicServer.Data
             return await _exerciseContext.FindByIdAsync(id);
         }
 
-        public PersonalBest GetPersonalBest(string definitionId)
+        public async Task<PersonalBest> GetPersonalBest(string definitionId)
         {
-            var exercises = GetDefinitionExercises(definitionId);
+            var exercises = await GetDefinitionExercises(definitionId);
             if (exercises == null || exercises.Count() == 0)
             {
                 return null;

@@ -19,11 +19,11 @@ namespace RobicServer.Query
 
         public async Task<ExerciseDefinition> Handle(GetExerciseDefinitionById request, CancellationToken cancellationToken)
         {
-            var exercise = await _definitionRepo.GetExerciseDefinition(request.ExerciseId);
-            if(exercise != null)
-                exercise.PersonalBest = _exerciseRepo.GetPersonalBest(exercise.Id);
+            var definition = await _definitionRepo.GetExerciseDefinition(request.DefinitionId);
+            if (definition != null)
+                definition.PersonalBest = await _exerciseRepo.GetPersonalBest(definition.Id);
 
-            return exercise;
+            return definition;
         }
     }
 }

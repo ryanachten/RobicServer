@@ -51,12 +51,6 @@ namespace RobicServer.Data
             return _exerciseDefinitionContext.FilterByAsync(defintion => defintion.User == userId);
         }
 
-        public async Task<bool> IsUsersDefinition(string userId, string definitionId)
-        {
-            ExerciseDefinition definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
-            return definiton != null && definiton.User == userId;
-        }
-
         public async Task<ExerciseDefinition> UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition)
         {
             existingDefinition.Title = updatedDefinition.Title;

@@ -46,7 +46,7 @@ namespace RobicServer.Controllers
         {
             var definition = await _mediator.Send(new GetExerciseDefinitionById
             {
-                ExerciseId = id
+                DefinitionId = id
             });
             if (definition == null)
                 return NotFound();
@@ -79,7 +79,7 @@ namespace RobicServer.Controllers
         {
             var definition = await _mediator.Send(new GetExerciseDefinitionById
             {
-                ExerciseId = updatedExercise.Id
+                DefinitionId = updatedExercise.Id
             });
 
             if (definition == null)
@@ -102,7 +102,7 @@ namespace RobicServer.Controllers
         {
             var definition = await _mediator.Send(new GetExerciseDefinitionById
             {
-                ExerciseId = id
+                DefinitionId = id
             });
             if (definition == null)
                 return NotFound();

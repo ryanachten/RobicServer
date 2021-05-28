@@ -11,6 +11,5 @@ namespace RobicServer.Data
         Task<ExerciseDefinition> CreateDefinition(string userId, ExerciseDefinition definition);
         Task<ExerciseDefinition> UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition);
         Task DeleteDefinition(ExerciseDefinition definition);
-        Task<bool> IsUsersDefinition(string userId, string definitionId);
     }
 }

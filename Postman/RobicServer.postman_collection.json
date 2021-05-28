@@ -42,7 +42,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{}",
+							"raw": "{\n    \n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -66,6 +66,52 @@
 			]
 		},
 		{
+			"name": "Exercise",
+			"item": [
+				{
+					"name": "Get Exercises By Definition",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/exercise?definition=6033560614e4fd0004273eaa",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"exercise"
+							],
+							"query": [
+								{
+									"key": "definition",
+									"value": "6033560614e4fd0004273eaa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Exercise By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{url}}/exercise/60335ee9c7362e4a8c2abf49",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"exercise",
+								"60335ee9c7362e4a8c2abf49"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "Exercise Definition",
 			"item": [
 				{
@@ -73,7 +119,15 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": "{{url}}/exercisedefinition",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"exercisedefinition"
+							]
+						}
 					},
 					"response": []
 				},
@@ -82,7 +136,16 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"url": null
+						"url": {
+							"raw": "{{url}}/exercisedefinition/6033560614e4fd0004273eaa",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"exercisedefinition",
+								"6033560614e4fd0004273eaa"
+							]
+						}
 					},
 					"response": []
 				},
@@ -93,7 +156,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"id\": \"6033560614e4fd0004273eaa\",\n    \"title\": \"Squat\",\n    \"history\": [\n        \"603f13048453c1000460aa67\",\n        \"603f13928453c1000460aa68\"\n    ],\n    \"lastSession\": {\n        \"definition\": \"6033560614e4fd0004273eaa\",\n        \"date\": \"2021-03-03T04:41:54.216Z\",\n        \"timeTaken\": \"0001-01-01T00:00:00Z\",\n        \"sets\": [\n            {\n                \"id\": null,\n                \"exercises\": null,\n                \"value\": 120,\n                \"reps\": 8\n            },\n            {\n                \"id\": null,\n                \"exercises\": null,\n                \"value\": 120,\n                \"reps\": 8\n            },\n            {\n                \"id\": null,\n                \"exercises\": null,\n                \"value\": 120,\n                \"reps\": 8\n            },\n            {\n                \"id\": null,\n                \"exercises\": null,\n                \"value\": 120,\n                \"reps\": 8\n            }\n        ],\n        \"netValue\": 3840,\n        \"id\": \"603f13928453c1000460aa68\"\n    },\n    \"lastImprovement\": -4\n}",
+							"raw": "{\n    \"id\": \"6033560614e4fd0004273eaa\",\n    \"title\": \"Squats\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -101,13 +164,13 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/exercisedefinition/",
+							"raw": "{{url}}/exercisedefinition/6033560614e4fd0004273eaa",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"exercisedefinition",
-								""
+								"6033560614e4fd0004273eaa"
 							]
 						}
 					},
@@ -119,13 +182,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{url}}/exercisedefinition/6033560614e4fd0004273eaa",
+							"raw": "{{url}}/exercisedefinition/60ab33c226cbfe81f86e640c",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
 								"exercisedefinition",
-								"6033560614e4fd0004273eaa"
+								"60ab33c226cbfe81f86e640c"
 							]
 						}
 					},
@@ -188,7 +251,7 @@
 		},
 		{
 			"key": "token",
-			"value": "add-token-here"
+			"value": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiI2MDMzNTNmYjE0ZTRmZDAwMDQyNzNlYTkiLCJlbWFpbCI6InJ5YW5AdGVzdC5jb20iLCJuYmYiOjE2MjIyMzE5NTQsImV4cCI6MTY1Mzc2Nzk1NCwiaWF0IjoxNjIyMjMxOTU0fQ.3kfOcpe4c8wz2_KEijnN8kQBP8ffrjVVwLjAKpV4kgDTky4XT1WexIcZcN0GbQ6otYGdhNHdaJLCkYGux0-n6w"
 		}
 	]
 }
