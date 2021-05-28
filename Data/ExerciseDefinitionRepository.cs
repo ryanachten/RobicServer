@@ -46,9 +46,9 @@ namespace RobicServer.Data
             return await _exerciseDefinitionContext.FindByIdAsync(id);
         }
 
-        public IEnumerable<ExerciseDefinition> GetUserDefinitions(string userId)
+        public Task<IEnumerable<ExerciseDefinition>> GetUserDefinitions(string userId)
         {
-            return _exerciseDefinitionContext.FilterBy(defintion => defintion.User == userId);
+            return _exerciseDefinitionContext.FilterByAsync(defintion => defintion.User == userId);
         }
 
         public async Task<bool> IsUsersDefinition(string userId, string definitionId)

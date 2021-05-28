@@ -18,7 +18,7 @@ namespace RobicServer.Query
 
         public Task<IEnumerable<ExerciseDefinition>> Handle(GetExerciseDefinitions request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_exerciseRepo.GetUserDefinitions(request.UserId));
+            return _exerciseRepo.GetUserDefinitions(request.UserId);
         }
     }
 }

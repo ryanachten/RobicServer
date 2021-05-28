@@ -75,11 +75,11 @@ namespace RobicServer.Controllers
         }
 
         [HttpPut("{id:length(24)}")]
-        public async Task<IActionResult> Update(string id, ExerciseDefinition updatedExercise)
+        public async Task<IActionResult> Update(ExerciseDefinition updatedExercise)
         {
             var definition = await _mediator.Send(new GetExerciseDefinitionById
             {
-                ExerciseId = id
+                ExerciseId = updatedExercise.Id
             });
 
             if (definition == null)

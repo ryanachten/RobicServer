@@ -6,7 +6,7 @@ namespace RobicServer.Data
 {
     public interface IExerciseDefinitionRepository
     {
-        IEnumerable<ExerciseDefinition> GetUserDefinitions(string userId);
+        Task<IEnumerable<ExerciseDefinition>> GetUserDefinitions(string userId);
         Task<ExerciseDefinition> GetExerciseDefinition(string id);
         Task<ExerciseDefinition> CreateDefinition(string userId, ExerciseDefinition definition);
         Task<ExerciseDefinition> UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition);
