@@ -3,6 +3,7 @@ using RobicServer.Data;
 using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace RobicServer.Controllers
 {
@@ -22,10 +23,10 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            Analytics analytics = _analyticsRepo.GetUserAnalytics(userId);
+            Analytics analytics = await _analyticsRepo.GetUserAnalytics(userId);
             return Ok(analytics);
         }
     }

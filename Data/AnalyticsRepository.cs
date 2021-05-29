@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using RobicServer.Helpers;
 using RobicServer.Models;
 
@@ -17,7 +18,7 @@ namespace RobicServer.Data
 
         private readonly IMongoRepository<Exercise> _exerciseRepo;
         private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionRepo;
-        private List<ExerciseDefinition> _userExerciseDefinitions;
+        private IEnumerable<ExerciseDefinition> _userExerciseDefinitions;
         private List<Exercise> _userExercises;
 
         public AnalyticsRepository(
@@ -28,9 +29,9 @@ namespace RobicServer.Data
             _exerciseRepo = exerciseRepo;
             _exerciseDefinitionRepo = exerciseDefinitionRepo;
         }
-        public Analytics GetUserAnalytics(string userId)
+        public async Task<Analytics> GetUserAnalytics(string userId)
         {
-            this.GetUserExercises(userId);
+            GetUserExercises(userId);
             List<AnalyticsItem> muscleGroupFrequency = this.GetMuscleGroupFrequency();
             List<AnalyticsItem> exerciseFrequency = this.GetExerciseFrequency();
 
@@ -59,7 +60,7 @@ namespace RobicServer.Data
                 }
                 else
                 {
-                    ExerciseDefinition def = _userExerciseDefinitions.Find(d => d.Id == defId);
+                    ExerciseDefinition def = _userExerciseDefinitions.FirstOrDefault(d => d.Id == defId);
                     exerciseProgressDict.Add(defId, new ExerciseProgressValue
                     {
                         Id = def.Id,
@@ -74,8 +75,8 @@ namespace RobicServer.Data
             List<AnalyticsItem> exerciseProgress = new List<AnalyticsItem>();
             foreach (KeyValuePair<string, ExerciseProgressValue> progressItem in exerciseProgressDict)
             {
-                ExerciseDefinition def = _userExerciseDefinitions.Find(d => d.Id == progressItem.Value.Id);
-                Exercise firstExercise = _userExercises.Find(ex => ex.Id == def.History?.FirstOrDefault());
+                ExerciseDefinition def = _userExerciseDefinitions.FirstOrDefault(d => d.Id == progressItem.Value.Id);
+                Exercise firstExercise = _userExercises.FirstOrDefault(ex => ex.Id == def.History?.FirstOrDefault());
 
                 double progressPercent = 0.0;
                 if (firstExercise != null)
@@ -100,19 +101,16 @@ namespace RobicServer.Data
         private List<AnalyticsItem> GetExerciseFrequency()
         {
             // Increment muscle group by occurance
-            List<AnalyticsItem> exerciseFrequency = new List<AnalyticsItem>();
-            foreach (var def in _userExerciseDefinitions)
-            {
-                if (def.History != null)
+            List<AnalyticsItem> exerciseFrequency = _userExerciseDefinitions.Select(
+                (def) =>
                 {
-                    exerciseFrequency.Add(new AnalyticsItem()
+                    return new AnalyticsItem
                     {
                         Marker = def.Title,
                         Count = def.History.Count
-                    });
+                    };
                 }
-            }
-            exerciseFrequency.Sort((a, b) => a.Count < b.Count ? 1 : -1);
+            ).OrderByDescending(a => a.Count).ToList();
             return exerciseFrequency;
         }
 
@@ -120,12 +118,12 @@ namespace RobicServer.Data
         {
             // Increment muscle group by occurance
             Dictionary<string, int> muscleGroupFrequency = new Dictionary<string, int>();
-            _userExercises.ForEach(e =>
+            _userExercises.ToList().ForEach(e =>
             {
-                ExerciseDefinition exerciseDefiniton = _userExerciseDefinitions.Find(def => def.Id == e.Definition);
+                ExerciseDefinition exerciseDefiniton = _userExerciseDefinitions.FirstOrDefault(def => def.Id == e.Definition);
                 if (exerciseDefiniton != null && exerciseDefiniton.PrimaryMuscleGroup != null)
                 {
-                    exerciseDefiniton.PrimaryMuscleGroup.ToList().ForEach(m =>
+                    exerciseDefiniton.PrimaryMuscleGroup.ForEach(m =>
                  {
                      if (muscleGroupFrequency.ContainsKey(m))
                      {
@@ -153,18 +151,12 @@ namespace RobicServer.Data
             return muscleGroupFrequencyList;
         }
 
-        // Gets exercises and exercise definitions based on user ID in claims
+        // Gets exercises and exercise definitions based on user ID in claimss
         private void GetUserExercises(string userId)
         {
-            _userExerciseDefinitions = _exerciseDefinitionRepo.AsQueryable().Where(e => e.User == userId).ToList();
-            _userExercises = new List<Exercise>();
-            _userExerciseDefinitions.AsParallel().ForAll(def =>
-            {
-                IQueryable<Exercise> defExercises = _exerciseRepo.AsQueryable().Where(e => e.Definition == def.Id);
-                if (defExercises.Count() != 0 && defExercises != null)
-                    lock (_userExercises)
-                        _userExercises.AddRange(defExercises);
-            });
+            _userExerciseDefinitions = _exerciseDefinitionRepo.FilterBy(e => e.User == userId).ToList();
+            var exericseIds = _userExerciseDefinitions.Select(e => e.Id);
+            _userExercises = _exerciseRepo.FilterBy(e => exericseIds.Contains(e.Definition)).ToList();
         }
     }
 }
