@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Data;
 using RobicServer.Models;
 using RobicServer.Models.DTOs;
 using System.Security.Claims;
@@ -10,6 +9,8 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using MediatR;
+using RobicServer.Command;
 
 namespace RobicServer.Controllers
 {
@@ -19,36 +20,62 @@ namespace RobicServer.Controllers
     {
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
-        private readonly IAuthRepository _repo;
+        private readonly IMediator _mediator;
 
-        public AuthController(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration config)
+        public AuthController(
+            IMapper mapper,
+            IConfiguration config,
+            IMediator mediator
+        )
         {
             _config = config;
             _mapper = mapper;
-            _repo = unitOfWork.AuthRepo;
+            _mediator = mediator;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userDetails)
         {
-            if (await _repo.UserExists(userDetails.Email))
-                return BadRequest($"Email {userDetails.Email} already registered to Robic");
+            User userToRegister = _mapper.Map<User>(userDetails);
+            try
+            {
+                var registeredUser = await _mediator.Send(new RegisterUser
+                {
+                    User = userToRegister,
+                    Password = userDetails.Password
+                });
+                var userForReturn = _mapper.Map<UserForDetailDto>(registeredUser);
 
-            User user = _mapper.Map<User>(userDetails);
-            var createdUser = await _repo.Register(user, userDetails.Password);
-
-            var userForReturn = _mapper.Map<UserForDetailDto>(createdUser);
-
-            return CreatedAtRoute("GetUser", new { controller = "User", id = createdUser.Id }, userForReturn);
+                return CreatedAtRoute("GetUser", new { controller = "User", id = registeredUser.Id }, userForReturn);
+            }
+            catch (System.Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userLoginDetails)
         {
-            User user = await _repo.Login(userLoginDetails.Email.ToLower(), userLoginDetails.Password);
+            var user = await _mediator.Send(new LoginUser
+            {
+                Email = userLoginDetails.Email,
+                Password = userLoginDetails.Password
+            });
             if (user == null)
                 return Unauthorized();
 
+            var userDetails = _mapper.Map<UserForDetailDto>(user);
+
+            return Ok(new
+            {
+                token = GenerateToken(user),
+                userDetails
+            });
+        }
+
+        private string GenerateToken(User user)
+        {
             var claims = new[]{
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Email, user.Email),
@@ -69,14 +96,7 @@ namespace RobicServer.Controllers
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
-
-            var userDetails = _mapper.Map<UserForDetailDto>(user);
-
-            return Ok(new
-            {
-                token = tokenHandler.WriteToken(token),
-                userDetails
-            });
+            return tokenHandler.WriteToken(token);
         }
     }
 }

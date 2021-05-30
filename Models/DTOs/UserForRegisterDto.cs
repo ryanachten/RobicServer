@@ -14,7 +14,7 @@ namespace RobicServer.Models.DTOs
         public string Email { get; set; }
 
         [Required]
-        [StringLength(10, MinimumLength = 4, ErrorMessage = "Password must be between 4 and 10 characters")]
+        [StringLength(20, MinimumLength = 4, ErrorMessage = "Password must be between 4 and 20 characters")]
         public string Password { get; set; }
     }
 }
