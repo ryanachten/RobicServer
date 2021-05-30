@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using MongoDB.Driver;
 using RobicServer.Helpers;
 using RobicServer.Models;
-using RobicServer.Interfaces;
 
 namespace RobicServer.Data
 {
@@ -45,6 +44,15 @@ namespace RobicServer.Data
             Expression<Func<TDocument, TProjected>> projectionExpression)
         {
             return _collection.Find(filterExpression).Project(projectionExpression).ToEnumerable();
+        }
+
+        public virtual Task<IEnumerable<TDocument>> FilterByAsync(
+            Expression<Func<TDocument, bool>> filterExpression)
+        {
+            return Task.Run(() =>
+            {
+                return _collection.Find(filterExpression).ToEnumerable();
+            });
         }
 
         public virtual TDocument FindOne(Expression<Func<TDocument, bool>> filterExpression)

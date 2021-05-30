@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using RobicServer.Models;
 
-namespace RobicServer.Interfaces
+namespace RobicServer.Data
 {
     public interface IMongoRepository<TDocument> where TDocument : IDocument
     {
@@ -17,6 +17,9 @@ namespace RobicServer.Interfaces
         IEnumerable<TProjected> FilterBy<TProjected>(
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, TProjected>> projectionExpression);
+
+        Task<IEnumerable<TDocument>> FilterByAsync(
+            Expression<Func<TDocument, bool>> filterExpression);
 
         TDocument FindOne(Expression<Func<TDocument, bool>> filterExpression);
 

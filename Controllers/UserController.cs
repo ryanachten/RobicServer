@@ -1,11 +1,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Interfaces;
-using RobicServer.Models;
 using AutoMapper;
 using RobicServer.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using MediatR;
+using RobicServer.Query;
+using RobicServer.Command;
 
 namespace RobicServer.Controllers
 {
@@ -15,18 +16,15 @@ namespace RobicServer.Controllers
     public class UserController : ControllerBase
     {
         private readonly IMapper _mapper;
-        private readonly IUserRepository _userRepo;
+        private readonly IMediator _mediator;
 
         public UserController(
-            IUnitOfWork unitOfWork,
-            IUserRepository userRepo,
-            IMongoRepository<Exercise> exerciseRepo,
-            IMongoRepository<ExerciseDefiniton> exerciseDefinitionRepo,
-            IMapper mapper
+            IMapper mapper,
+            IMediator mediator
         )
         {
             _mapper = mapper;
-            _userRepo = unitOfWork.UserRepo;
+            _mediator = mediator;
         }
 
         [HttpGet("{id:length(24)}", Name = "GetUser")]
@@ -36,7 +34,10 @@ namespace RobicServer.Controllers
             if (userId != id)
                 return Unauthorized();
 
-            User user = await _userRepo.GetUser(id);
+            var user = await _mediator.Send(new GetUserById
+            {
+                UserId = id
+            });
 
             if (user == null)
                 return NotFound();
@@ -52,11 +53,17 @@ namespace RobicServer.Controllers
             if (userId != id)
                 return Unauthorized();
 
-            User user = await _userRepo.GetUser(id);
+            var user = await _mediator.Send(new GetUserById
+            {
+                UserId = id
+            });
             if (user == null)
                 return NotFound();
 
-            await _userRepo.DeleteUser(user);
+            await _mediator.Send(new DeleteUser
+            {
+                User = user
+            });
 
             return NoContent();
         }

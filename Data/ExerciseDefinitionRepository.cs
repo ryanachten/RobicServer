@@ -1,24 +1,23 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RobicServer.Models;
-using RobicServer.Interfaces;
 
 namespace RobicServer.Data
 {
     public class ExerciseDefinitionRepository : IExerciseDefinitionRepository
     {
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
+        private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionContext;
         private readonly IMongoRepository<Exercise> _exerciseContext;
         private readonly IMongoRepository<User> _userContext;
 
-        public ExerciseDefinitionRepository(IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext, IMongoRepository<Exercise> exerciseContext, IMongoRepository<User> userContext)
+        public ExerciseDefinitionRepository(IMongoRepository<ExerciseDefinition> exerciseDefinitionContext, IMongoRepository<Exercise> exerciseContext, IMongoRepository<User> userContext)
         {
             _exerciseDefinitionContext = exerciseDefinitionContext;
             _exerciseContext = exerciseContext;
             _userContext = userContext;
         }
 
-        public async Task CreateDefinition(string userId, ExerciseDefiniton definition)
+        public async Task<ExerciseDefinition> CreateDefinition(string userId, ExerciseDefinition definition)
         {
             await _exerciseDefinitionContext.InsertOneAsync(definition);
 
@@ -26,44 +25,41 @@ namespace RobicServer.Data
             User user = await _userContext.FindByIdAsync(userId);
             user.Exercises.Add(definition.Id);
             await _userContext.ReplaceOneAsync(user);
+            return definition;
         }
 
-        public async Task DeleteDefinition(string userId, string id)
+        public async Task DeleteDefinition(ExerciseDefinition definition)
         {
-            await _exerciseDefinitionContext.DeleteByIdAsync(id);
+            await _exerciseDefinitionContext.DeleteByIdAsync(definition.Id);
 
             // Remove definition from user exercises
-            User user = await _userContext.FindByIdAsync(userId);
-            user.Exercises.Remove(id);
+            User user = await _userContext.FindByIdAsync(definition.User);
+            user.Exercises.Remove(definition.Id);
             await _userContext.ReplaceOneAsync(user);
 
             // Remove exercises associated with definition
-            await _exerciseContext.DeleteManyAsync(e => e.Definition == id);
+            await _exerciseContext.DeleteManyAsync(e => e.Definition == definition.Id);
         }
 
-        public async Task<ExerciseDefiniton> GetExerciseDefinition(string id)
+        public async Task<ExerciseDefinition> GetExerciseDefinition(string id)
         {
             return await _exerciseDefinitionContext.FindByIdAsync(id);
         }
 
-        public IEnumerable<ExerciseDefiniton> GetUserDefinitions(string userId)
+        public Task<IEnumerable<ExerciseDefinition>> GetUserDefinitions(string userId)
         {
-            return _exerciseDefinitionContext.FilterBy(defintion => defintion.User == userId);
+            return _exerciseDefinitionContext.FilterByAsync(defintion => defintion.User == userId);
         }
 
-        public async Task<bool> IsUsersDefinition(string userId, string definitionId)
-        {
-            ExerciseDefiniton definiton = await _exerciseDefinitionContext.FindByIdAsync(definitionId);
-            return definiton != null && definiton.User == userId;
-        }
-
-        public async Task UpdateDefinition(ExerciseDefiniton existingDefinition, ExerciseDefiniton updatedDefinition)
+        public async Task<ExerciseDefinition> UpdateDefinition(ExerciseDefinition existingDefinition, ExerciseDefinition updatedDefinition)
         {
             existingDefinition.Title = updatedDefinition.Title;
             existingDefinition.Unit = updatedDefinition.Unit;
             existingDefinition.PrimaryMuscleGroup = updatedDefinition.PrimaryMuscleGroup;
 
             await _exerciseDefinitionContext.ReplaceOneAsync(existingDefinition);
+
+            return existingDefinition;
         }
     }
 }

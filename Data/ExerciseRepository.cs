@@ -4,22 +4,21 @@ using System.Linq;
 using System.Threading.Tasks;
 using RobicServer.Helpers;
 using RobicServer.Models;
-using RobicServer.Interfaces;
 
 namespace RobicServer.Data
 {
     public class ExerciseRepository : IExerciseRepository
     {
         private readonly IMongoRepository<Exercise> _exerciseContext;
-        private readonly IMongoRepository<ExerciseDefiniton> _exerciseDefinitionContext;
+        private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionContext;
 
-        public ExerciseRepository(IMongoRepository<Exercise> exerciseContext, IMongoRepository<ExerciseDefiniton> exerciseDefinitionContext)
+        public ExerciseRepository(IMongoRepository<Exercise> exerciseContext, IMongoRepository<ExerciseDefinition> exerciseDefinitionContext)
         {
             _exerciseContext = exerciseContext;
             _exerciseDefinitionContext = exerciseDefinitionContext;
         }
 
-        public async Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefiniton definition)
+        public async Task<Exercise> CreateExercise(Exercise exercise, ExerciseDefinition definition)
         {
             exercise.Date = DateTime.Now;
 
@@ -40,7 +39,7 @@ namespace RobicServer.Data
             return exercise;
         }
 
-        public async Task DeleteExercise(string id, ExerciseDefiniton definiton)
+        public async Task DeleteExercise(string id, ExerciseDefinition definiton)
         {
             await _exerciseContext.DeleteByIdAsync(id);
 
@@ -49,12 +48,10 @@ namespace RobicServer.Data
             await _exerciseDefinitionContext.ReplaceOneAsync(definiton);
         }
 
-        public List<Exercise> GetDefinitionExercises(string definitionId)
+        public Task<IEnumerable<Exercise>> GetDefinitionExercises(string definitionId)
         {
             // Filter exercises to only those  associated with the user's definitions
-            var exercises = _exerciseContext.AsQueryable()
-                .Where(exercise => exercise.Definition == definitionId).ToList();
-            return exercises;
+            return _exerciseContext.FilterByAsync(exercise => exercise.Definition == definitionId);
         }
 
         public async Task<Exercise> GetExerciseById(string id)
@@ -62,9 +59,9 @@ namespace RobicServer.Data
             return await _exerciseContext.FindByIdAsync(id);
         }
 
-        public PersonalBest GetPersonalBest(string definitionId)
+        public async Task<PersonalBest> GetPersonalBest(string definitionId)
         {
-            var exercises = GetDefinitionExercises(definitionId);
+            var exercises = await GetDefinitionExercises(definitionId);
             if (exercises == null || exercises.Count() == 0)
             {
                 return null;
@@ -114,9 +111,10 @@ namespace RobicServer.Data
             };
         }
 
-        public async Task UpdateExercise(Exercise updatedExercise)
+        public async Task<Exercise> UpdateExercise(Exercise updatedExercise)
         {
             await _exerciseContext.ReplaceOneAsync(updatedExercise);
+            return updatedExercise;
         }
 
         private PersonalBestHistory GetPersonalBestHistory(Exercise exercise)
