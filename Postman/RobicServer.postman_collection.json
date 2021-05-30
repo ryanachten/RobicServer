@@ -9,13 +9,13 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Login",
+					"name": "Login User",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"ryan@test.com\",\n    \"password\": \"Password1\"\n}",
+							"raw": "{\n    \"email\": \"email here\",\n    \"password\": \"Password here\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -36,13 +36,13 @@
 					"response": []
 				},
 				{
-					"name": "Register",
+					"name": "Register User",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \n}",
+							"raw": "{\n    \"firstName\": \"Ryan\",\n    \"lastName\": \"Test\",\n    \"email\": \"ryan@test231.com\",\n    \"password\": \"Password123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -50,12 +50,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{url}}/api/auth/register",
+							"raw": "{{url}}/auth/register",
 							"host": [
 								"{{url}}"
 							],
 							"path": [
-								"api",
 								"auth",
 								"register"
 							]
@@ -345,7 +344,7 @@
 		},
 		{
 			"key": "token",
-			"value": "add-token-here"
+			"value": "auth token"
 		}
 	]
 }
