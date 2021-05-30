@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
-using RobicServer.Data;
-using RobicServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using MediatR;
+using RobicServer.Query;
 
 namespace RobicServer.Controllers
 {
@@ -13,20 +13,23 @@ namespace RobicServer.Controllers
     [ApiController]
     public class AnalyticsController : ControllerBase
     {
-        private readonly IAnalyticsRepository _analyticsRepo;
+        private readonly IMediator _mediator;
 
         public AnalyticsController(
-            IUnitOfWork unitOfWork
+            IMediator mediator
         )
         {
-            _analyticsRepo = unitOfWork.AnalyticsRepo;
+            _mediator = mediator;
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            Analytics analytics = _analyticsRepo.GetUserAnalytics(userId);
+            var analytics = await _mediator.Send(new GetAnalytics
+            {
+                UserId = userId
+            });
             return Ok(analytics);
         }
     }
