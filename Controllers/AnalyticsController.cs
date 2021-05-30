@@ -23,10 +23,10 @@ namespace RobicServer.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public IActionResult Get()
         {
             string userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            Analytics analytics = await _analyticsRepo.GetUserAnalytics(userId);
+            Analytics analytics = _analyticsRepo.GetUserAnalytics(userId);
             return Ok(analytics);
         }
     }

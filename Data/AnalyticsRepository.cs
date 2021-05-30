@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using RobicServer.Helpers;
 using RobicServer.Models;
 
@@ -18,7 +18,7 @@ namespace RobicServer.Data
 
         private readonly IMongoRepository<Exercise> _exerciseRepo;
         private readonly IMongoRepository<ExerciseDefinition> _exerciseDefinitionRepo;
-        private IEnumerable<ExerciseDefinition> _userExerciseDefinitions;
+        private List<ExerciseDefinition> _userExerciseDefinitions;
         private List<Exercise> _userExercises;
 
         public AnalyticsRepository(
@@ -29,7 +29,7 @@ namespace RobicServer.Data
             _exerciseRepo = exerciseRepo;
             _exerciseDefinitionRepo = exerciseDefinitionRepo;
         }
-        public async Task<Analytics> GetUserAnalytics(string userId)
+        public Analytics GetUserAnalytics(string userId)
         {
             GetUserExercises(userId);
             List<AnalyticsItem> muscleGroupFrequency = this.GetMuscleGroupFrequency();
@@ -47,35 +47,11 @@ namespace RobicServer.Data
 
         private List<AnalyticsItem> GetExerciseProgress()
         {
-            Dictionary<string, ExerciseProgressValue> exerciseProgressDict = new Dictionary<string, ExerciseProgressValue>();
-            foreach (var e in _userExercises)
+            List<AnalyticsItem> exerciseProgress = _userExercises.GroupBy(e => e.Definition).Select(g =>
             {
-                string defId = e.Definition;
-                if (exerciseProgressDict.ContainsKey(defId))
-                {
-                    ExerciseProgressValue val = exerciseProgressDict[defId];
-                    val.Total += ExerciseUtilities.GetNetExerciseValue(e);
-                    val.NumberOfSessions += 1;
-                    exerciseProgressDict[defId] = val;
-                }
-                else
-                {
-                    ExerciseDefinition def = _userExerciseDefinitions.FirstOrDefault(d => d.Id == defId);
-                    exerciseProgressDict.Add(defId, new ExerciseProgressValue
-                    {
-                        Id = def.Id,
-                        Title = def.Title,
-                        Total = ExerciseUtilities.GetNetExerciseValue(e),
-                        NumberOfSessions = 1
-                    });
-                }
-            }
-
-            // Convert dict to analytics list
-            List<AnalyticsItem> exerciseProgress = new List<AnalyticsItem>();
-            foreach (KeyValuePair<string, ExerciseProgressValue> progressItem in exerciseProgressDict)
-            {
-                ExerciseDefinition def = _userExerciseDefinitions.FirstOrDefault(d => d.Id == progressItem.Value.Id);
+                ExerciseDefinition def = _userExerciseDefinitions.FirstOrDefault(d => d.Id == g.First().Definition);
+                var total = g.Sum(t => (double)t.NetValue);
+                var numberOfSessions = g.Count();
                 Exercise firstExercise = _userExercises.FirstOrDefault(ex => ex.Id == def.History?.FirstOrDefault());
 
                 double progressPercent = 0.0;
@@ -84,17 +60,15 @@ namespace RobicServer.Data
                     double initialNetValue = ExerciseUtilities.GetNetExerciseValue(firstExercise);
 
                     // Progress percent = average net value - initial net value
-                    progressPercent = (progressItem.Value.Total / progressItem.Value.NumberOfSessions) - initialNetValue;
+                    progressPercent = (total / numberOfSessions) - initialNetValue;
                 }
-
-
-                exerciseProgress.Add(new AnalyticsItem
+                return new AnalyticsItem
                 {
-                    Marker = progressItem.Value.Title,
+                    Marker = def.Title,
                     Count = progressPercent,
-                });
-            }
-            exerciseProgress.Sort((a, b) => a.Count < b.Count ? 1 : -1);
+                };
+            }).OrderByDescending(a => a.Count).ToList();
+
             return exerciseProgress;
         }
 
@@ -118,23 +92,20 @@ namespace RobicServer.Data
         {
             // Increment muscle group by occurance
             Dictionary<string, int> muscleGroupFrequency = new Dictionary<string, int>();
-            _userExercises.ToList().ForEach(e =>
+            _userExercises.GroupBy(e => e.Definition).ToList().ForEach(g =>
             {
-                ExerciseDefinition exerciseDefiniton = _userExerciseDefinitions.FirstOrDefault(def => def.Id == e.Definition);
-                if (exerciseDefiniton != null && exerciseDefiniton.PrimaryMuscleGroup != null)
-                {
-                    exerciseDefiniton.PrimaryMuscleGroup.ForEach(m =>
+                ExerciseDefinition exerciseDefiniton = _userExerciseDefinitions.FirstOrDefault(def => def.Id == g.First().Definition);
+                exerciseDefiniton.PrimaryMuscleGroup.ForEach(m =>
                  {
                      if (muscleGroupFrequency.ContainsKey(m))
                      {
-                         muscleGroupFrequency[m] += 1;
+                         muscleGroupFrequency[m] += g.Count();
                      }
                      else
                      {
-                         muscleGroupFrequency.Add(m, 1);
+                         muscleGroupFrequency.Add(m, g.Count());
                      }
                  });
-                }
             });
 
             // Convert dictionary to analytics list

@@ -5,6 +5,6 @@ namespace RobicServer.Data
 {
     public interface IAnalyticsRepository
     {
-        Task<Analytics> GetUserAnalytics(string userId);
+        Analytics GetUserAnalytics(string userId);
     }
 }
