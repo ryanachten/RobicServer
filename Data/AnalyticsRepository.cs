@@ -127,6 +127,7 @@ namespace RobicServer.Data
         private void GetUserExercises(string userId)
         {
             _userExerciseDefinitions = _exerciseDefinitionRepo.FilterBy(e => e.User == userId).ToList();
+
             var exericseIds = _userExerciseDefinitions.Select(e => e.Id);
             _userExercises = _exerciseRepo.FilterBy(e => exericseIds.Contains(e.Definition)).ToList();
         }
