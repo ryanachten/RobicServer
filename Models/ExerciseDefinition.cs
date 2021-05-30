@@ -49,7 +49,19 @@ namespace RobicServer.Models
 
         [BsonElement("primaryMuscleGroup")]
         [BsonRepresentation(BsonType.String)]
-        public List<string> PrimaryMuscleGroup { get; set; }
+        private List<string> primaryMuscleGroup;
+        public List<string> PrimaryMuscleGroup
+        {
+            get
+            {
+                if (primaryMuscleGroup == null)
+                {
+                    primaryMuscleGroup = new List<string>();
+                }
+                return primaryMuscleGroup;
+            }
+            set { primaryMuscleGroup = value; }
+        }
 
 #nullable enable
         // Computed properties
