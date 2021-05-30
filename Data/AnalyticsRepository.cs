@@ -50,9 +50,10 @@ namespace RobicServer.Data
             List<AnalyticsItem> exerciseProgress = _userExercises.GroupBy(e => e.Definition).Select(g =>
             {
                 ExerciseDefinition def = _userExerciseDefinitions.FirstOrDefault(d => d.Id == g.First().Definition);
+                Exercise firstExercise = _userExercises.FirstOrDefault(ex => ex.Id == def.History?.FirstOrDefault());
+
                 var total = g.Sum(t => (double)t.NetValue);
                 var numberOfSessions = g.Count();
-                Exercise firstExercise = _userExercises.FirstOrDefault(ex => ex.Id == def.History?.FirstOrDefault());
 
                 double progressPercent = 0.0;
                 if (firstExercise != null)
