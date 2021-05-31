@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using RobicServer.Data;
+using RobicServer.Services;
 
 namespace RobicServer
 {
@@ -32,6 +33,7 @@ namespace RobicServer
             services.AddScoped<IExerciseRepository, ExerciseRepository>();
             services.AddScoped<IExerciseDefinitionRepository, ExerciseDefinitionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IPredictionService, PredictionService>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
