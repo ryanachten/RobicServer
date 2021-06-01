@@ -5,3 +5,4 @@
 bin/*
 obj/*
 startup.sh
+lauchSettings.json
