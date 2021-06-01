@@ -7,8 +7,10 @@ namespace RobicServer.Models
     {
         public string ExerciseId { get; set; }
         public DateTime Date { get; set; }
+        [ColumnName("NetValue")]
         public double NetValue { get; set; }
-        public int IsTrainingInput { get; set; }
+        [ColumnName("IsTrainingInput")]
+        public double IsTrainingInput { get; set; }
 
     }
 }
