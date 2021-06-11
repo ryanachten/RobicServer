@@ -37,13 +37,12 @@ namespace RobicServer.Controllers
             return Ok(analytics);
         }
 
-        [HttpGet("predict")]
-        public async Task<IActionResult> Predict()
+        [HttpGet("predict/{id}")]
+        public async Task<IActionResult> Predict(string id)
         {
-            string definitionId = "5d0dac4391c2894536e6480d";
-
-            _predictor.PredictNetValue(definitionId);
-            return Ok("predict!");
+            // TODO: prediction service should be called via MediatR
+            var results = await _predictor.PredictNetValue(id);
+            return Ok(results);
         }
     }
 }

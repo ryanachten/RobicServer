@@ -1,7 +1,9 @@
-﻿namespace RobicServer.Services
+﻿using System.Threading.Tasks;
+
+namespace RobicServer.Services
 {
     public interface IPredictionService
     {
-        public void PredictNetValue(string definitionId);
+        public Task<object> PredictNetValue(string definitionId);
     }
 }

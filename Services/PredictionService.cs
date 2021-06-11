@@ -6,6 +6,7 @@ using RobicServer.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RobicServer.Services
 {
@@ -20,7 +21,7 @@ namespace RobicServer.Services
             _mediator = mediator;
         }
 
-        public async void PredictNetValue(string definitionId)
+        public async Task<object> PredictNetValue(string definitionId)
         {
             IEnumerable<Exercise> exercises = await _mediator.Send(new GetExercisesByDefinition()
             {
@@ -35,6 +36,19 @@ namespace RobicServer.Services
                 IsTrainingInput = e.Date.Year < 2021 ? 1 : 0
             });
 
+            // TODO improve this exception handling
+            // basically, we don't want to proceed if there is no data to predict or evaluate from  
+            var trainingSetCount = inputs.Where(i => i.IsTrainingInput == 1).Count();
+            var evalSetCount = inputs.Where(i => i.IsTrainingInput == 0).Count();
+            if(trainingSetCount == 0 || evalSetCount == 0)
+            {
+                return null;
+            }
+            Console.WriteLine("---------------------");
+            Console.WriteLine($"Training Data: {trainingSetCount}, Eval data: {evalSetCount}");
+            Console.WriteLine("---------------------");
+
+
             IDataView dataView = _mlContext.Data.LoadFromEnumerable(inputs);
             IDataView trainingData = _mlContext.Data.FilterRowsByColumn(dataView, "IsTrainingInput", upperBound: 1);
             IDataView evaluationData = _mlContext.Data.FilterRowsByColumn(dataView, "IsTrainingInput", lowerBound: 1);
@@ -42,9 +56,9 @@ namespace RobicServer.Services
             var forecastingPipeline = _mlContext.Forecasting.ForecastBySsa(
                 outputColumnName: "ForecastedNetValue",
                 inputColumnName: "NetValue",
-                windowSize: 7, // analyzed on a weekly basis
-                seriesLength: 30, // monthly intervals
-                trainSize: 365, // 365 data points for the first year
+                windowSize: 2, // analyzed on a 2 day basis
+                seriesLength: 7, // weekly intervals
+                trainSize: trainingSetCount,
                 horizon: 7, // forecast 7 periods into the future
                 confidenceLevel: 0.95f,
                 confidenceLowerBoundColumn: "LowerBoundNetValue",
@@ -52,10 +66,10 @@ namespace RobicServer.Services
 
             SsaForecastingTransformer forecaster = forecastingPipeline.Fit(trainingData);
 
-            Evaluate(evaluationData, forecaster);
+            return Evaluate(evaluationData, forecaster);
         }
 
-        void Evaluate(IDataView testData, ITransformer model)
+        object Evaluate(IDataView testData, ITransformer model)
         {
             IDataView predictions = model.Transform(testData);
             
@@ -66,19 +80,26 @@ namespace RobicServer.Services
                 .Select(prediction => prediction.ForecastedNetValue[0]);
 
             // Calculate the error (difference between actual and forecast)
+            Console.WriteLine("Actual vs Forecast");
             var metrics = actual.Zip(forecast, (actualValue, forecastValue) => {
                 Console.WriteLine($"actualValue: {actualValue}, forecastValue: {forecastValue}");
                 return actualValue - forecastValue;
             });
 
-
             var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
             var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error
-
+            
+            Console.WriteLine("---------------------");
             Console.WriteLine("Evaluation Metrics");
             Console.WriteLine("---------------------");
             Console.WriteLine($"Mean Absolute Error: {MAE:F3}");
             Console.WriteLine($"Root Mean Squared Error: {RMSE:F3}\n");
+
+            return new
+            {
+                MAE = MAE,
+                RMSE = RMSE
+            };
         }
     }
 }
