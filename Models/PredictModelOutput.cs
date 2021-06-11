@@ -2,9 +2,9 @@
 {
     public class PredictModelOutput
     {
-        public double[] ForecastedNetValue { get; set; }
-        public double[] LowerBoundNetValue { get; set; }
-        public double[] UpperBoundNetValue { get; set; }
+        public float[] ForecastedNetValue { get; set; }
+        public float[] LowerBoundNetValue { get; set; }
+        public float[] UpperBoundNetValue { get; set; }
 
     }
 }

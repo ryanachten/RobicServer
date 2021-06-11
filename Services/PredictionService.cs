@@ -31,7 +31,7 @@ namespace RobicServer.Services
             {
                 ExerciseId = e.Id,
                 Date = e.Date,
-                NetValue = (double)e.NetValue,
+                NetValue = (float)e.NetValue,
                 IsTrainingInput = e.Date.Year < 2021 ? 1 : 0
             });
 
@@ -52,21 +52,25 @@ namespace RobicServer.Services
 
             SsaForecastingTransformer forecaster = forecastingPipeline.Fit(trainingData);
 
-            //Evaluate(evaluationData, forecaster);
+            Evaluate(evaluationData, forecaster);
         }
 
         void Evaluate(IDataView testData, ITransformer model)
         {
             IDataView predictions = model.Transform(testData);
             
-            IEnumerable<double> actual = _mlContext.Data.CreateEnumerable<PredictModelInput>(testData, true)
+            IEnumerable<float> actual = _mlContext.Data.CreateEnumerable<PredictModelInput>(testData, true)
                 .Select(observed => observed.NetValue);
 
-            IEnumerable<double> forecast = _mlContext.Data.CreateEnumerable<PredictModelOutput>(predictions, true)
+            IEnumerable<float> forecast = _mlContext.Data.CreateEnumerable<PredictModelOutput>(predictions, true)
                 .Select(prediction => prediction.ForecastedNetValue[0]);
 
             // Calculate the error (difference between actual and forecast)
-            var metrics = actual.Zip(forecast, (actualValue, forecastValue) => actualValue - forecastValue);
+            var metrics = actual.Zip(forecast, (actualValue, forecastValue) => {
+                Console.WriteLine($"actualValue: {actualValue}, forecastValue: {forecastValue}");
+                return actualValue - forecastValue;
+            });
+
 
             var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
             var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error

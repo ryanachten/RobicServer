@@ -8,9 +8,9 @@ namespace RobicServer.Models
         public string ExerciseId { get; set; }
         public DateTime Date { get; set; }
         [ColumnName("NetValue")]
-        public double NetValue { get; set; }
+        public float NetValue { get; set; }
         [ColumnName("IsTrainingInput")]
-        public double IsTrainingInput { get; set; }
+        public float IsTrainingInput { get; set; }
 
     }
 }
