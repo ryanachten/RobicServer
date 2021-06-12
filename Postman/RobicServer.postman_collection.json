@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "1c6a21c2-5527-4ced-a11d-3fd23a48ee6f",
+		"_postman_id": "4d49ce10-6b49-4771-acc2-ddd1da4c7f95",
 		"name": "RobicServer",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -301,6 +301,110 @@
 					],
 					"path": [
 						"analytics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Predict",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const res = pm.response.json();\r",
+							"const vizData = {\r",
+							"    \r",
+							"    labels: res.actualResults.map((val, index) => index),\r",
+							"    actualResults: res.actualResults,\r",
+							"    forecastedResults: res.forecastedResults\r",
+							"};\r",
+							"\r",
+							"var template = `\r",
+							"<canvas id=\"myChart\" height=\"150\"></canvas>\r",
+							"\r",
+							"<script src=\"https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js\"></script> \r",
+							"\r",
+							"<script>\r",
+							"    var ctx = document.getElementById(\"myChart\");\r",
+							"\r",
+							"    var myChart = new Chart(ctx, {\r",
+							"        type: \"line\",\r",
+							"        data: {\r",
+							"            labels: [],\r",
+							"            datasets: [{\r",
+							"                label: '',\r",
+							"                data: [],\r",
+							"                backgroundColor: \"#3e95cd\",\r",
+							"\t\t\t\t\tborderColor: \"blue\",\r",
+							"\t\t\t\t\tfill: false,         \r",
+							"                },\r",
+							"                {\r",
+							"                    label: '',\r",
+							"                    data: [],\r",
+							"                    backgroundColor: \"#3e95cd\",\r",
+							"                        borderColor: \"red\",\r",
+							"                        fill: false,         \r",
+							"                    }\r",
+							"            ]\r",
+							"        },\r",
+							"        options: {\r",
+							"            legend: { display: false },\r",
+							"            title: {\r",
+							"                display: true,\r",
+							"                text: ''\r",
+							"            },\r",
+							"            scales: {\r",
+							"                xAxes: [{\r",
+							"                    display: true,\r",
+							"                    scaleLabel: {\r",
+							"                        display: true,\r",
+							"                        labelString: 'Session'\r",
+							"                    }\r",
+							"                }],\r",
+							"                yAxes: [{\r",
+							"                    display: true,\r",
+							"                    scaleLabel: {\r",
+							"                        display: true,\r",
+							"                        labelString: 'NetValue'\r",
+							"                    }\r",
+							"                }]\r",
+							"            }\r",
+							"        }\r",
+							"\r",
+							"    });\r",
+							"\r",
+							"    // Access the data passed to pm.visualizer.set() from the JavaScript\r",
+							"    // code of the Visualizer template\r",
+							"    pm.getData(function (err, value) {\r",
+							"        myChart.data.datasets[0].label = value.labels\r",
+							"        myChart.data.datasets[0].data = value.actualResults;\r",
+							"        myChart.data.datasets[1].label = value.labels\r",
+							"        myChart.data.datasets[1].data = value.forecastedResults;\r",
+							"        myChart.data.labels = value.labels;\r",
+							"        myChart.update();\r",
+							"    });\r",
+							"</script>`;\r",
+							"\r",
+							"pm.visualizer.set(template, vizData);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/analytics/predict/5d0fd1a337efa80017a58fd1",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"analytics",
+						"predict",
+						"5d0fd1a337efa80017a58fd1"
 					]
 				}
 			},

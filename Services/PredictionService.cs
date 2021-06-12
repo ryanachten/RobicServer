@@ -21,7 +21,7 @@ namespace RobicServer.Services
             _mediator = mediator;
         }
 
-        public async Task<object> PredictNetValue(string definitionId)
+        public async Task<PredictedResults> PredictNetValue(string definitionId)
         {
             IEnumerable<Exercise> exercises = await _mediator.Send(new GetExercisesByDefinition()
             {
@@ -44,10 +44,6 @@ namespace RobicServer.Services
             {
                 return null;
             }
-            Console.WriteLine("---------------------");
-            Console.WriteLine($"Training Data: {trainingSetCount}, Eval data: {evalSetCount}");
-            Console.WriteLine("---------------------");
-
 
             IDataView dataView = _mlContext.Data.LoadFromEnumerable(inputs);
             IDataView trainingData = _mlContext.Data.FilterRowsByColumn(dataView, "IsTrainingInput", upperBound: 1);
@@ -66,10 +62,19 @@ namespace RobicServer.Services
 
             SsaForecastingTransformer forecaster = forecastingPipeline.Fit(trainingData);
 
-            return Evaluate(evaluationData, forecaster);
+            var results = Evaluate(evaluationData, forecaster);
+
+            var forecasterEngine = forecaster.CreateTimeSeriesEngine<PredictModelInput, PredictModelOutput>(_mlContext);
+            var predictionResults = Forecast(forecasterEngine, evaluationData, 7);
+
+            results.EvaluationSetCount = evalSetCount;
+            results.TrainingSetCount = trainingSetCount;
+            results.PredictionResults = predictionResults;
+
+            return results;
         }
 
-        object Evaluate(IDataView testData, ITransformer model)
+        PredictedResults Evaluate(IDataView testData, ITransformer model)
         {
             IDataView predictions = model.Transform(testData);
             
@@ -80,26 +85,49 @@ namespace RobicServer.Services
                 .Select(prediction => prediction.ForecastedNetValue[0]);
 
             // Calculate the error (difference between actual and forecast)
-            Console.WriteLine("Actual vs Forecast");
-            var metrics = actual.Zip(forecast, (actualValue, forecastValue) => {
-                Console.WriteLine($"actualValue: {actualValue}, forecastValue: {forecastValue}");
-                return actualValue - forecastValue;
-            });
+            var metrics = actual.Zip(forecast, (actualValue, forecastValue) => actualValue - forecastValue);
 
             var MAE = metrics.Average(error => Math.Abs(error)); // Mean Absolute Error
             var RMSE = Math.Sqrt(metrics.Average(error => Math.Pow(error, 2))); // Root Mean Squared Error
-            
-            Console.WriteLine("---------------------");
-            Console.WriteLine("Evaluation Metrics");
-            Console.WriteLine("---------------------");
-            Console.WriteLine($"Mean Absolute Error: {MAE:F3}");
-            Console.WriteLine($"Root Mean Squared Error: {RMSE:F3}\n");
 
-            return new
+            return new PredictedResults
             {
-                MAE = MAE,
-                RMSE = RMSE
+                MeanAbsoluteError = MAE,
+                RootMeanSquaredError = RMSE,
+                ActualResults = actual,
+                ForecastedResults = forecast,
             };
+        }
+
+        private PredictModelOutput Forecast(TimeSeriesPredictionEngine<PredictModelInput, PredictModelOutput> forecaster, IDataView testData, int horizon)
+        {
+           var forecast = forecaster.Predict();
+
+            IEnumerable<string> forecastOutput = _mlContext.Data.CreateEnumerable<PredictModelInput>(testData, reuseRowObject: false)
+            .Take(horizon)
+            .Select((PredictModelInput exercise, int index) =>
+            {
+                // TODO: dates don't align with what we're expecitng here - investigate
+                string date = exercise.Date.ToShortDateString();
+                float actualNetValue = exercise.NetValue;
+                float lowerEstimate = Math.Max(0, forecast.LowerBoundNetValue[index]);
+                float estimate = forecast.ForecastedNetValue[index];
+                float upperEstimate = forecast.UpperBoundNetValue[index];
+                return $"Date: {date}\n" +
+                $"Actual NetValue: {actualNetValue}\n" +
+                $"Lower Estimate: {lowerEstimate}\n" +
+                $"Forecast: {estimate}\n" +
+                $"Upper Estimate: {upperEstimate}\n";
+            });
+
+            Console.WriteLine("Exercise Forecast");
+            Console.WriteLine("---------------------");
+            foreach (var prediction in forecastOutput)
+            {
+                Console.WriteLine(prediction);
+            }
+
+            return forecast;
         }
     }
 }

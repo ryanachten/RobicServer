@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "RobicServer": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "TokenKey": "%2h2BRm4zuv*eKyCY&7b",
+        "DatabaseName": "robic",
+        "ConnectionString": "mongodb+srv://RyanAchten:3N9MqKVNQDGbyaQ@robic.40vtg.mongodb.net/robic?retryWrites=true&w=majority" 
+      }
+    }
+  }
+}
