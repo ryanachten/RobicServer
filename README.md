@@ -32,7 +32,7 @@ RobicServer is divided into three layers:
 - The **service layer** comprised predominantly of Mediator queries and commands
 - The **repository layer** which functions as a data access layer to the MongoDB database
 
-![Robic Workout User Flow](./info/images/Robic_Flow_1.jpg "Robic Workout User Flow")
+![Robic Workout User Flow](./Info/images/Robic_Flow_1.jpg "Robic Workout User Flow")
 
 ## Developing with RobicServer
 
@@ -70,6 +70,6 @@ Steps:
 - Point ngrok at localhost: `ngrok http https://localhost:5001`
 - Use forwarding address printed by ngrok as API URL for React Native local development
 
-![Robic Analytics User Flow](./info/images/Robic_Flow_3.jpg "Robic Analytics User Flow")
+![Robic Analytics User Flow](./Info/images/Robic_Flow_3.jpg "Robic Analytics User Flow")
 
 Developed and designed by Ryan Achten
