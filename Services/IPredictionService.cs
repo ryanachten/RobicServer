@@ -5,6 +5,8 @@ namespace RobicServer.Services
 {
     public interface IPredictionService
     {
-        public Task<PredictedResults> PredictNetValue(string definitionId);
+        public Task<PredictedResults> ForecastNetValue(string definitionId);
+        public Task RegressionNetValue(string definitionId);
+
     }
 }

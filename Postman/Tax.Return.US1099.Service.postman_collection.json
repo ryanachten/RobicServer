@@ -1,0 +1,487 @@
+{
+	"info": {
+		"_postman_id": "33b330ef-1203-4293-9e76-a0eb11893196",
+		"name": "Tax.Return.US1099.Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/ping",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Identity token (Local)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "username",
+							"value": "xero_business_us1099",
+							"type": "string"
+						},
+						{
+							"key": "password",
+							"value": "secret",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "scope",
+							"value": "xero_all-apis",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://identity.doublebadger.xero-test.com/connect/token",
+					"protocol": "https",
+					"host": [
+						"identity",
+						"doublebadger",
+						"xero-test",
+						"com"
+					],
+					"path": [
+						"connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Identity token (XeroWeb)",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "secret",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "xero_identity_test-client",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "scope",
+							"value": "xero_identity_test",
+							"type": "text"
+						},
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://integration-identity.xero-uat.com/connect/token",
+					"protocol": "https",
+					"host": [
+						"integration-identity",
+						"xero-uat",
+						"com"
+					],
+					"path": [
+						"connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Secure Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/secureping",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"secureping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report Summary",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{url}}/reports/2021",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"reports",
+						"2021"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Report Summary Stored Proc",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{url}}/reports/sp/2021",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"reports",
+						"sp",
+						"2021"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Form Types",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{url}}/report/summary/2020",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"report",
+						"summary",
+						"2020"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Contacts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{url}}/contacts?page=1&pageSize=50&filter=IS_1099_CONTACTS",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"contacts"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "50"
+						},
+						{
+							"key": "filter",
+							"value": "IS_1099_CONTACTS"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Business Types",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{url}}/contacts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save Contact",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"contactID\": \"756a8a03-9dc0-466d-9c6c-964f2114ce4e\",\r\n    \"name\": \"Test\",\r\n    \"taxNumberType\": \"TAXNUMBERTYPE/SSN\",\r\n    \"taxNumber\": \"123-12-1234\",\r\n    \"emailAddress\": \"test@test.com\",\r\n    \"addressLine1\": \"Address1\",\r\n    \"addressLine2\": \"Address2\",\r\n    \"addressLine3\": \"Address3\",\r\n    \"addressLine4\": \"Address4\",\r\n    \"townCity\": \"TownX\",\r\n    \"stateRegion\": \"RegionX\",\r\n    \"postalCode\": \"6011\",\r\n    \"is1099Contact\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/contacts/756a8a03-9dc0-466d-9c6c-964f2114ce4e",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"contacts",
+						"756a8a03-9dc0-466d-9c6c-964f2114ce4e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save Contact (Report Detail)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Xero-Tenant-Id",
+						"value": "{{tenant-id}}",
+						"type": "text"
+					},
+					{
+						"key": "Xero-User-Id",
+						"value": "{{user-id}}",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"contactID\": \"756a8a03-9dc0-466d-9c6c-964f2114ce4e\",\r\n    \"name\": \"Test\",\r\n    \"taxNumberType\": \"TAXNUMBERTYPE/SSN\",\r\n    \"taxNumber\": \"123-12-1234\",\r\n    \"emailAddress\": \"test@test.com\",\r\n    \"addressLine1\": \"Address1\",\r\n    \"addressLine2\": \"Address2\",\r\n    \"addressLine3\": \"Address3\",\r\n    \"addressLine4\": \"Address4\",\r\n    \"townCity\": \"TownX\",\r\n    \"stateRegion\": \"RegionX\",\r\n    \"postalCode\": \"6011\",\r\n    \"is1099Contact\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/contacts/756a8a03-9dc0-466d-9c6c-964f2114ce4e",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"contacts",
+						"756a8a03-9dc0-466d-9c6c-964f2114ce4e"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "token",
+			"value": "token goes here"
+		},
+		{
+			"key": "url",
+			"value": "http://localhost:5000"
+		},
+		{
+			"key": "tenant-id",
+			"value": "68cbd493-5027-41db-bdbe-e4819bb63bd4"
+		},
+		{
+			"key": "user-id",
+			"value": "a80c0208-7945-4195-af99-629b022cc066"
+		},
+		{
+			"value": "unauthorised user"
+		},
+		{
+			"value": "authorised user"
+		}
+	]
+}

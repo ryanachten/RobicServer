@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.ML;
 using Microsoft.ML.Transforms.TimeSeries;
+using Microsoft.ML.Data;
 using RobicServer.Models;
 using RobicServer.Query;
 using System;
@@ -10,6 +11,14 @@ using System.Threading.Tasks;
 
 namespace RobicServer.Services
 {
+    struct LoadedData {
+        public IDataView TrainingData { get; set; }
+        public int TrainingSetCount { get; set; }
+        public IDataView EvaluationData { get; set; }
+        public int EvalutationSetCount { get; set; }
+    }
+
+
     public class PredictionService : IPredictionService
     {
         private readonly MLContext _mlContext;
@@ -17,18 +26,18 @@ namespace RobicServer.Services
 
         public PredictionService(IMediator mediator)
         {
-            _mlContext = new MLContext();
+            _mlContext = new MLContext(seed: 0);
             _mediator = mediator;
         }
 
-        public async Task<PredictedResults> PredictNetValue(string definitionId)
+        private async Task<LoadedData?> LoadData(string definitionId)
         {
             IEnumerable<Exercise> exercises = await _mediator.Send(new GetExercisesByDefinition()
             {
                 DefinitionId = definitionId
             });
             // TOOD: Move into automapper profile
-            var inputs = exercises.Select( e => new PredictModelInput()
+            var inputs = exercises.Select(e => new PredictModelInput()
             {
                 ExerciseId = e.Id,
                 Date = e.Date,
@@ -40,7 +49,7 @@ namespace RobicServer.Services
             // basically, we don't want to proceed if there is no data to predict or evaluate from  
             var trainingSetCount = inputs.Where(i => i.IsTrainingInput == 1).Count();
             var evalSetCount = inputs.Where(i => i.IsTrainingInput == 0).Count();
-            if(trainingSetCount == 0 || evalSetCount == 0)
+            if (trainingSetCount == 0 || evalSetCount == 0)
             {
                 return null;
             }
@@ -48,33 +57,85 @@ namespace RobicServer.Services
             IDataView dataView = _mlContext.Data.LoadFromEnumerable(inputs);
             IDataView trainingData = _mlContext.Data.FilterRowsByColumn(dataView, "IsTrainingInput", upperBound: 1);
             IDataView evaluationData = _mlContext.Data.FilterRowsByColumn(dataView, "IsTrainingInput", lowerBound: 1);
+            return new LoadedData()
+            {
+                TrainingData = trainingData,
+                TrainingSetCount = trainingSetCount,
+                EvaluationData = evaluationData,
+                EvalutationSetCount = evalSetCount,
+            };
+        }
+
+        public async Task RegressionNetValue(string definitionId)
+        {
+            var loadedData = await LoadData(definitionId);
+            if (loadedData == null)
+            {
+                return;
+            }
+            var data = (LoadedData)loadedData;
+
+            var pipeline = _mlContext
+                .Transforms.CopyColumns(outputColumnName: "Label", inputColumnName: "NetValue")
+                           .Append(_mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "ExerciseIdEncoded", inputColumnName: "ExerciseId"))
+                           .Append(_mlContext.Transforms.Categorical.OneHotEncoding(outputColumnName: "DateEncoded", inputColumnName: "Date"))
+                           .Append(_mlContext.Transforms.Concatenate("Features", "ExerciseIdEncoded", "DateEncoded"))
+                           .Append(_mlContext.Regression.Trainers.FastTree());
+
+            var model = pipeline.Fit(data.TrainingData);
+
+            EvaluateRegression(data.TrainingData, model);
+        }
+
+        private void EvaluateRegression(IDataView testData, ITransformer model)
+        {
+            var predictions = model.Transform(testData);
+
+            var metrics = _mlContext.Regression.Evaluate(predictions, "Label", "Score");
+            Console.WriteLine();
+            Console.WriteLine($"*************************************************");
+            Console.WriteLine($"*       Model quality metrics evaluation         ");
+            Console.WriteLine($"*------------------------------------------------");
+            Console.WriteLine($"*       RSquared Score:      {metrics.RSquared:0.##}");
+            Console.WriteLine($"*       Root Mean Squared Error:      {metrics.RootMeanSquaredError:#.##}");
+        }
+
+        public async Task<PredictedResults> ForecastNetValue(string definitionId)
+        {
+            var loadedData = await LoadData(definitionId);
+            if(loadedData == null)
+            {
+                return null;
+            }
+            var data = (LoadedData)loadedData;
+            
 
             var forecastingPipeline = _mlContext.Forecasting.ForecastBySsa(
                 outputColumnName: "ForecastedNetValue",
                 inputColumnName: "NetValue",
                 windowSize: 2, // analyzed on a 2 day basis
                 seriesLength: 7, // weekly intervals
-                trainSize: trainingSetCount,
+                trainSize: data.TrainingSetCount,
                 horizon: 7, // forecast 7 periods into the future
                 confidenceLevel: 0.95f,
                 confidenceLowerBoundColumn: "LowerBoundNetValue",
                 confidenceUpperBoundColumn: "UpperBoundNetValue");
 
-            SsaForecastingTransformer forecaster = forecastingPipeline.Fit(trainingData);
+            SsaForecastingTransformer forecaster = forecastingPipeline.Fit(data.TrainingData);
 
-            var results = Evaluate(evaluationData, forecaster);
+            var results = EvaluateForecast(data.EvaluationData, forecaster);
 
             var forecasterEngine = forecaster.CreateTimeSeriesEngine<PredictModelInput, PredictModelOutput>(_mlContext);
-            var predictionResults = Forecast(forecasterEngine, evaluationData, 7);
+            var predictionResults = Forecast(forecasterEngine, data.EvaluationData, 7);
 
-            results.EvaluationSetCount = evalSetCount;
-            results.TrainingSetCount = trainingSetCount;
+            results.EvaluationSetCount = data.EvalutationSetCount;
+            results.TrainingSetCount = data.TrainingSetCount;
             results.PredictionResults = predictionResults;
 
             return results;
         }
 
-        PredictedResults Evaluate(IDataView testData, ITransformer model)
+        PredictedResults EvaluateForecast(IDataView testData, ITransformer model)
         {
             IDataView predictions = model.Transform(testData);
             
